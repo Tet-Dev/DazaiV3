@@ -23,5 +23,33 @@ module.exports = {
 			result += characters.charAt(Math.floor(Math.random() * charactersLength));
 		}
 		return result;
+	},
+	/**
+	 * 
+	 * @param {Array<*>} array 
+	 * @param {Number} length 
+	 * @returns {Array<Array<*>>}
+	 */
+	splitArrayIntoChunks: (array, length) => {
+		let res = [];
+		while (array.length >= length) {
+			res.push(array.splice(0, length));
+		}
+		if (array.length) res.push(array);
+		return res;
+	},
+	/**
+	 * Shuffles array in-place;
+	 * @param {Array<*>} array
+	 * @returns {Array<*>} 
+	 */
+	shuffle: (array) => {
+		let counter = array.length;
+		while (counter > 0) {
+			let index = Math.floor(Math.random() * counter);
+			counter--;
+			[array[counter], array[index]] = [array[index], array[counter]];
+		}
+		return array;
 	}
 };

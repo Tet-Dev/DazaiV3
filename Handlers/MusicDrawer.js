@@ -24,7 +24,9 @@ module.exports = {
 		for (let i = 0; i < buffer.length; ++i) {
 			buffer[i] = uint[i];
 		}
-		await guildData.channelBound.createMessage("", {
+		await guildData.channelBound.createMessage({
+			content : "",
+		}, {
 			file: buffer,
 			name: "Dazai.png"
 		}).catch(er => console.trace(er));
@@ -35,5 +37,8 @@ module.exports = {
 			musicMap.get(m.key)(m.data);
 			musicMap.delete(m.key);
 		});
+	},
+	generateNowPlayingCard: ()=>{
+
 	}
 };

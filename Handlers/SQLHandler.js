@@ -44,7 +44,6 @@ class SQLHandler {
 			if (!this || !this.guildDB) {
 				reject("Object not Initiated");
 			} else {
-				console.log(`Performed Query!`,str);
 				this.guildDB.query(str, function (err, res) {
 					(err ? reject(err) : resolve(res));
 				});
@@ -95,7 +94,7 @@ class SQLHandler {
 		await SQLHandler.query(`DELETE FROM \`nadekoguilddata\`.\`${db}\` WHERE (\`${dirty?keyname:SQLHandler.clean(keyname)}\` = '${dirty?keyval:SQLHandler.clean(keyval)}')`);
 	}
 	static async getGuild(guildID){
-		return await SQLHandler.genericGet("guilddata","id","guildID",false,true);
+		return await SQLHandler.genericGet("guilddata","id",guildID,false,true);
 	}
 }
 module.exports = SQLHandler;

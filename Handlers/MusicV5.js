@@ -7,6 +7,7 @@ const { DataClient } = require("eris-boiler");
 const { Client, VoiceChannel, StageChannel, VoiceConnection, GuildChannel, TextChannel, Message, Member } = require("eris");
 const { Response } = require("node-fetch");
 const MusicDrawer = require("./MusicDrawer");
+const TetLib = require("./TetLib");
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 function SecsToFormat(string) {
 	var sec_num = parseInt(string, 10);
@@ -31,16 +32,6 @@ function genID(length) {
 	for (let i = 0; i < characters.length; i++)
 		result += characters.charAt(Math.floor(Math.random() * charactersLength));
 	return result;
-}
-function shuffle(array) {
-	let counter = array.length;
-	while (counter > 0) {
-		let index = Math.floor(Math.random() * counter);
-		counter--;
-		[array[counter], array[index]] = [array[index], array[counter]];
-	}
-
-	return array;
 }
 /**
  * 
@@ -73,6 +64,7 @@ async function resolveTracks(node, search) {
 }
 /** @type {Map<String,GuildData>} */
 let guildData = new Map();
+let gData = guildData;
 let spotilink;
 let nodes;
 let regions;
@@ -81,6 +73,7 @@ let bot;
 class MusicHandler {
 	/** @type {MusicHandler} */
 	static self;
+	static guildData = gData;
 	constructor() {
 		MusicHandler.self = this;
 		nodes = JSON.parse(process.env.LavalinkNodes);
@@ -125,7 +118,7 @@ class MusicHandler {
 	 * @returns {Player} player
 	 */
 	static async joinVC(voiceChannelID, txtChannel) {
-		if (!bot.voiceConnections.get(voiceChannelID)) {
+		if (!bot.voiceConnections.get(txtChannel.guild.id)) {
 			let player = await getPlayer(bot.getChannel(voiceChannelID));
 			let guildID = player.guildId;
 			guildData.set(guildID, {
@@ -134,8 +127,15 @@ class MusicHandler {
 				channelBound: txtChannel,
 				player: player,
 				skips: new Set(),
+				loop: false,
+				paused: 0,
 			})
 			let handleEnd = () => {
+				guildData.get(guildID).playing = false;
+				guildData.get(guildID).skips.clear();
+				if (guildData.get(guildID).loop){
+					guildData.get(guildID).queue.push(guildData.get(guildID).currentlyPlaying);
+				}
 				MusicHandler.processQueue(guildData.get(guildID));
 			};
 			player.on("end", handleEnd);
@@ -154,14 +154,17 @@ class MusicHandler {
 	 * @param {GuildData} guildData 
 	 * @returns {Boolean}
 	 */
-	static async processQueue(guildData) {
-		if (!guildData || guildData?.playing) return false;
+	static processQueue(guildData) {
+
+		if (!guildData || guildData?.player?.playing) return false;
+		guildData.playing = true;
 		let songInfo = guildData.queue.shift();
+		
 		if (!songInfo) return 0;
-		guildData.currentlyPlaying=songInfo;
+		guildData.currentlyPlaying = songInfo;
 		guildData.startedAt = Date.now();
-		guildData.channelBound.createMessage(`Now Playing ... ${songInfo.trackData.info.title}`);
-		MusicDrawer.generateUpNextCard(songInfo.trackData,songInfo.requester.username,guildData);
+		
+		MusicDrawer.generateUpNextCard(songInfo.trackData, `${songInfo.requester.username}#${songInfo.requester.user.discriminator}`, guildData);
 		guildData.player.play(songInfo.trackData.track);
 		return true;
 	}
@@ -177,35 +180,38 @@ class MusicHandler {
 	 * Adds trackinfo to queue
 	 * @param {TrackInfo} trackData 
 	 * @param {Message} msg 
-	 * @param {GuildData} guildData
+	 * @param {String} guildID
 	 */
-	static async addToQueue(trackData, msg, guildData) {
+	static addToQueue(trackData, msg, guildID) {
+		let guData = gData.get(guildID);
 		/** @type {SongRequest} */
 		let songRequest = {
 			requester: msg.member,
 			trackData: trackData
 		};
-		guildData.queue.push(songRequest);
-		console.log(await MusicHandler.processQueue(guildData));
-
+		guData.queue = guData.queue.concat(songRequest);
+		MusicHandler.processQueue(guData)
+		gData.set(guildID,guData);		
+		
 	}
 
 	/**
 	 * 
 	 * @param {Array<TrackInfo>} tracks 
 	 * @param {Message} msg 
-	 * @param {GuildData} guildData 
+	 * @param {String} guildID
 	 */
-	static async addArrayToQueue(tracks, msg, guildData) {
+	static addArrayToQueue(tracks, msg, guildID) {
+		let guildData = gData.get(guildID);
 		if (tracks.length == 0)
 			return "Empty playlist!";
-		await MusicHandler.addToQueue(tracks.shift(),msg,guildData);
 		guildData.queue = guildData.queue.concat(tracks.map(x => {
 			return {
 				trackData: x,
 				requester: msg.member,
 			};
 		}));
+		MusicHandler.processQueue(guildData);
 		return `Queued ${tracks.length + 1} tracks!`;
 	}
 
@@ -244,4 +250,6 @@ module.exports = MusicHandler;
  * @property {Set<String>} skips
  * @property {SongRequest} currentlyPlaying
  * @property {Number} startedAt
+ * @property {Boolean} loop
+ * @property {Number} paused
  */

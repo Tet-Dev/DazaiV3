@@ -1,6 +1,5 @@
 const { GuildCommand } = require("eris-boiler/lib");
 const ReactionHandler = require("eris-reactions");
-const { ReactionCollector, MessageCollector } = require("eris-collector");
 const { DataClient } = require("eris-boiler");
 const { Message } = require("eris");
 const MusicHandler = require("../Handlers/MusicV5");
@@ -24,18 +23,18 @@ function SecsToFormat(string) {
 }
 function getChoice(bot, msg, userid) {
 	return new Promise(async (res, rej) => {
-		let filter = (m, emoji, userID) => userID === userid;
-		/* Create collector */
-		let collector = new ReactionCollector(bot, msg, filter, {
-			time: 1000 * 60
+		let filter = (userID) => userID === userid;
+		let result = await ReactionHandler.collectReactions(msg, filter, {
+			maxMatches: 1,
+			time: 1000 * 60,
 		});
-		collector.on("collect", (m, emoji, userID) => {
-			res(emoji);
-		});
-		setTimeout(() => {
-			msg.delete();
+		if (result[0]?.emoji?.name)
+			res(result[0]?.emoji);
+		else {
+			// eslint-disable-next-line no-unused-vars
+			msg.delete().catch(_ => { });
 			res(null);
-		}, 60000);
+		}
 	});
 }
 module.exports = new GuildCommand({
@@ -60,12 +59,12 @@ module.exports = new GuildCommand({
 				[spotifyType, spotifyID] = spotifyType[0].split("/");
 				spotifyType = spotifyType.toLowerCase();
 				msg.channel.createMessage("Loading content..");
-				let restracks
+				let restracks;
 				if (spotifyType === "playlist") restracks = await MusicHandler.self.spotiPlaylist(spotifyID);
 				else if (spotifyType === "album") restracks = await MusicHandler.self.spotiAlbum(spotifyID);
 				else if (spotifyType === "track") {
 					let resTrack = await MusicHandler.self.spotiSong(spotifyID);
-					let resthing = await MusicHandler.addToQueue(resTrack, msg, MusicHandler.getGuildData(msg.guildID));
+					let resthing = MusicHandler.addToQueue(resTrack, msg, msg.guildID);
 					if (resthing)
 						msg.channel.createMessage(resthing);
 					return;
@@ -73,7 +72,7 @@ module.exports = new GuildCommand({
 				restracks = restracks.filter(x => x);
 				let resthing;
 				if (restracks.length)
-					resthing = await MusicHandler.addArrayToQueue(restracks, msg, MusicHandler.getGuildData(msg.guildID));
+					resthing = MusicHandler.addArrayToQueue(restracks, msg, msg.guildID);
 				if (resthing)
 					msg.channel.createMessage(resthing);
 			}
@@ -81,20 +80,17 @@ module.exports = new GuildCommand({
 				// DazaiMsg(msg.channel.id, "Sorry! Playlists are Disabled atm!")
 				// return
 				let resTrack = await MusicHandler.self.resolveTrack(search);
-				let resthing = await MusicHandler.queueArray(msg, resTrack.tracks);
+				let resthing = MusicHandler.addArrayToQueue(resTrack.tracks,msg,msg.guildID);
 				if (resthing)
 					msg.channel.createMessage(resthing);
 			} else if (search.split("https://www\.youtube\.com/watch?").length > 1 || search.includes("https://youtu.be/")) {
 				let resTrack = await MusicHandler.self.resolveTrack(search);
-				let resthing = await MusicHandler.addToQueue(resTrack?.tracks[0],msg,MusicHandler.getGuildData(msg.guildID)).catch(er => console.trace(er));
+				let resthing = MusicHandler.addToQueue(resTrack?.tracks[0], msg, msg.guildID);
 				if (resthing)
 					msg.channel.createMessage(resthing);
 
 			} else {
-				let searchArr = await MusicHandler.self.getTracksFromSearch(search);//, { limit: 20 }).catch(er => console.trace(er));
-				// if (!searchArr || ! searchArr.items) searchArr = await  ytsr(search, { limit: 20 }).catch(er => console.trace(er));
-				// if (!searchArr || !searchArr.items) return "I could not find anything relating to your search.";
-				// searchArr.items = searchArr.items.filter(x => x && x.type === "video");
+				let searchArr = await MusicHandler.self.getTracksFromSearch(search);
 				if (searchArr.tracks.length > 8) searchArr.tracks.length = 8;
 				const choices = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"];
 				let fields = searchArr.tracks.map((x, ind) => {
@@ -136,7 +132,7 @@ module.exports = new GuildCommand({
 				if (choice.name === "❌") promptMSG.delete();
 				for (var i = 0; i < choices.length; i++) {
 					if (choice.name === choices[i]) {
-						let resthing = await MusicHandler.queueSong(msg, searchArr.tracks[i],);
+						let resthing = MusicHandler.addToQueue(searchArr.tracks[i], msg, msg.guildID);
 						if (resthing)
 							msg.channel.createMessage(resthing);
 						promptMSG.delete();
