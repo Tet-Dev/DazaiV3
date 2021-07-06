@@ -23,12 +23,12 @@ class PermissionsHandler {
 		if (!data) return false;
 		if (data.adminRole && mem.roles.filter(x => x === data.adminRole).length == 1) return true;
 		let hasRole = "everyone";
-		// console.log(mem.roles,data.modRole);
+		// 
 		if (data.djRole && mem.roles.includes(data.djRole)) hasRole = "dj";
 		if (data.extraRole && mem.roles.includes(data.extraRole)) hasRole = "extraRole2";
 		if (data.modRole && mem.roles.includes(data.modRole)) hasRole = "modRole";
 		if (data.extraRole2 && mem.roles.includes(data.extraRole2)) hasRole = "extraRole2";
-		console.log(hasRole);
+		
 		let inherits = {
 			everyone: (data.everyonePerms ? data.everyonePerms.split(",") : base.everyone).includes(permName),
 			dj: (data.djRolePerms ? data.djRolePerms.split(",") : base.dj).includes(permName),
@@ -45,7 +45,7 @@ class PermissionsHandler {
 			return inherits.extraRole || inherits.dj || inherits.everyone;
 
 		case "modRole":
-			console.log("has mod!");
+			
 			return inherits.modRole || inherits.extraRole || inherits.dj || inherits.everyone;
 
 		case "extraRole2":

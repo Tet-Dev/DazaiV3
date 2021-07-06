@@ -51,7 +51,7 @@ let upNext = null;
 	cachedNoto40 = fonts[40];
 	cachedNoto24 = fonts[24];
 	upNext = await Image.renderTextFromCache(cachedNoto40, "Up Next: ", Image.rgbToColor(255, 255, 255));
-	console.log("Cache Ready!");
+	
 })();
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 let queue = [];
@@ -136,7 +136,7 @@ function getMediumRes(thumbnails) {
 async function generateUpNext(dat) {
 	let dataOG = dat[0];
 	let data = await getVideo(dataOG.info.identifier).catch(er => console.trace(er));
-	console.log(`Generating card for ${data.snippet.title}`);
+	
 	let nextSongs = dat[2] || [];
 	let thumbnail;
 	let tbuffer;
@@ -153,7 +153,7 @@ async function generateUpNext(dat) {
 	bgcopy.resize(1536, Image.RESIZE_AUTO);
 	bgcopy = await Jimp.read(new Buffer(await bgcopy.encode(3)));
 	bgcopy.blur(13);
-	console.log("Check 1 passed");
+	
 	bgcopy = await Image.decode(await bgcopy.getBufferAsync(Jimp.MIME_PNG));
 	bgcopy.crop(0, Math.round(bgcopy.height / 2 - 240), 1536, 420);
 	let cover = new Image(1536, 420);
@@ -164,7 +164,7 @@ async function generateUpNext(dat) {
 	let vidlen = SecsToFormat((Math.round(dataOG.info.length / 1000) || 0));
 	let txtcolor = Image.colorToRGBA(thumbnail.dominantColor(true, true,));
 	txtcolor = txtcolor.map(x => x + 60 > 255 ? 255 : x + 60);
-	console.log("Check 2 passed");
+	
 	let duraText = await Image.renderTextFromCache(cachedNoto32, `Length: ${vidlen}`, Image.rgbToColor(255, 255, 255), 450, Image.WRAP_STYLE_WORD);
 	let title = await Image.renderTextFromCache(cachedNoto40, parseTitle(data.snippet.title).substring(0, 51), Image.rgbToColor(255, 255, 255), 12000, Image.WRAP_STYLE_WORD);
 	title.crop(0,0,1068,title.height);
@@ -193,7 +193,7 @@ async function generateUpNext(dat) {
 		// nextQueue.roundCorners(8);
 		nextQueue.composite(tempImg, 0, (i + 0.5) * 5 + i * 58 - 6.5);
 	}
-	console.log("Check 3 passed");
+	
 	thumbnail.resize(420, 420);
 	newimage.composite(bgcopy, 0, 0);
 	newimage.composite(thumbnail, 0, 0);
@@ -203,10 +203,10 @@ async function generateUpNext(dat) {
 	newimage.composite(duraText, (1520 - duraText.width), 171);
 	newimage.composite(upNext, 442, 164);
 	newimage.roundCorners(15);
-	console.log("Check 4 passed");
+	
 	newimage.composite(nextQueue, 420, 230);
 	let encodeData = (await newimage.encode(3));
-	console.log("Returning... ");
+	
 	return encodeData;
 }
 (async () => {
