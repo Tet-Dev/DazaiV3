@@ -20,9 +20,7 @@ module.exports = new GuildCommand({
 		if (isNaN(pos)) return `Please provide an index referring to a position in the queue (Between 1 and ${guildData.queue.length})`;
 		if (pos % 1 !== 0) return `Please provide a **whole number** referring to a position in the queue (Between 1 and ${guildData.queue.length})`;
 		if (pos > guildData.queue?.length) return `Please provide a valid index referring to a position in the queue (Between 1 and ${guildData.queue.length})`;
-		console.log(guildData.queue.map((x,i)=>({title: x.trackData.info.title,pos: i+1})));
 		let items = guildData.queue.splice(pos - 1, parseInt(params[1]) > 1 ? parseInt(params[1]) - pos || 1 : 1);
-		console.log(items.map(x=>({title: x.trackData.info.title})),pos);
 		if (items.length > 10) {
 			let queuePages = TetLib.splitArrayIntoChunks(items, 10).map((page, pageIndex) => {
 				let mappedInfo = page.map((x, i) => {

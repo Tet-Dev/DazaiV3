@@ -31,7 +31,6 @@ class AIManager {
 			(err, response) => {
 				if (err) return rej(err);
 				res(response.data);
-				// console.log(JSON.stringify(response.data, null, 2));
 			});
 		});
 	}

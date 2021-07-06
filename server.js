@@ -22,7 +22,6 @@ Object.defineProperty(Array.prototype, "chunk_inefficient", {
 
 //api host
 // const api = process.env.APIEP;
-// console.log(process.env);
 // process.exit(0);
 
 (async () => {

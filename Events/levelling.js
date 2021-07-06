@@ -38,7 +38,6 @@ module.exports = new DiscordEvent({
 		let res = await LevellingHandler.addXP(msg.author.id, msg.guildID, amntXP);
 		UserCurve.currentlevelcurve++;
 		await LevellingHandler.updateCurve(msg.author.id, msg.guildID, UserCurve);
-		console.log(res);
 		
 		if (res.old.level !== res.new.level) {
 			let dmchan = await bot.getDMChannel(msg.author.id);

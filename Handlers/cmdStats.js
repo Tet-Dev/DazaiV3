@@ -23,7 +23,6 @@ class CommandStats {
 		(async () => {
 			while (true) {
 				// writing = true;
-				// console.log("writing")
 				await fs.writeFile("./assets/commandStats.json", JSON.stringify(this.data));
 				
 				await sleep(5000);
@@ -43,7 +42,6 @@ class CommandStats {
 			cont: str,
 		};
 		this.data.push(cmdData);
-		console.log("Command Used!",cmdData);
 	}
 }
 module.exports = CommandStats;
