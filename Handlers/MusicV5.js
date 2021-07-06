@@ -102,8 +102,6 @@ class MusicHandler {
 	async spotiPlaylist(playlist) { return (await spotilink.getPlaylistTracks(playlist, true)).filter(x => x); }
 	async getTracksFromSearch(term) { let data = await resolveTracks(nodes[0], `ytsearch:${term}`).catch(er => console.error(er)); return data; }
 	async resolveTrack(term) { return await resolveTracks(nodes[0], `${term}`).catch(er => console.error(er)); }
-	static async runTest() {
-	}
 	/**
 	 * Checks if the Player has the specified guild
 	 * @param {String} guildID 
@@ -146,8 +144,10 @@ class MusicHandler {
 			});
 		}
 	}
-
-	/**
+	static runTest(){
+		return guildData.get("739559911033405592").player.state.position
+		console.log(guildData.get("739559911033405592").player)
+	}
 
 	/**
 	 * Processes a Guild's music queue. Returns true if completed successfully false otherwise
