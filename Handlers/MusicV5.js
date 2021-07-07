@@ -91,7 +91,6 @@ class MusicHandler {
 				defaultRegion: "us",
 			});
 		}
-		MusicHandler.runTest()
 	}
 	static init() {
 		bot = process.bot;
