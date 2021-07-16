@@ -147,7 +147,21 @@ class MusicHandler {
 		return guildData.get("739559911033405592").player.state.position
 		console.log(guildData.get("739559911033405592").player)
 	}
+	/**
+	 * 
+	 * @param {String} guildID
+	 */
+	static stop(guildID) {
+		try {
+			bot.leaveVoiceChannel(guildData.get(guildID).player.channelId);
+			guildData.get(guildID).player.disconnect();
+			guildData.delete(guildID);
+		} catch (error) {
 
+		}
+
+
+	}
 	/**
 	 * Processes a Guild's music queue. Returns true if completed successfully false otherwise
 	 * @param {GuildData} guildData 
@@ -199,7 +213,7 @@ class MusicHandler {
 				embed: {
 					color: 0x00FF00,
 					title: `${songRequest.trackData.info.title}`,
-					description: `Author : ${songRequest.trackData.info.author}\nLength: ${TetLib.SecsToFormat(songRequest.trackData.info.length/1000)}`,
+					description: `Author : ${songRequest.trackData.info.author}\nLength: ${TetLib.SecsToFormat(songRequest.trackData.info.length / 1000)}`,
 					footer: {
 						text: `Song Added By ${msg.author.username}#${msg.author.discriminator} | ${gData.get(guildID).queue.length} tracks in queue.`,
 						icon_url: msg.author.avatarURL,
@@ -210,7 +224,7 @@ class MusicHandler {
 		}
 		gData.set(guildID, guData);
 
-		}
+	}
 
 	/**
 	 * Adds an array of tracks into the queue
