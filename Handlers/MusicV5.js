@@ -194,9 +194,23 @@ class MusicHandler {
 		};
 		guData.queue = guData.queue.concat(songRequest);
 		MusicHandler.processQueue(guData)
+		if (gData.get(guildID).queue.length >= 1) {
+			return {
+				embed: {
+					color: 0x00FF00,
+					title: `${songRequest.trackData.info.title}`,
+					description: `Author : ${songRequest.trackData.info.author}\nLength: ${TetLib.SecsToFormat(songRequest.trackData.info.length/1000)}`,
+					footer: {
+						text: `Song Added By ${msg.author.username}#${msg.author.discriminator} | ${gData.get(guildID).queue.length} tracks in queue.`,
+						icon_url: msg.author.avatarURL,
+					},
+					url: `https://www.youtube.com/watch?v=${songRequest.trackData.info.identifier}`
+				}
+			}
+		}
 		gData.set(guildID, guData);
 
-	}
+		}
 
 	/**
 	 * Adds an array of tracks into the queue
@@ -267,7 +281,7 @@ class MusicHandler {
 	 * @param {String} guildid 
 	 * @param {Number} duration 
 	 * @param {boolean} absolute 
-	 * @returns 
+	 * @returns {Number} newPosition
 	 */
 	static seek(guildid, duration, absolute) {
 		let gobj = guildData.get(guildid);
@@ -275,7 +289,7 @@ class MusicHandler {
 			return 0;
 		}
 		gobj.player.seek(Math.min(gobj.currentlyPlaying.trackData.info.length, absolute ? duration * 1000 : gobj.player.state.position + duration * 1000));
-		return Math.min(0, Math.min(gobj.currentlyPlaying.trackData.info.length, absolute ? duration * 1000 : gobj.player.state.position + duration * 1000))
+		return Math.max(0, Math.min(gobj.currentlyPlaying.trackData.info.length, absolute ? duration * 1000 : gobj.player.state.position + duration * 1000));
 	}
 }
 module.exports = MusicHandler;

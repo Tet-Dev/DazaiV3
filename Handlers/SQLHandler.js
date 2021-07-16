@@ -110,6 +110,17 @@ class SQLHandler {
 	static async updateChannel(channelID,updateOBJ){
 
 	}
+	/**
+	 * 
+	 * @param {String} userID
+	 * @returns {SQLUserData}
+	 */
+	static async getUser(userID){
+		return await SQLHandler.genericGet("personaldata","userid",userID,false,true);
+	}
+	static async setUser(userID,updateOBJ){
+		return await SQLHandler.genericUpdate("personaldata","userid",userID,updateOBJ);
+	}
 }
 module.exports = SQLHandler;
 /**
@@ -159,5 +170,19 @@ module.exports = SQLHandler;
  * @property {Number} uwuspeak
  * @property {String} parentGuild
  * 
+ */
+/**
+ * 
+ * @typedef {Object} SQLUserData
+ * @property {String} userid
+ * @property {String} personalbg
+ * @property {String} personalcolor
+ * @property {String} design
+ * @property {String} ColorUnlocks
+ * @property {String} CardUnlocks
+ * @property {String} redeems
+ * @property {String} lastdaily
+ * @property {Number} streak
+ * @property {Number} autoSelectSongs
  */
 //  channelID, disable_smartquoting, gainxp, uwuspeak, parentGuild, aiChatOn, AIModerationOn, TOXICITY, SEVERE_TOXICITY, IDENTITY_ATTACK, INSULT, PROFANITY, THREAT, SEXUALLY_EXPLICIT, FLIRTATION, Consequence

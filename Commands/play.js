@@ -3,6 +3,7 @@ const ReactionHandler = require("eris-reactions");
 const { DataClient } = require("eris-boiler");
 const { Message } = require("eris");
 const MusicHandler = require("../Handlers/MusicV5");
+const SQLHandler = require("../Handlers/SQLHandler");
 //------------------------------------------------ BASIC CONSTS
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 //------------------------------------------------
@@ -80,7 +81,7 @@ module.exports = new GuildCommand({
 				// DazaiMsg(msg.channel.id, "Sorry! Playlists are Disabled atm!")
 				// return
 				let resTrack = await MusicHandler.self.resolveTrack(search);
-				let resthing = MusicHandler.addArrayToQueue(resTrack.tracks,msg,msg.guildID);
+				let resthing = MusicHandler.addArrayToQueue(resTrack?.tracks,msg,msg.guildID);
 				if (resthing)
 					msg.channel.createMessage(resthing);
 			} else if (search.split("https://www\.youtube\.com/watch?").length > 1 || search.includes("https://youtu.be/")) {
@@ -91,6 +92,13 @@ module.exports = new GuildCommand({
 
 			} else {
 				let searchArr = await MusicHandler.self.getTracksFromSearch(search);
+				if ((await SQLHandler.getUser(msg.author.id)).autoSelectSongs){
+					let resthing = MusicHandler.addToQueue(searchArr.tracks[0], msg, msg.guildID);
+						if (resthing)
+							msg.channel.createMessage(resthing);
+					return;
+				}
+				if (!searchArr?.tracks || !searchArr?.tracks?.length) return msg.channel.createMessage("No results found!");
 				if (searchArr.tracks.length > 8) searchArr.tracks.length = 8;
 				const choices = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"];
 				let fields = searchArr.tracks.map((x, ind) => {
@@ -104,9 +112,8 @@ module.exports = new GuildCommand({
 
 				let promptMSG = await bot.createMessage(msg.channel.id, {
 					embed: {
-
-
-						description: "Select which one you would like to play!",
+						title: "Search Results",
+						description: `Select which one you would like to play! (To turn this off do \`daz prefs autoselectmusic on\``,
 						color: 0,
 						fields: fields,
 					},
@@ -150,6 +157,6 @@ module.exports = new GuildCommand({
 		permissionNode: "playSong",
 		aliases: ["p"],
 		parameters: ["Song Youtube Link / Spotify Playlist / Youtube Playlist / Song Name"]
-	} // functionality of command
+	}
 	// list of things in object passed to run: bot (Databot), msg (Message), params (String[])
 });

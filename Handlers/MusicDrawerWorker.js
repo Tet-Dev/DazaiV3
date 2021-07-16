@@ -170,27 +170,32 @@ async function generateUpNext(dat) {
 	console.log("Check 2 passed");
 	let duraText = await Image.renderTextFromCache(cachedNoto32, `Length: ${vidlen}`, Image.rgbToColor(255, 255, 255), 450, Image.WRAP_STYLE_WORD);
 	let requestedBy = await Image.renderTextFromCache(cachedNoto24, `${dat[1]}`, Image.rgbaToColor(txtcolor[0], txtcolor[1], txtcolor[2], txtcolor[3]), 646, Image.WRAP_STYLE_WORD);
-	let nextQueue = new Image(645, 127);
-	let domColor = txtcolor.map(x=> x>30? x-30: 0);
+
+	let domColor = txtcolor.map(x => x > 30 ? x - 30 : 0);
 	domColor[3] = 200;
-	nextQueue.fill(Image.rgbaToColor(...domColor));
-	for (let i = 0; i < nextSongs.length; i++) {
-		if (i == 2) {
-			break;
+	if (nextSongs.length > 0) {
+		let nextQueue = new Image(645, 127);
+		nextQueue.fill(Image.rgbaToColor(...domColor));
+		for (let i = 0; i < nextSongs.length; i++) {
+			if (i == 2) {
+				break;
+			}
+			console.log(nextSongs[i]);
+			let tempImg = new Image(645, 63);
+			let binfo = await getVideo(nextSongs[i].info.identifier);
+			let ithumb = await fetch(binfo.snippet.thumbnails.standard.url);
+			ithumb = await Image.decode(await ithumb.buffer());
+			ithumb.crop(Math.round((ithumb.width / 2) - ((ithumb.height - 90) / 2)), 45, ithumb.height - 90, ithumb.height - 90);
+			ithumb.resize(57, 57);
+			let tText = await Image.renderTextFromCache(cachedNoto32, `#${i + 1}| ${SecsToFormat(Math.round(nextSongs[i].info.length / 1000))} | ${binfo.snippet.title.substring(0, 30)}`, Image.rgbToColor(255, 255, 255));
+			tText.crop(0, 0, 550, tText.height);
+			tempImg.composite(tText, 5, 12.5);
+			tempImg.composite(ithumb, 580, 9);
+			nextQueue.composite(tempImg, 0, (i + 0.5) * 5 + i * 58 - 6.5);
 		}
-		console.log(nextSongs[i]);
-		let tempImg = new Image(645, 63);
-		let binfo = await getVideo(nextSongs[i].info.identifier);
-		let ithumb = await fetch(binfo.snippet.thumbnails.standard.url);
-		ithumb = await Image.decode(await ithumb.buffer());
-		ithumb.crop(Math.round((ithumb.width / 2) - ((ithumb.height - 90) / 2)), 45, ithumb.height - 90, ithumb.height - 90);
-		ithumb.resize(57, 57);
-		let tText = await Image.renderTextFromCache(cachedNoto32, `#${i + 1}| ${SecsToFormat(Math.round(nextSongs[i].info.length / 1000))} | ${binfo.snippet.title.substring(0, 30)}`, Image.rgbToColor(255, 255, 255));
-		tText.crop(0, 0, 550, tText.height);
-		tempImg.composite(tText, 5, 12.5);
-		tempImg.composite(ithumb, 580, 9);
-		nextQueue.composite(tempImg, 0, (i + 0.5) * 5 + i * 58 - 6.5);
+		newimage.composite(nextQueue, 327, 133 + 14);
 	}
+
 	console.log("Check 3 passed");
 	thumbnail.resize(240, 240);
 	newimage.composite(bgcopy, 0, 0);
@@ -201,7 +206,7 @@ async function generateUpNext(dat) {
 	newimage.composite(imgText, 51, 300);
 	newimage.roundCorners(15);
 	console.log("Check 4 passed");
-	newimage.composite(nextQueue, 327, 133 + 14);
+
 	let encodeData = (await newimage.encode(3));
 	console.log("Returning... ");
 	return encodeData;
