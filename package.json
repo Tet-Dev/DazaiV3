@@ -37,6 +37,7 @@
 		"eventemitter3": "^4.0.7",
 		"imagescript": "github:tet-dev/imagescript",
 		"jimp": "^0.16.1",
+		"lodash": "^4.17.21",
 		"moment": "^2.29.1",
 		"mysql2": "^2.2.5",
 		"sodium-native": "3.2",

@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const { Command } = require("eris-boiler");
 const moment = require("moment");
 const os = require("os");
@@ -28,4 +29,4 @@ module.exports = new Command({
 			}
 		};
 	})
-})
+});

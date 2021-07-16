@@ -40,8 +40,8 @@ Object.defineProperty(Array.prototype, "chunk_inefficient", {
 			restMode: true,
 			defaultImageSize: 256,
 			sendIDOnly: true,
-			firstShardID: Number(process.env.shardID),
-			lastShardID: Number(process.env.shardID),
+			// firstShardID: Number(process.env.shardID),
+			// lastShardID: Number(process.env.shardID),
 		},
 	};
 	const bot = new DataClient(process.env.token, options);

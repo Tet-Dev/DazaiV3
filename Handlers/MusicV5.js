@@ -130,7 +130,7 @@ class MusicHandler {
 			let handleEnd = () => {
 				guildData.get(guildID).playing = false;
 				guildData.get(guildID).skips.clear();
-				if (guildData.get(guildID).loop){
+				if (guildData.get(guildID).loop) {
 					guildData.get(guildID).queue.push(guildData.get(guildID).currentlyPlaying);
 				}
 				MusicHandler.processQueue(guildData.get(guildID));
@@ -143,7 +143,7 @@ class MusicHandler {
 			});
 		}
 	}
-	static runTest(){
+	static runTest() {
 		return guildData.get("739559911033405592").player.state.position
 		console.log(guildData.get("739559911033405592").player)
 	}
@@ -158,11 +158,15 @@ class MusicHandler {
 		if (!guildData || guildData?.player?.playing) return false;
 		guildData.playing = true;
 		let songInfo = guildData.queue.shift();
-		
-		if (!songInfo) return 0;
+
+		if (!songInfo) {
+			guildData.currentlyPlaying = null;
+			guildData.playing = false;
+			return 0;
+		}
 		guildData.currentlyPlaying = songInfo;
 		guildData.startedAt = Date.now();
-		
+
 		MusicDrawer.generateUpNextCard(songInfo.trackData, `${songInfo.requester.username}#${songInfo.requester.user.discriminator}`, guildData);
 		guildData.player.play(songInfo.trackData.track);
 		return true;
@@ -190,12 +194,12 @@ class MusicHandler {
 		};
 		guData.queue = guData.queue.concat(songRequest);
 		MusicHandler.processQueue(guData)
-		gData.set(guildID,guData);		
-		
+		gData.set(guildID, guData);
+
 	}
 
 	/**
-	 * 
+	 * Adds an array of tracks into the queue
 	 * @param {Array<TrackInfo>} tracks 
 	 * @param {Message} msg 
 	 * @param {String} guildID
@@ -213,7 +217,66 @@ class MusicHandler {
 		MusicHandler.processQueue(guildData);
 		return `Queued ${tracks.length + 1} tracks!`;
 	}
-
+	/**
+	 * Disconnects the bot from the guild. Returns true if successful and false if it wasnt even connected
+	 * @param {String} guildid 
+	 */
+	async disconnect(guildid) {
+		let gobj = guildData.get(guildid);
+		if (!gobj) {
+			return false;
+		}
+		gobj.player.stop();
+		bot.leaveVoiceChannel(gobj.player.channelId);
+		bot.voiceConnections.delete(guildid);
+		guildData.delete(guildid);
+		return true;
+	}
+	/**
+	 * Pauses music streaming.
+	 * @param {String} guildid 
+	 */
+	static pause(guildid) {
+		let gobj = guildData.get(guildid);
+		if (!gobj) {
+			return 0;
+		}
+		if (gobj.player.paused) {
+			return 1;
+		}
+		gobj.player.setPause(true);
+		return 2;
+	}
+	/**
+	 * Resumes music streaming.
+	 * @param {String} guildid 
+	 */
+	static resume(guildid) {
+		let gobj = guildData.get(guildid);
+		if (!gobj) {
+			return 0;
+		}
+		if (!gobj.player.paused) {
+			return 1;
+		}
+		gobj.player.setPause(false);
+		return 2;
+	}
+	/**
+	 * Seeks through a song. Duration is in SECONDS
+	 * @param {String} guildid 
+	 * @param {Number} duration 
+	 * @param {boolean} absolute 
+	 * @returns 
+	 */
+	static seek(guildid, duration, absolute) {
+		let gobj = guildData.get(guildid);
+		if (!gobj) {
+			return 0;
+		}
+		gobj.player.seek(Math.min(gobj.currentlyPlaying.trackData.info.length, absolute ? duration * 1000 : gobj.player.state.position + duration * 1000));
+		return Math.min(0, Math.min(gobj.currentlyPlaying.trackData.info.length, absolute ? duration * 1000 : gobj.player.state.position + duration * 1000))
+	}
 }
 module.exports = MusicHandler;
 /**

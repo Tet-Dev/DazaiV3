@@ -93,8 +93,71 @@ class SQLHandler {
 	static async genericDelete(db,keyname,keyval,dirty){
 		await SQLHandler.query(`DELETE FROM \`nadekoguilddata\`.\`${db}\` WHERE (\`${dirty?keyname:SQLHandler.clean(keyname)}\` = '${dirty?keyval:SQLHandler.clean(keyval)}')`);
 	}
+	/**
+	 * 
+	 * @param {String} guildID 
+	 * @returns {SQLGuildData}
+	 */
 	static async getGuild(guildID){
 		return await SQLHandler.genericGet("guilddata","id",guildID,false,true);
 	}
+	static async updateGuild(guildID,updateOBJ){
+		return await SQLHandler.genericUpdate("guilddata","id",guildID,updateOBJ);
+	}
+	static async getChannel(channelID){
+
+	}
+	static async updateChannel(channelID,updateOBJ){
+
+	}
 }
 module.exports = SQLHandler;
+/**
+ * @typedef {Object} SQLGuildData
+ * @property {String} id
+ * @property {String} guilddatabg
+ * @property {String} guilddatacolor
+ * @property {String} inviter
+ * @property {String} levelrewards
+ * @property {Number} keepRolesWhenLevel
+ * @property {String} giveRolesWhenJoin
+ * @property {String} reactionroles
+ * @property {Number} premium
+ * @property {String} levelremoves
+ * @property {String} joinmsg
+ * @property {String} leavemsg
+ * @property {String} joindmmsg
+ * @property {String} levelmsgs
+ * @property {String} levelmsgchan
+ * @property {String} joinchan
+ * @property {String} leavechan
+ * @property {String} punishments
+ * @property {String} boosters
+ * @property {String} prefix
+ * @property {String} modRole
+ * @property {String} adminRole
+ * @property {String} djRole
+ * @property {String} modRolePerms
+ * @property {String} djRolePerms
+ * @property {String} extraRolePerms
+ * @property {String} extraRole2Perms
+ * @property {String} extraRole2
+ * @property {String} extraRole
+ * @property {String} everyonePerms
+ * @property {String} lockedGuildMemberNames
+ * @property {Number} xpCurve
+ * @property {Number} beta
+ * @property {Number} AImessagesLeft
+ * @property {Number} whoping
+ * @property {String} auditLogChannel
+ */
+/**
+ * @typedef {Object} SQLChannelData
+ * @property {String} channelID
+ * @property {Number} disable_smartquoting
+ * @property {Number} gainxp
+ * @property {Number} uwuspeak
+ * @property {String} parentGuild
+ * 
+ */
+//  channelID, disable_smartquoting, gainxp, uwuspeak, parentGuild, aiChatOn, AIModerationOn, TOXICITY, SEVERE_TOXICITY, IDENTITY_ATTACK, INSULT, PROFANITY, THREAT, SEXUALLY_EXPLICIT, FLIRTATION, Consequence
