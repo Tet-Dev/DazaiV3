@@ -4,6 +4,7 @@ const { DataClient } = require("eris-boiler");
 const { Message } = require("eris");
 const MusicHandler = require("../Handlers/MusicV5");
 const SQLHandler = require("../Handlers/SQLHandler");
+const PrefixManager = require("../Handlers/PrefixManager");
 //------------------------------------------------ BASIC CONSTS
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 //------------------------------------------------
@@ -113,7 +114,7 @@ module.exports = new GuildCommand({
 				let promptMSG = await bot.createMessage(msg.channel.id, {
 					embed: {
 						title: "Search Results",
-						description: `Select which one you would like to play! (To turn this off do \`daz prefs autoselectmusic on\``,
+						description: `Select which one you would like to play! (To turn this off do \`${await PrefixManager(bot,msg)} prefs autoselectmusic on\``,
 						color: 0,
 						fields: fields,
 					},

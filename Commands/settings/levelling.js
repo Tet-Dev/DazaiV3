@@ -1,15 +1,14 @@
 const { SettingCommand } = require("eris-boiler/lib");
 const AuditLogHandler = require("../../Handlers/AuditLogHandler");
-const PrefixManager = require("../../Handlers/PrefixManager");
 
 module.exports = new SettingCommand({
-	name: "prefix",
-	description: "set prefix for server",
+	name: "levelling",
+	description: "Turn Levelling On or Off",
 	options: {
 		permissionNode: "admin",
-		parameters: [ "desired prefix" ]
+		parameters: ["`on` or `off`"],
 	},
-	displayName: "Prefix",
+	displayName: "Levelling Module",
 	getValue: async (bot, { channel }) => {
 		const prefix = await bot.SQLHandler.getGuild(channel.guild.id);
 		return (prefix.prefix || bot.ora.defaultPrefix);
@@ -26,7 +25,6 @@ module.exports = new SettingCommand({
 		}
 
 		await bot.SQLHandler.updateGuild(msg.guildID,{ prefix: fullParam });
-		await PrefixManager(bot, msg);
 		await AuditLogHandler.sendAuditLogMessage(msg.guildID,"Update Bot Prefix", `Old Prefix: \`\`\`${guildData.prefix}\`\`\`\nNew Prefix: \`\`\`${fullParam}\`\`\``,0,msg.author);
 		return "Prefix set!";
 	}

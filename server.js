@@ -56,7 +56,7 @@ Object.defineProperty(Array.prototype, "chunk_inefficient", {
 	SQLHandler.init();
 	MusicDrawer.init();
 
-
+	bot.botMasters = process.env.botMasters
 	bot.token = process.env.token;
 	bot.addCommands(join(__dirname, "Commands"));
 	bot.addEvents(join(__dirname, "Events"));
@@ -64,6 +64,7 @@ Object.defineProperty(Array.prototype, "chunk_inefficient", {
 	bot.esnipes = new Map();
 	bot.PermissionsHandler = new PermissionsHandler(SQLHandler,bot);
 	bot.permissionsHandler = bot.PermissionsHandler;
+	bot.guildsColl = [];
 	await bot.connect();
 	
 	
