@@ -54,7 +54,7 @@ module.exports = new GuildCommand({
 		let guildData = MusicHandler.getGuildData(msg.guildID);
 		if (!guildData || !guildData.queue?.length) return "There isn't anything in the queue right now! Join a Voice Channel and play some music!";
 		if (guildData.queue.length > 10){
-			let queuePages = TetLib.splitArrayIntoChunks(guildData.queue, 10).map((page, pageIndex) => {
+			let queuePages = TetLib.splitArrayIntoChunks(guildData.queue.concat([]), 10).map((page, pageIndex) => {
 				let mappedInfo = page.map((x, i) => {
 					/** @type {import("../Handlers/MusicV5").SongRequest} */
 					let item = x;

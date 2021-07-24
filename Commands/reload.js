@@ -13,6 +13,7 @@ module.exports = new Command({
 			return "Only the bot owner may run this command!";
 		Object.keys(require.cache).forEach( (key) => { delete require.cache[key]; });
 		bot.addCommands(join(process.cwd(), "Commands"));
+		bot.addEvents(join(process.cwd(), "Events"));
 		return "Commands reloaded!";
 	})
 });

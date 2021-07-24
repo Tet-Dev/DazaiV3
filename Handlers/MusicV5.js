@@ -200,6 +200,7 @@ class MusicHandler {
 	 * @param {String} guildID
 	 */
 	static addToQueue(trackData, msg, guildID) {
+		msg.channel.sendTyping();
 		let guData = gData.get(guildID);
 		/** @type {SongRequest} */
 		let songRequest = {
@@ -213,7 +214,7 @@ class MusicHandler {
 				embed: {
 					color: 0x00FF00,
 					title: `${songRequest.trackData.info.title}`,
-					description: `Author : ${songRequest.trackData.info.author}\nLength: ${TetLib.SecsToFormat(songRequest.trackData.info.length / 1000)}`,
+					description: `Author: ${songRequest.trackData.info.author}\nLength: ${TetLib.SecsToFormat(songRequest.trackData.info.length / 1000)}`,
 					footer: {
 						text: `Song Added By ${msg.author.username}#${msg.author.discriminator} | ${gData.get(guildID).queue.length} tracks in queue.`,
 						icon_url: msg.author.avatarURL,
