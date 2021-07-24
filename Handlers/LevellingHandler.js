@@ -67,8 +67,53 @@ class LevellingHandler {
 	static async updateCurve(userid, guildid, updateOBJ) {
 		return await SQLHandler.genericUpdate("levellingcurve","userguildid",`${guildid}§${userid}`,updateOBJ);
 	}
+	/**
+	 * Get all level info for everyone in the guild
+	 * @param {String} guildid
+	 */
+	static async getLevelStatsInGuild(guildid){
+		//I know this is a bad sol rn but idk how to just get the position
+		/**
+		 * @type {Array<xpData>}
+		 */
+		let res = await sqlConnection.query("SELECT * FROM nadekoguilddata.guildleveling WHERE userguildid LIKE '" + SQLHandler.clean(guildid) + "§%'"); 
+		return res.sort((b, x) => (x.level - b.level != 0 ? x.level - b.level : x.exp - b.exp));
+	}
+	/**
+	 * Gets the position of a user in a guild
+	 * @param {String} guildid
+	 * @param {String} userid
+	 * @returns {leaderboardData}
+	 */
+	static async getPositionInGuild(guildid, userid){
+		let LB = await this.getLevelStatsInGuild(guildid);
+		LB = LB.map(x => {
+			return {
+				id: x.userguildid.split("§")[1],
+				level: x.level,
+				exp: x.exp
+			};
+		});
+		let pos = -1;
+		for (let i = 0; i < LB.length; i++) {
+			if (LB[i].id === userid) {
+				pos = i + 1;
+				break;
+			}
+		}
+		return {
+			position : pos,
+			leaderboard: LB
+		}
+
+	}
 }
 module.exports = LevellingHandler;
+/**
+ * @typedef {Object} leaderboardData
+ * @property {Array<xpData>} leaderboard
+ * @property {Number} position
+ */
 /**
  * @typedef {Object} xpData
  * @property {Number} level
