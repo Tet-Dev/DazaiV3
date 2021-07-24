@@ -21,12 +21,12 @@ module.exports = new Command({
 			content: "",
 			embed:{
 				title: "Links",
-				description: `[[Commands/Docs]](https://docs.dazai.app) [[Support Server]](https://discord.gg/jvqdyW8) [[Invite]](https://invite.dazai.app) [[Site]](https://dazai.app) `,
+				description: "[[Commands/Docs]](https://docs.dazai.app) [[Support Server]](https://discord.gg/jvqdyW8) [[Invite]](https://invite.dazai.app) [[Site]](https://dazai.app) ",
 				image:{
 					url: "https://github.com/icedTet/siteAssets/blob/main/help.png?raw=true "
 				},
 			}
-		})
+		});
 		// return {
 		// 	dm: false,
 		// 	content

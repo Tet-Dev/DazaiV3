@@ -90,7 +90,7 @@ module.exports = new SettingCommand({
 	
 			chan.createMessage(res.replace(/\{USERNAME\}/g, msg.author.username).replace(/\{MENTION\}/g, msg.author.mention).replace(/\{I\D\}/g, msg.author.id).replace(/\{OL\DLVL}/g, "999").replace(/\{NEWLVL\}/g, "1000"));
 			break;
-		// case "list":
+			// case "list":
 	
 		default:
 			return "Invalid event! valid events are: \"list\",\"join\",\"leave\",\"joinDM\",\"levelup\"";

@@ -76,7 +76,7 @@ class LevellingHandler {
 		/**
 		 * @type {Array<xpData>}
 		 */
-		let res = await sqlConnection.query("SELECT * FROM nadekoguilddata.guildleveling WHERE userguildid LIKE '" + SQLHandler.clean(guildid) + "§%'"); 
+		let res = await SQLHandler.query("SELECT * FROM nadekoguilddata.guildleveling WHERE userguildid LIKE '" + SQLHandler.clean(guildid) + "§%'"); 
 		return res.sort((b, x) => (x.level - b.level != 0 ? x.level - b.level : x.exp - b.exp));
 	}
 	/**

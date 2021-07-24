@@ -7,8 +7,8 @@ module.exports = new GuildCommand({
 		try {
 			let resp = await MusicHandler.getGuildData(msg.guildID);
 			if (!resp) return "Nothing is currently playing!";
-            resp.loop = !resp.loop;
-            return resp.loop ? "Looping has been enabled" : "Looping has been disabled";
+			resp.loop = !resp.loop;
+			return resp.loop ? "Looping has been enabled" : "Looping has been disabled";
 
 		} catch (error) {
 			return "Nothing is playing...";

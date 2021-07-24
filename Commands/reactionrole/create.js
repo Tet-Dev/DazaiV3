@@ -103,8 +103,8 @@ module.exports = new SettingCommand({
 
 			return "Reaction Role Set!";
 		} else {
-			msg.channel.createMessage("Hi! I can help you setup a reaction role! First, lets start off by tapping the copy ID button of the message you would like me to add reaction roles to.")
-			msg.channel.createMessage("https://cdn.discordapp.com/attachments/865666783180750878/865666801853268008/Screen_Shot_2021-07-16_at_11.49.56_AM.png")
+			msg.channel.createMessage("Hi! I can help you setup a reaction role! First, lets start off by tapping the copy ID button of the message you would like me to add reaction roles to.");
+			msg.channel.createMessage("https://cdn.discordapp.com/attachments/865666783180750878/865666801853268008/Screen_Shot_2021-07-16_at_11.49.56_AM.png");
 			msg.channel.createMessage("Then, please paste the information you have obtained from the step above");
 			let resp = await getNextMessageForPrompt(bot, msg);
 			if (!resp) return "Setup timed out";
@@ -146,11 +146,11 @@ module.exports = new SettingCommand({
 			if (!msg.member.guild.members.get(bot.user.id).permissions.has("manageRoles")) return {
 				embed: {
 					color: 0xFF0000,
-					description: `I am sorry, but I do not have permission to give out that role! It would appear that I lack the \`\`\`Manage Roles\`\`\` permission.`
+					description: "I am sorry, but I do not have permission to give out that role! It would appear that I lack the ```Manage Roles``` permission."
 				}
 			};
 
-			msg.channel.createMessage("Next, please type out the emoji you would like me to use!")
+			msg.channel.createMessage("Next, please type out the emoji you would like me to use!");
 			let emote = await getNextMessageForPrompt(bot, msg);
 			if (!emote) return "Setup timed out";
 			emote = emote.content;

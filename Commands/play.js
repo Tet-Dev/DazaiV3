@@ -54,7 +54,7 @@ module.exports = new GuildCommand({
 		let channelID = msg?.member?.voiceState?.channelID;
 		let search = params.join(" ");
 		if (channelID) {
-			await MusicHandler.joinVC(channelID, msg.channel)
+			await MusicHandler.joinVC(channelID, msg.channel);
 			let spotifyType = search.match(/(?<=https:\/\/open.spotify.com\/)(playlist|album|track)\/\w+/);
 			let spotifyID;
 			if (spotifyType) {
@@ -95,8 +95,8 @@ module.exports = new GuildCommand({
 				let searchArr = await MusicHandler.self.getTracksFromSearch(search);
 				if ((await SQLHandler.getUser(msg.author.id)).autoSelectSongs){
 					let resthing = MusicHandler.addToQueue(searchArr.tracks[0], msg, msg.guildID);
-						if (resthing)
-							msg.channel.createMessage(resthing);
+					if (resthing)
+						msg.channel.createMessage(resthing);
 					return;
 				}
 				if (!searchArr?.tracks || !searchArr?.tracks?.length) return msg.channel.createMessage("No results found!");

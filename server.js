@@ -2,6 +2,7 @@ const { DataClient } = require("eris-boiler");
 const SQLHandler = require("./Handlers/SQLHandler");
 const {join} = require("path");
 const MusicHandler = require("./Handlers/MusicV5");
+const RankCardDrawer = require("./Handlers/RankCardDrawer");
 const PermissionsHandler = require("./Handlers/permissionHandler");
 const MusicDrawer = require("./Handlers/MusicDrawer");
 
@@ -55,8 +56,9 @@ Object.defineProperty(Array.prototype, "chunk_inefficient", {
 	*/
 	SQLHandler.init();
 	MusicDrawer.init();
+	RankCardDrawer.init();
 
-	bot.botMasters = process.env.botMasters
+	bot.botMasters = process.env.botMasters;
 	bot.token = process.env.token;
 	bot.addCommands(join(__dirname, "Commands"));
 	bot.addEvents(join(__dirname, "Events"));

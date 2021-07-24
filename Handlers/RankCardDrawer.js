@@ -5,12 +5,12 @@ let RankCardMap = new Map();
 let rankCardWorker;
 const TetLib = require("./TetLib");
 const LevellingHandler = require("./LevellingHandler");
-const LinkMap = require("./RankCardHelpers/linkMap");
-const ColorMap = require("./RankCardHelpers/colorMap");
+const LinkMap = require("./RankCardHelpers/linkMap")();
+const ColorMap = require("./RankCardHelpers/colorMap")();
 module.exports = {
 	init: () => {
 		const cp = require("child_process");
-		rankCardWorker = cp.fork("handleGen.js");
+		rankCardWorker = cp.fork("./Handlers/RankCardDrawerWorker.js");
 		rankCardWorker.on("message", async (m) => {
 			RankCardMap.get(m.key)(m.data);
 			RankCardMap.delete(m.key);
@@ -34,7 +34,7 @@ module.exports = {
 		let position = LBData.position;
 		let bgName = LinkMap.get(userData.personalbg) || LinkMap.get("spacegray");
 		let color = ColorMap.get(userData.personalcolor) || [255,255,255];
-		let design = userData.design;
+		let design = "tetDesign" || userData.design || "tetDesign";
 		let avatar = member.user.dynamicAvatarURL("png",256);
 		let resData = await new Promise((res) => {
 			let randID = TetLib.genID(50);
