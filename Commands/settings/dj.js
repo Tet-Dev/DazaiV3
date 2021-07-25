@@ -17,7 +17,7 @@ module.exports = new SettingCommand({
 		 */
 		 let client = bot;
 		 let cguild = channel.guild;
-let roles = cguild && cguild.roles && cguild.roles.size ? Array.from(cguild.roles.values()) : await client.getRESTGuildRoles(channel.guild.id); 
+		let roles = cguild && cguild.roles && cguild.roles.size ? Array.from(cguild.roles.values()) : await client.getRESTGuildRoles(channel.guild.id); 
 		 if (!roleId) {
 			 return "None";
 		 }

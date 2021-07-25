@@ -5,7 +5,7 @@ module.exports = new GuildCommand({
 	description: "Disconnects the bot.",
 	run: (async (client, { msg, params }) => {
 		MusicHandler.stop(msg.channel.guild.id);
-        return ("Disconnected.");
+		return ("Disconnected.");
 
 	}),
 	options:{

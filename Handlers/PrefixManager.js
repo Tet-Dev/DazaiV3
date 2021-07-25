@@ -8,15 +8,15 @@ const prefixMap = new Map();
  * @returns {Promise<String>} serverPrefix
  */
 module.exports = async (bot,msg) => {
-    /** @type {Eris.Message} */
-    const message = msg;
-    if (message.channel.type == 1){
-        return "daz";
-    }
-    let prefix = prefixMap.get(message.guildID);
-    if (prefix == null){
-        prefix = (await SQLHandler.getGuild(message.guildID))?.prefix;
-        prefixMap.set(message.guildID,prefix);
-    }
-    return prefix || "daz";
-}
+	/** @type {Eris.Message} */
+	const message = msg;
+	if (message.channel.type == 1){
+		return "daz";
+	}
+	let prefix = prefixMap.get(message.guildID);
+	if (prefix == null){
+		prefix = (await SQLHandler.getGuild(message.guildID))?.prefix;
+		prefixMap.set(message.guildID,prefix);
+	}
+	return prefix || "daz";
+};

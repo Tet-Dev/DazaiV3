@@ -1,3 +1,6 @@
+// eslint-disable-next-line no-unused-vars
+const { Member, User } = require("eris");
+
 module.exports = {
 	sleep: (delay) => new Promise((resolve) => setTimeout(resolve, delay)),
 	text_truncate: (str, len) => {
@@ -51,5 +54,39 @@ module.exports = {
 			[array[counter], array[index]] = [array[index], array[counter]];
 		}
 		return array;
-	}
+	},
+	/**
+	 * Converts large number to a prefixed number (eg: 1435839 => 1.43m)
+	 * @param {Number} num
+	 * @returns {String}
+	 */
+	formatNumber(num) {
+		if (num >= 1000000000) {
+			return (num / 1000000000).toFixed(3).replace(/\.0$/, "") + "b";
+		}
+		if (num >= 1000000) {
+			return (num / 1000000).toFixed(3).replace(/\.0$/, "") + "m";
+		}
+		if (num >= 1000) {
+			return (num / 1000).toFixed(3).replace(/\.0$/, "") + "k";
+		}
+		return num;
+	},
+	/**
+	 * Gets a display string from a member (Teto#6942)
+	 * @param {Member} member
+	 * @param {Boolean} useNickname
+	 * @returns {String} formatted name
+	 */
+	getMemberDisplayName(member,useNickname){
+		return useNickname? `${member.nick || member.user.username}#${member.user.discriminator}` : this.getUserDisplayName(member.user);
+	},
+	/**
+	 * Gets a display string from a user (Teto#6942)
+	 * @param {User} user
+	 * @returns {String} formatted name
+	 */
+	getUserDisplayName(user){
+		return `${user.username}#${user.discriminator}`;
+	},
 };

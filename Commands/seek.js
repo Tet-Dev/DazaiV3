@@ -6,7 +6,7 @@ module.exports = new GuildCommand({
 	description: "Seek through a s",
 	run: (async (client, { msg, params }) => {
 		console.log(await MusicHandler.seek(msg.guildID,Number(params[0]),false));
-		return `Seeking to ${TetLib.SecsToFormat((await MusicHandler.seek(msg.guildID,Number(params[0]),false))/1000)}`
+		return `Seeking to ${TetLib.SecsToFormat((await MusicHandler.seek(msg.guildID,Number(params[0]),false))/1000)}`;
 	}),
 	options: {
 		permissionNode: "seek",

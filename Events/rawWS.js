@@ -170,7 +170,7 @@ module.exports = new DiscordEvent({
 			"embeds": [],
 			"allowed_mentions": [],
 			flags: 64
-		}
+		};
 		let rand = Math.random()>0.8;
 		let cont = {
 			"type": rand? 4:5,

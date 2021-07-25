@@ -15,7 +15,7 @@ module.exports = new SettingCommand({
 		/** @type {DataClient} */
 		let client = bot;
 		const dbGuild = await SQLHandler.getGuild(channel.guild.id);
-		return dbGuild.auditLogChannel && client.getChannel(dbGuild.auditLogChannel) ? client.getChannel(dbGuild.auditLogChannel).name : "Channel not set!"
+		return dbGuild.auditLogChannel && client.getChannel(dbGuild.auditLogChannel) ? client.getChannel(dbGuild.auditLogChannel).name : "Channel not set!";
 	},
 	run: async (bot, { msg, params }) => {
 		/** @type {String} */

@@ -35,6 +35,7 @@
 		"eris-reactions": "^0.1.4",
 		"erlpack": "github:abalabahaha/erlpack",
 		"eventemitter3": "^4.0.7",
+		"ffmpeg-static": "^4.4.0",
 		"imagescript": "github:tet-dev/imagescript",
 		"jimp": "^0.16.1",
 		"lodash": "^4.17.21",
