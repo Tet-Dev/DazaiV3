@@ -30,7 +30,7 @@ module.exports = {
 	 * @param {Number} length 
 	 * @returns {Array<Array<*>>}
 	 */
-	wsplitArrayIntoChunks: (array, length) => {
+	splitArrayIntoChunks: (array, length) => {
 		let res = [];
 		while (array.length >= length) {
 			res.push(array.splice(0, length));
