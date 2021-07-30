@@ -8,7 +8,6 @@ function getVideo(id) {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise(async (reso, rej) => {
 		yt.getById(id, (er, res) => {
-			console.log(process.env.MODERATORAIKEY, res, id);
 			if (er)
 				return rej(er);
 			else
@@ -126,14 +125,12 @@ let cachedPop64;
 // 	let allCachedFonts = await Image.cacheFontAtScales([16,24,32,48,],noto);
 // 	// cachedNoto24 = await Image.cacheFont(24, noto);
 // 	console.timeEnd("cacheFont");
-// 	console.log(allCachedFonts);
 // 	cachedNoto64 = allCachedFonts[48];
 // 	cachedNoto32 = allCachedFonts[32];
 // 	cachedNoto24 = allCachedFonts[24];
 // 	cachedNoto16 = allCachedFonts[16];
 
 // 	ready += 2;
-// 	console.log("Cache Done!");
 // })();
 let bgs = new Map();
 let ready = 0;
@@ -160,7 +157,6 @@ async function getBG(path) {
 
 async function generateTetCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut) {
 	time = Date.now();
-	console.log("Recieved type",timeStamp());
 	let base = await getBG(bgimg);
 	base = base.clone();
 	base.resize(1024, 340);
@@ -169,13 +165,11 @@ async function generateTetCard(level, xp, next, currentFormatted, nextFormatted,
 	pfp = await Image.decode(pfp);
 	if (pfp.height < 256) pfp.resize(256, 256);
 	pfp = pfp.cropCircle(false, 0.05);
-	console.log("formatted pfp",timeStamp());
 	base.composite(pfp, 40, Math.round(base.height / 2) - Math.round(pfp.height / 2));
 	let rankLvl = await Image.renderTextFromCache(cachedPop32, `Rank ${rank}`, Jimp.rgbaToInt(255, 255, 255, 255));
 	let lvl = await Image.renderTextFromCache(cachedPop80, `Level ${level}`, Jimp.rgbaToInt(255, 255, 255, 255));
 	// let rect = 
 	let text = await Image.renderTextFromCache(cachedPop64, name, Jimp.rgbaToInt(parseInt(colorschemeR), parseInt(colorschemeG), parseInt(colorschemeB), 255));
-	console.log("rendered text",timeStamp());
 	// fs.writeFileSync("test2.png",await text.encode());
 	let lvlDetails = await Image.renderTextFromCache(cachedPop20, `${currentFormatted} / ${nextFormatted} XP`, Jimp.rgbaToInt(255, 255, 255, 255));
 	base.composite(rankLvl, (pfp.width + 50), 60);
@@ -188,18 +182,15 @@ async function generateTetCard(level, xp, next, currentFormatted, nextFormatted,
 	let color = Image.colorToRGBA(pfp.averageColor());
 	color[3] = 100;
 	base.drawBox(0, 320, 1024, 30, Image.rgbaToColor(color[0], color[1], color[2], color[3]));
-	console.log("Drew Box",timeStamp());
 	xpBar.fill(Jimp.rgbaToInt(parseInt(colorschemeR), parseInt(colorschemeG), parseInt(colorschemeB), 255));
 	base.composite(xpBar, 0, 318);
 	base.composite(lvlDetails, 950 - (9 * `${currentFormatted} / ${nextFormatted} XP`.length), 290);
 	let temp = "./temp/" + genID(10) + ".png";
 	base.resize(1024, 340);
-	console.log("writign out",writeOut,timeStamp());
 	if (writeOut) {
 		await fsp.writeFile(temp, await base.encode(3)).catch(er => console.error(er));
 	}
 	let res = !writeOut && await base.encode(3);
-	console.log("Encoded!",timeStamp());
 	return writeOut ? temp : res;
 }
 
@@ -238,7 +229,6 @@ async function generateGrifyCard(level, xp, next, currentFormatted, nextFormatte
 	abcd.fill(Jimp.rgbaToInt(f * color[0], f * color[1], f * color[2], 170));
 	base.composite(abcd, config.xpbar.progress.leftmargin, 0);//0, 318
 
-	console.log(color);
 	//base.drawBox(config.xpbar.track.leftmargin, config.xpbar.track.topmargin, 1024, 30, Image.rgbaToColor(color[0],color[1],color[2],color[3]));
 	//base.drawBox(config.xpbar.track.leftmargin, config.xpbar.track.height, 1024, config.xpbar.track.height, Image.rgbaToColor(color[0],color[1],color[2], 100));//320
 	let transparent = new Image(xpprogress, 22);
@@ -256,12 +246,10 @@ async function generateGrifyCard(level, xp, next, currentFormatted, nextFormatte
 	base.resize(1024, 340);
 	if (writeOut) {
 		await fsp.writeFile("./test.png", await base.encode(3)).catch(er => console.error(er));
-		console.log("wrote test.png");
 	}
 	return writeOut ? temp : await base.encode(3);
 }
 async function generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut, design) {
-	console.log(name,writeOut,design);
 	const data = [level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut]
 	return {
 		data: design === "tetDesign" ? await generateTetCard(...data) : await generateGrifyCard(...data),
@@ -274,7 +262,6 @@ async function generateGIFCard(level, xp, next, currentFormatted, nextFormatted,
 		let blankPath = (await generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, "./assets/jimpStuff/fullBlankBG.png", name, true,design)).data;
 		let ffmpegCMD = spawn(require("ffmpeg-static"), ["-i", bgimg, "-i", blankPath, "-filter_complex", "overlay=0:0", "-pix_fmt", "yuv420p", "-c:a", "copy", temp2]);
 		ffmpegCMD.on("close", async (code) => {
-			console.log("FFMPEG ended with code",code);
 			await fsp.unlink(blankPath);
 			res({ data: (await fsp.readFile(temp2)), type: "gif" });
 			fsp.unlink(temp2);
@@ -331,14 +318,10 @@ let moneyIcon;
 		while (queue.length == 0) {
 			await sleep(10);
 		}
-		console.log("Processing queue");
 		let item = queue.shift();
 		let type = [generateGIFCard, generateCardData,][~~item.type];
 		let path = await type(...item.data).catch(er => console.trace(er));
 		process.send({ key: item.key, data: path });
 		// abc.substring(1,abc.length-1)
-		//Parse args
-
-
 	}
 })();
