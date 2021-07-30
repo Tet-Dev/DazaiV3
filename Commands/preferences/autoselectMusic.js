@@ -18,8 +18,8 @@ module.exports = new Command({
 			}
 		});
 	},
-	run: (bot, {member,params}) => {
-		let toggle = params[0];
+	run: (bot, {member,params }) => {
+		let toggle = params[0] ;
 		if (toggle === "on") {
 			SQLHandler.setUser(member.id, {autoSelectSongs: 1});
 			return ("Auto-select songs is now on");
@@ -27,6 +27,7 @@ module.exports = new Command({
 			SQLHandler.setUser(member.id, {autoSelectSongs: 0});
 			return ("Auto-select songs is now off");
 		} else {
+			console.log(toggle,params)
 			return ("Invalid option, valid options are `on` and `off`");
 		}
 	},

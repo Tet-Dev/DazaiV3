@@ -8,8 +8,8 @@ module.exports = new Command({
 	description: "Runs test functions ",
 	options: {
 	},
-	run: (async (bot, { msg, params }) => {
-		if (!process.env.botMasters.includes(msg.author.id))
+	run: (async (bot, { msg, params,user }) => {
+		if (!process.env.botMasters.includes(user.id))
 			return "Only the bot owner may run this command!";
 		msg.channel.createMessage(JSON.stringify(MusicHandler.runTest()));
 		return "Test ran	!";
