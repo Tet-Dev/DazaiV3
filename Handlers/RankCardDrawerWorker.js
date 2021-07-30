@@ -262,15 +262,16 @@ async function generateGrifyCard(level, xp, next, currentFormatted, nextFormatte
 }
 async function generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut, design) {
 	console.log(name,writeOut,design);
-	if (design === "tetDesign")
-		return await generateTetCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut);
-	if (design === "grifyDesign")
-		return await generateGrifyCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut);
+	const data = [level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut]
+	return {
+		data: design === "tetDesign" ? await generateTetCard(...data) : await generateGrifyCard(...data),
+		type: "png"
+	}
 }
 async function generateGIFCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name,writeout, design) {
 	return new Promise(async (res, rej) => {
 		let temp2 = "./temp/" + genID(12) + ".gif";
-		let blankPath = await generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, "./assets/jimpStuff/fullBlankBG.png", name, true,design);
+		let blankPath = (await generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, "./assets/jimpStuff/fullBlankBG.png", name, true,design)).data;
 		let ffmpegCMD = spawn(require("ffmpeg-static"), ["-i", bgimg, "-i", blankPath, "-filter_complex", "overlay=0:0", "-pix_fmt", "yuv420p", "-c:a", "copy", temp2]);
 		ffmpegCMD.on("close", async (code) => {
 			console.log("FFMPEG ended with code",code);

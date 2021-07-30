@@ -173,6 +173,7 @@ async function generateUpNext(dat) {
 
 	let domColor = txtcolor.map(x => x > 30 ? x - 30 : 0);
 	domColor[3] = 200;
+	newimage.composite(bgcopy, 0, 0);
 	if (nextSongs.length > 0) {
 		let nextQueue = new Image(645, 127);
 		nextQueue.fill(Image.rgbaToColor(...domColor));
@@ -198,7 +199,7 @@ async function generateUpNext(dat) {
 
 	console.log("Check 3 passed");
 	thumbnail.resize(240, 240);
-	newimage.composite(bgcopy, 0, 0);
+
 	newimage.composite(thumbnail, 51, 51);
 	newimage.composite(author, 51, 355);
 	newimage.composite(requestedBy, 325, 90 - 72 + 14 + (imgText.height) / 2);

@@ -1,0 +1,86 @@
+const { DiscordEvent } = require("eris-boiler/lib");
+const axios = require("axios");
+const { assignWith } = require("lodash");
+const Member = require("eris/lib/structures/Member");
+const Message = require("eris/lib/structures/Message");
+const faces = ["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"];
+const fetch = require("node-fetch");
+const { APIEP } = require("../env");
+const httpRegex = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+function parseEmotes(str) {
+	let allEStr = str.split("|").filter(x => x);
+	return allEStr.map(x => {
+		let miniargs = x.split(",");
+		let msgChannel = miniargs[0].split("§");
+		let emoot = miniargs[1];
+		return {
+			channel: msgChannel[0],
+			id: msgChannel[1],
+			emote: miniargs[1].replace("<", "").replace(/\:/g, "").replace(">", ""),
+			roleID: miniargs[2]
+		};
+	});
+}
+const tips = [
+	"Did you vote today? https://vote.dazai.app"
+];
+module.exports = new DiscordEvent({
+	name: "interactionCreate",
+	run: async (bot, data, id) => {
+		console.log(data.data,data.data.options[0]);
+	}
+});
+//Types 4 is announce to everyone, 2 is silent 3 is
+// {
+// 	d: {
+// 	  channel_id: '739559914124607562',
+// 	  data: { id: '786740889191841823', name: 'test' },
+// 	  guild_id: '739559911033405592',
+// 	  id: '786743714139078666',
+// 	  member: {
+// 		deaf: false,
+// 		is_pending: false,
+// 		joined_at: '2020-08-02T19:07:03.184000+00:00',
+// 		mute: false,
+// 		nick: '{Dazai Support} Tet DegeneTet',
+// 		pending: false,
+// 		permissions: '2147483647',
+// 		premium_since: '2020-09-24T22:17:10.362000+00:00',
+// 		roles: [Array],
+// 		user: [Object]
+// 	  },
+// 	  token: 'aW50ZXJhY3Rpb246Nzg2NzQzNzE0MTM5MDc4NjY2OjR4bkRVSktOY0FIN1IwRHNlSm9ib2ZXVjNoMk1DdXVNeVhtS2FETzBucWRNR09icEdKWGJFZXptczEzMUZLcDBXMGFJb1l0QVVVUkJXQm9hVml6c1pYUmowQ3FRSFBIaW54RzZaczcwZUpOT1JqMm9xcnlEYU44ZjViZE9VTFpM',
+// 	  type: 2,
+// 	  version: 1
+// 	},
+// 	op: 0,
+// 	s: 21,
+// 	t: 'INTERACTION_CREATE'
+//   } 0
+//   { d: null, op: 11, s: null, t: null } 0
+//   {
+// 	d: {
+// 	  channel_id: '739559914124607562',
+// 	  data: { id: '786740889191841823', name: 'test' },
+// 	  guild_id: '739559911033405592',
+// 	  id: '786743839091720202',
+// 	  member: {
+// 		deaf: false,
+// 		is_pending: false,
+// 		joined_at: '2020-08-02T19:07:03.184000+00:00',
+// 		mute: false,
+// 		nick: '{Dazai Support} Tet DegeneTet',
+// 		pending: false,
+// 		permissions: '2147483647',
+// 		premium_since: '2020-09-24T22:17:10.362000+00:00',
+// 		roles: [Array],
+// 		user: [Object]
+// 	  },
+// 	  token: 'aW50ZXJhY3Rpb246Nzg2NzQzODM5MDkxNzIwMjAyOlUxRHhXZ1hKMk8xVm5ma2VOcjBkNFVoWlFlYnQ1amZQdEpRd0VIVG1INVhiOFVscGptenFwYWQwMGYxMTRhU3NMeVlSbXJveGtZUkNBbzZFSGFaeUM3dlZ3cG9sSHV6QTNib2huRzBxcWFqM1d1bjJwaHhyNnlsa1BFTVVjbVMy',
+// 	  type: 2,
+// 	  version: 1
+// 	},
+// 	op: 0,
+// 	s: 22,
+// 	t: 'INTERACTION_CREATE'
+//   } 0

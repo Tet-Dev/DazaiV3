@@ -20,12 +20,10 @@ let reroCache = new Map();
 module.exports = new DiscordEvent({
 	name: "messageReactionAdd",
 	run: async (bot, msg, emoji, reactor) => {
-		console.log("reaction!",msg.id,emoji,reactor.user.id);
 		if (!msg.guildID) return;
 		let emotesList;
 		let data = await bot.SQLHandler.getGuild(msg.guildID);
 		emotesList = data.reactionroles ? parseEmotes(data.reactionroles.replace(/\<\@\&/g, "").replace(/\>/g, "")) : [];
-		console.log(emotesList);
 		if (emotesList.length === 0) return;
 		let possiblereros = emotesList.filter(x => x.id === msg.id && x.channel === msg.channel.id && (x.emote === emoji.name || x.emote === emoji.id));
 		if (possiblereros.length === 0) return;

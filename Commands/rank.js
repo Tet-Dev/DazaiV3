@@ -6,11 +6,12 @@ module.exports = new GuildCommand({
 	description: "Displays your ranking!",
 	run: (async (client, { params,channel,user,member }) => {
 		channel.sendTyping();
+		console.log(params);
 		let mentionedUser = params.length ? params[0].match(/\d+/) : null;
 		/** @type  {Member} */
 		let mem;
 		if (!mentionedUser)
-			[mentionedUser, mem] = [user, member];
+			[mentionedUser, mem] = [user.id, member];
 		else
 			[mentionedUser, mem] = [mentionedUser[0], await client.getRESTGuildMember(member.guild.id, mentionedUser[0])];
 		let userData = await SQLHandler.getUser(mentionedUser);
