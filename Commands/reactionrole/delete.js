@@ -1,4 +1,4 @@
-const { SettingCommand } = require("eris-boiler/lib");
+const { SettingCommand, IntArgument } = require("eris-boiler/lib");
 
 //------------------------------------------------ BASIC CONSTS
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
@@ -68,25 +68,25 @@ module.exports = new SettingCommand({
 	name: "delete",
 	description: "Delete a Reaction Role!",
 	options: {
-		parameters: ["Position"],
+		parameters: [new IntArgument("position", "Position of the reaction role (found in rero list command)", false)],
 		permissionNode: "admin",
 		// permission
 	},
 	displayName: "Delete a Reaction Role",
-	getValue: async (client, { msg }) => {
+	getValue: async () => {
 		return "To Delete a Reaction Role, `rero delete POSITION`. `POSITION` can be found in `rero list` and is the number after the `#` ";
 		// });
 	},
-	run: (async (client, { msg, params }) => {
-		let guildData = await client.SQLHandler.getGuild(msg.guildID);
+	run: (async (client, { msg, params, channel, member }) => {
+		let guildData = await client.SQLHandler.getGuild(context.channel.guild.id);
 		let emoteslist = guildData.reactionroles ? parseEmotes(guildData.reactionroles) : [];
 		if (emoteslist.length == 0) return "No Reaction Roles!";
 		if (emoteslist.length <= params[0] || params[0] < 0) return "Invalid Position Selected!";
-		let emoteslist2 = emoteslist.splice(params[0],1);
+		let emoteslist2 = emoteslist.splice(params[0], 1);
 		let fieldArr = emoteslist2.map((x, ind) => {
 			return {
 				name: "Reaction Role #" + params,
-				value: "Emote: " + getEmoteByID(msg.member.guild, x.emote) + " | Role Given: <@&" + x.roleID + "> | [Go To Message](https://discord.com/channels/" + msg.channel.guild.id + "/" + x.channel + "/" + x.id + ")"
+				value: "Emote: " + getEmoteByID(context.channel.guild.id, x.emote) + " | Role Given: <@&" + x.roleID + "> | [Go To Message](https://discord.com/channels/" + context.channel.guild.id + "/" + x.channel + "/" + x.id + ")"
 			};
 		});
 
@@ -94,8 +94,8 @@ module.exports = new SettingCommand({
 		// 	return { title: "Reaction Role Removed! ", fields: x };
 		// });
 		// if (pagi.length == 1) {
-		await client.SQLHandler.updateGuild(msg.guildID,{reactionroles: stringifyEmotes(emoteslist)});
-		client.createMessage(msg.channel.id, { embed: { title: "Reaction Role Removed! ", fields: fieldArr } });
+		await client.SQLHandler.updateGuild(context.channel.guild.id, { reactionroles: stringifyEmotes(emoteslist) });
+		client.createMessage(channel.id, { embed: { title: "Reaction Role Removed! ", fields: fieldArr } });
 		// }
 		// const paginatedEmbed = await EmbedPaginator.createPaginationEmbed(msg, pagi);
 

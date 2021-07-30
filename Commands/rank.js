@@ -1,21 +1,21 @@
-const { GuildCommand } = require("eris-boiler/lib");
+const { GuildCommand, UserArgument } = require("eris-boiler/lib");
 const RankCardDrawer = require("../Handlers/RankCardDrawer");
 const SQLHandler = require("../Handlers/SQLHandler");
 module.exports = new GuildCommand({
 	name: "rank", // name of command
 	description: "Displays your ranking!",
-	run: (async (client, { msg, params }) => {
-		msg.channel.sendTyping();
+	run: (async (client, { params,channel,user,member }) => {
+		channel.sendTyping();
 		let mentionedUser = params.length ? params[0].match(/\d+/) : null;
 		/** @type  {Member} */
-		let member;
+		let mem;
 		if (!mentionedUser)
-			[mentionedUser, member] = [msg.author.id, msg.member];
+			[mentionedUser, mem] = [user, member];
 		else
-			[mentionedUser, member] = [mentionedUser[0], await client.getRESTGuildMember(msg.guildID, mentionedUser[0])];
+			[mentionedUser, mem] = [mentionedUser[0], await client.getRESTGuildMember(member.guild.id, mentionedUser[0])];
 		let userData = await SQLHandler.getUser(mentionedUser);
-		let fileData = await RankCardDrawer.generate(member,userData);
-		msg.channel.createMessage("Want to change your card design? try out `daz inventory` !",{
+		let fileData = await RankCardDrawer.generate(mem,userData);
+		channel.createMessage("Want to change your card design? try out `daz inventory` !",{
 			file: fileData.buffer,
 			name: `DazaiRankCard.${fileData.type}`,
 		});
@@ -23,6 +23,7 @@ module.exports = new GuildCommand({
 	}),
 	options: {
 		permissionNode: "pauseMusic",
+		parameters: [new UserArgument("user","User to view rank details about",true)],
 		// aliases: ["q"]
 		// parameters: ["The index of the item or \"all\" to purge the queue"]
 	}

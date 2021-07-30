@@ -40,7 +40,7 @@ function getChoice(bot, msg, userid) {
 	});
 }
 module.exports = new GuildCommand({
-	name: "voteSkip", // name of command
+	name: "voteskip", // name of command
 	description: "votes to skip the next song",
 	run: (async (client, context) => {
 		// Declare Types 
@@ -50,26 +50,27 @@ module.exports = new GuildCommand({
 		let msg = context.msg;
 		/** @type {Array<String>} */
 		let params = context.params;
+		let member = context.member;
 
-		let guildData = MusicHandler.getGuildData(msg.guildID);
+		let guildData = MusicHandler.getGuildData(context.channel.guild.id);
 		if (!guildData || !guildData.playing) return "There isn't anything playing right now! Hop into a Voice Channel and play some music!";
-		if (msg.member?.voiceState?.channelID !== guildData.player.channelId) return "You must be in the same Voice Channel as the bot to VoteSkip!";
+		if (member?.voiceState?.channelID !== guildData.player.channelId) return "You must be in the same Voice Channel as the bot to VoteSkip!";
 		let minimumRequired = Math.ceil(bot.getChannel(guildData.player.channelId).voiceMembers.filter(member=>!member.bot).length/2);
 		if (guildData.skips.size >= minimumRequired)
 		{
-			msg.channel.createMessage("Skipping Song with at least 50% of the vote!.");
+			channel.createMessage("Skipping Song with at least 50% of the vote!.");
 			guildData.player.stop();
 			return;
 		}
-		if (guildData.skips.has(msg.author.id)) return `You already voted to skip this song! ${guildData.skips.size} / ${bot.getChannel(guildData.player.channelId).voiceMembers.filter(member=>!member.bot).length} voted to skip! You need 50% of the participants in this Voice Channel or ${minimumRequired} users to skip.`;
-		guildData.skips.add(msg.author.id);
+		if (guildData.skips.has(member.id)) return `You already voted to skip this song! ${guildData.skips.size} / ${bot.getChannel(guildData.player.channelId).voiceMembers.filter(member=>!member.bot).length} voted to skip! You need 50% of the participants in this Voice Channel or ${minimumRequired} users to skip.`;
+		guildData.skips.add(member.id);
 		if (guildData.skips.size >= minimumRequired)
 		{
-			msg.channel.createMessage("Skipping Song with at least 50% of the vote!.");
+			context.channel.createMessage("Skipping Song with at least 50% of the vote!.");
 			guildData.player.stop();
 			return;
 		}
-		msg.channel.createMessage(`You have voted to skip this song! ${guildData.skips.size} / ${bot.getChannel(guildData.player.channelId).voiceMembers.filter(member=>!member.bot).length} voted to skip! You need 50% of the participants in this Voice Channel or ${minimumRequired} users to skip.`);
+		context.channel.createMessage(`You have voted to skip this song! ${guildData.skips.size} / ${bot.getChannel(guildData.player.channelId).voiceMembers.filter(member=>!member.bot).length} voted to skip! You need 50% of the participants in this Voice Channel or ${minimumRequired} users to skip.`);
 
 	}),
 	options: {

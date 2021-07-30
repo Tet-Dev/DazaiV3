@@ -3,9 +3,9 @@ const MusicHandler = require("../Handlers/MusicV5");
 module.exports = new GuildCommand({
 	name: "pause", // name of command
 	description: "Pauses music.",
-	run: (async (client, { msg, params }) => {
+	run: (async (client, { member, params }) => {
 		try {
-			let resp = await MusicHandler.pause(msg.guildID);
+			let resp = await MusicHandler.pause(member.guild.id);
 			if (resp) return "Music paused!";
 			else return "The music was already paused?";
 		} catch (error) {

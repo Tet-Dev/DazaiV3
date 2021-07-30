@@ -7,14 +7,13 @@ module.exports = new GuildCommand({
 		// Declare Types 
 		/** @type {DataClient} */
 		let bot = client;
-		/** @type {Message} */
-		let msg = context.msg;
+		let channel = context.channel;
 		/** @type {Array<String>} */
 		let params = context.params;
 
-		let guildData = MusicHandler.getGuildData(msg.guildID);
+		let guildData = MusicHandler.getGuildData(channel.guild.id);
 		if (!guildData || !guildData.playing) return "There isn't anything playing right now! Hop into a Voice Channel and play some music!";
-		msg.channel.createMessage(`Skipping Song via ForceSkip from ${msg.author.mention}`);
+		channel.createMessage(`Skipping Song via ForceSkip from ${context.member.mention}`);
 		guildData.player.stop();
 		return;
 	}),

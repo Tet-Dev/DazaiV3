@@ -3,7 +3,7 @@ const { Command } = require("eris-boiler");
 module.exports = new Command({
 	name: "help",
 	description: "Displays this message :)",
-	run: async (bot, {params,msg}) => {
+	run: async (bot, {params,channel}) => {
 
 		if (params[0]) {
 			return commandInfo(bot, params[0]);
@@ -17,7 +17,7 @@ module.exports = new Command({
 		//   ) + ':' + ' '.repeat(longName - name.length) + description,
 		//   'Available commands:```'
 		// ) + '\n```\nTo get more information try: `help command`'
-		msg.channel.createMessage({
+		channel.createMessage({
 			content: "",
 			embed:{
 				title: "Links",

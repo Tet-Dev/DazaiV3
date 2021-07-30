@@ -3,9 +3,9 @@ const MusicHandler = require("../Handlers/MusicV5");
 module.exports = new GuildCommand({
 	name: "loop", // name of command
 	description: "Toggles whether or not music loops (loops thru playlist)",
-	run: (async (client, { msg, params }) => {
+	run: (async (client, { member, params }) => {
 		try {
-			let resp = await MusicHandler.getGuildData(msg.guildID);
+			let resp = await MusicHandler.getGuildData(member.guild.id);
 			if (!resp) return "Nothing is currently playing!";
 			resp.loop = !resp.loop;
 			return resp.loop ? "Looping has been enabled" : "Looping has been disabled";

@@ -196,15 +196,17 @@ class MusicHandler {
 	/**
 	 * Adds trackinfo to queue
 	 * @param {TrackInfo} trackData 
+	 * @param {TextChannel} channel
 	 * @param {Message} msg 
+	 * @param {Member} member
 	 * @param {String} guildID
 	 */
-	static addToQueue(trackData, msg, guildID) {
-		msg.channel.sendTyping();
+	static addToQueue(trackData, channel,member, guildID) {
+		channel.sendTyping();
 		let guData = gData.get(guildID);
 		/** @type {SongRequest} */
 		let songRequest = {
-			requester: msg.member,
+			requester: member,
 			trackData: trackData
 		};
 		guData.queue = guData.queue.concat(songRequest);
@@ -216,8 +218,8 @@ class MusicHandler {
 					title: `${songRequest.trackData.info.title}`,
 					description: `Author: ${songRequest.trackData.info.author}\nLength: ${TetLib.SecsToFormat(songRequest.trackData.info.length / 1000)}`,
 					footer: {
-						text: `Song Added By ${msg.author.username}#${msg.author.discriminator} | ${gData.get(guildID).queue.length} tracks in queue.`,
-						icon_url: msg.author.avatarURL,
+						text: `Song Added By ${member.user.username}#${member.user.discriminator} | ${gData.get(guildID).queue.length} tracks in queue.`,
+						icon_url: member.user.avatarURL,
 					},
 					url: `https://www.youtube.com/watch?v=${songRequest.trackData.info.identifier}`
 				}
@@ -230,17 +232,17 @@ class MusicHandler {
 	/**
 	 * Adds an array of tracks into the queue
 	 * @param {Array<TrackInfo>} tracks 
-	 * @param {Message} msg 
+	 * @param {Member} member 
 	 * @param {String} guildID
 	 */
-	static addArrayToQueue(tracks, msg, guildID) {
+	static addArrayToQueue(tracks, member, guildID) {
 		let guildData = gData.get(guildID);
 		if (tracks.length == 0)
 			return "Empty playlist!";
 		guildData.queue = guildData.queue.concat(tracks.map(x => {
 			return {
 				trackData: x,
-				requester: msg.member,
+				requester: member,
 			};
 		}));
 		MusicHandler.processQueue(guildData);

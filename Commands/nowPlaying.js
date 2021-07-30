@@ -11,17 +11,18 @@ module.exports = new GuildCommand({
 		// Declare Types 
 		/** @type {DataClient} */
 		let bot = client;
+		let channel = context.channel;
 		/** @type {Message} */
 		let msg = context.msg;
 		/** @type {Array<String>} */
 		let params = context.params;
 		/** @type {import("../Handlers/MusicV5").GuildData} */
-		let gdata = MusicHandler.getGuildData(msg.guildID);
+		let gdata = MusicHandler.getGuildData(channel.guild.id);
 		if (!gdata || !gdata.playing) return "Theres nothing playing right now!";
-		msg.channel.sendTyping();
-		let bufferThing = await MusicDrawer.generateNowPlayingCard(gdata.currentlyPlaying.trackData, `${gdata.currentlyPlaying.requester.nick || gdata.currentlyPlaying.requester.username}#${gdata.currentlyPlaying.requester.discriminator}`, gdata, msg.channel);
+		channel.sendTyping();
+		let bufferThing = await MusicDrawer.generateNowPlayingCard(gdata.currentlyPlaying.trackData, `${gdata.currentlyPlaying.requester.nick || gdata.currentlyPlaying.requester.username}#${gdata.currentlyPlaying.requester.discriminator}`, gdata, channel);
 
-		await msg.channel.createMessage("",
+		await channel.createMessage("",
 			{
 				file: bufferThing, name: "Dazai.png"
 			});
