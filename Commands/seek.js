@@ -5,7 +5,6 @@ module.exports = new GuildCommand({
 	name: "seek", // name of command
 	description: "Seek through a song",
 	run: (async (client, { msg, params,channel }) => {
-		console.log(await MusicHandler.seek(channel.guild.id,Number(params[0]),false));
 		return `Seeking to ${TetLib.SecsToFormat((await MusicHandler.seek(channel.guild.id,Number(params[0]),false))/1000)}`;
 	}),
 	options: {

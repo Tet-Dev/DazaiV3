@@ -27,7 +27,7 @@ const tips = [
 module.exports = new DiscordEvent({
 	name: "interactionCreate",
 	run: async (bot, data, id) => {
-		console.log(data.data,data.data.options[0]);
+		// console.log(data.data,data.data.options[0]);
 	}
 });
 //Types 4 is announce to everyone, 2 is silent 3 is

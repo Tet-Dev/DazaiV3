@@ -21,9 +21,6 @@ module.exports = new GuildCommand({
 	description: "",
 	run: (async (client, { msg, params }) => {
 		if (client.botMasters.includes(msg.author.id)){
-			console.log(`(async ()=> {
-				return ${msg.content.substring(msg.content.match(/.+eval /g)[0].length)}
-			})()`)
 			let result = await eval(
 				`(async ()=> {
 					return ${msg.content.substring(msg.content.match(/.+eval /g)[0].length)}

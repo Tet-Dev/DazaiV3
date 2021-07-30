@@ -145,7 +145,6 @@ class MusicHandler {
 	}
 	static runTest() {
 		return guildData.get("739559911033405592").player.state.position
-		console.log(guildData.get("739559911033405592").player)
 	}
 	/**
 	 * 

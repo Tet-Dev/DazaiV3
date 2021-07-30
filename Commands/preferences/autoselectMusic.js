@@ -27,7 +27,6 @@ module.exports = new Command({
 			SQLHandler.setUser(member.id, {autoSelectSongs: 0});
 			return ("Auto-select songs is now off");
 		} else {
-			console.log(toggle,params)
 			return ("Invalid option, valid options are `on` and `off`");
 		}
 	},

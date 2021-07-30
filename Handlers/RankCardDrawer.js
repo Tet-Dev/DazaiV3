@@ -33,7 +33,6 @@ module.exports = {
 		let username = TetLib.getMemberDisplayName(member, true);
 		let position = LBData.position;
 		let bgName = LinkMap.get(userData.personalbg) || LinkMap.get("spacegray");
-		console.log(bgName, userData.personalbg);
 		let color = ColorMap.get(userData.personalcolor) || [255,255,255];
 		let design = "tetDesign" || userData.design || "tetDesign";
 		let avatar = member.user.dynamicAvatarURL("png",256);
@@ -46,7 +45,6 @@ module.exports = {
 				key: randID
 			}));
 		});
-		console.log(resData.type);
 		let type = resData.type;
 		resData = resData.data || resData;
 	

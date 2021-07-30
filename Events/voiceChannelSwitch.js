@@ -16,7 +16,6 @@ module.exports = new DiscordEvent({
 			if (bot.getChannel(bot.voiceConnections.get(mem.guild.id).channelId).voiceMembers.filter(member=>!member.bot).length === 0) {
 				setTimeout(() => {
 					if (bot.getChannel(bot.voiceConnections.get(mem.guild.id).channelId).voiceMembers.filter(member=>!member.bot).length === 0){
-						console.log("leaving");
 						MusicHandler.getGuildData(mem.guild.id).channelBound.createMessage({
 							embed: {
 								color: 0xFF0000,

@@ -6,7 +6,6 @@ module.exports = new GuildCommand({
 	description: "Displays your ranking!",
 	run: (async (client, { params,channel,user,member }) => {
 		channel.sendTyping();
-		console.log(params);
 		let mentionedUser = params.length ? params[0].match(/\d+/) : null;
 		/** @type  {Member} */
 		let mem;

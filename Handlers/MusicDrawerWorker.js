@@ -167,7 +167,6 @@ async function generateUpNext(dat) {
 	let vidlen = SecsToFormat((Math.round(dataOG.info.length / 1000) || 0));
 	let txtcolor = Image.colorToRGBA(thumbnail.dominantColor(true, true,));
 	txtcolor = txtcolor.map(x => x + 60 > 255 ? 255 : x + 60);
-	console.log("Check 2 passed");
 	let duraText = await Image.renderTextFromCache(cachedNoto32, `Length: ${vidlen}`, Image.rgbToColor(255, 255, 255), 450, Image.WRAP_STYLE_WORD);
 	let requestedBy = await Image.renderTextFromCache(cachedNoto24, `${dat[1]}`, Image.rgbaToColor(txtcolor[0], txtcolor[1], txtcolor[2], txtcolor[3]), 646, Image.WRAP_STYLE_WORD);
 
@@ -181,7 +180,6 @@ async function generateUpNext(dat) {
 			if (i == 2) {
 				break;
 			}
-			console.log(nextSongs[i]);
 			let tempImg = new Image(645, 63);
 			let binfo = await getVideo(nextSongs[i].info.identifier);
 			let ithumb = await fetch(binfo.snippet.thumbnails.standard.url);
@@ -197,7 +195,6 @@ async function generateUpNext(dat) {
 		newimage.composite(nextQueue, 327, 133 + 14);
 	}
 
-	console.log("Check 3 passed");
 	thumbnail.resize(240, 240);
 
 	newimage.composite(thumbnail, 51, 51);
@@ -206,10 +203,8 @@ async function generateUpNext(dat) {
 	newimage.composite(duraText, 326, 78 + 14);
 	newimage.composite(imgText, 51, 300);
 	newimage.roundCorners(15);
-	console.log("Check 4 passed");
 
 	let encodeData = (await newimage.encode(3));
-	console.log("Returning... ");
 	return encodeData;
 }
 (async () => {
