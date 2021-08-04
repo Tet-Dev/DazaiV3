@@ -16,8 +16,8 @@ function getVideo(id) {
 	});
 }
 let time = Date.now();
-function timeStamp(){
-	let t =  Date.now()-time;
+function timeStamp() {
+	let t = Date.now() - time;
 	time = Date.now();
 	return t;
 }
@@ -53,10 +53,19 @@ let noto = fs.readFileSync("./assets/noto.otf");//read font files
 let pop = fs.readFileSync("./assets/pop.ttf");
 const imagescript = require("imagescript");
 const fetch = require("node-fetch");
-async function getPFP(avatar){
+/** @type {String,Image} */
+const pfpCache = new Map();
+async function getPFP(avatar) {
+	if (pfpCache.has(avatar))
+		return pfpCache.get(avatar).clone();
 	let pfp = await fetch(avatar);
 	pfp = await pfp.buffer();
-	return await Image.decode(pfp);
+	let img = (await Image.decode(pfp));
+	pfpCache.set(avatar, img.clone());
+	setTimeout(() => {
+		pfpCache.delete(avatar);
+	}, 1000 * 60 * 1200);
+	return img;
 }
 const config = {
 	"font": {
@@ -139,16 +148,16 @@ let cachedPop64;
 let bgs = new Map();
 let ready = 0;
 
-class TimeTracker{
-	constructor(){
+class TimeTracker {
+	constructor() {
 		this.time = Date.now();
 	}
 	start() {
 		this.time = Date.now();
 	}
-	logTime(label){
-		let t = Date.now()-this.time;
-		console.log(label, t);
+	logTime(label) {
+		let t = Date.now() - this.time;
+		// console.log(label, t);
 		this.time = Date.now();
 	}
 
@@ -292,10 +301,10 @@ async function generateCardData(level, xp, next, currentFormatted, nextFormatted
 		type: "jpeg"
 	}
 }
-async function generateGIFCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name,writeout, design) {
+async function generateGIFCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeout, design) {
 	return new Promise(async (res, rej) => {
 		let temp2 = "./temp/" + genID(12) + ".gif";
-		let blankPath = (await generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, "./assets/jimpStuff/fullBlankBG.png", name, true,design)).data;
+		let blankPath = (await generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, "./assets/jimpStuff/fullBlankBG.png", name, true, design)).data;
 		let ffmpegCMD = spawn(require("ffmpeg-static"), ["-i", bgimg, "-i", blankPath, "-filter_complex", "overlay=0:0", "-pix_fmt", "yuv420p", "-c:a", "copy", temp2]);
 		ffmpegCMD.on("close", async (code) => {
 			await fsp.unlink(blankPath);
