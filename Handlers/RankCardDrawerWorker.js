@@ -53,7 +53,11 @@ let noto = fs.readFileSync("./assets/noto.otf");//read font files
 let pop = fs.readFileSync("./assets/pop.ttf");
 const imagescript = require("imagescript");
 const fetch = require("node-fetch");
-
+async function getPFP(avatar){
+	let pfp = await fetch(avatar);
+	pfp = await pfp.buffer();
+	return await Image.decode(pfp);
+}
 const config = {
 	"font": {
 		"sizes":
@@ -135,6 +139,23 @@ let cachedPop64;
 let bgs = new Map();
 let ready = 0;
 
+class TimeTracker{
+	constructor(){
+		this.time = Date.now();
+	}
+	start() {
+		this.time = Date.now();
+	}
+	logTime(label){
+		let t = Date.now()-this.time;
+		console.log(label, t);
+		this.time = Date.now();
+	}
+
+}
+
+
+
 //Load Assets
 (async () => {
 	let allfiles = await fsp.readdir("./assets/DazaiBgs");
@@ -156,25 +177,35 @@ async function getBG(path) {
 
 
 async function generateTetCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut) {
-	time = Date.now();
+	let tt = new TimeTracker();
+	tt.start();
 	let base = await getBG(bgimg);
 	base = base.clone();
 	base.resize(1024, 340);
-	let pfp = await fetch(avatar);
-	pfp = await pfp.buffer();
-	pfp = await Image.decode(pfp);
+	tt.logTime("base resized");
+	let pfp = await getPFP(avatar);
+	tt.logTime("fetched pfp");
 	if (pfp.height < 256) pfp.resize(256, 256);
 	pfp = pfp.cropCircle(false, 0.05);
+	tt.logTime("resized pfp");
 	base.composite(pfp, 40, Math.round(base.height / 2) - Math.round(pfp.height / 2));
+	tt.logTime("composited pfp");
 	let rankLvl = await Image.renderTextFromCache(cachedPop32, `Rank ${rank}`, Jimp.rgbaToInt(255, 255, 255, 255));
+	tt.logTime("rankText rendered");
 	let lvl = await Image.renderTextFromCache(cachedPop80, `Level ${level}`, Jimp.rgbaToInt(255, 255, 255, 255));
+	tt.logTime("levelText rendered");
 	// let rect = 
 	let text = await Image.renderTextFromCache(cachedPop64, name, Jimp.rgbaToInt(parseInt(colorschemeR), parseInt(colorschemeG), parseInt(colorschemeB), 255));
+	tt.logTime("usernameText rendered");
 	// fs.writeFileSync("test2.png",await text.encode());
 	let lvlDetails = await Image.renderTextFromCache(cachedPop20, `${currentFormatted} / ${nextFormatted} XP`, Jimp.rgbaToInt(255, 255, 255, 255));
+	tt.logTime("xpCurrent rendered");
 	base.composite(rankLvl, (pfp.width + 50), 60);
+	tt.logTime("rankText composited");
 	base.composite(lvl, (pfp.width + 50), 80);
+	tt.logTime("levelText composited");
 	base.composite(text, (pfp.width + 50), 164);
+	tt.logTime("usernameText composited");
 	xp = xp || next * 0.0009765625;
 	if (xp / next > 1)
 		xp = next;
@@ -182,15 +213,20 @@ async function generateTetCard(level, xp, next, currentFormatted, nextFormatted,
 	let color = Image.colorToRGBA(pfp.averageColor());
 	color[3] = 100;
 	base.drawBox(0, 320, 1024, 30, Image.rgbaToColor(color[0], color[1], color[2], color[3]));
+	tt.logTime("xpBar rendered");
 	xpBar.fill(Jimp.rgbaToInt(parseInt(colorschemeR), parseInt(colorschemeG), parseInt(colorschemeB), 255));
+	tt.logTime("xpBar filled");
 	base.composite(xpBar, 0, 318);
+	tt.logTime("xpBar composited");
 	base.composite(lvlDetails, 950 - (9 * `${currentFormatted} / ${nextFormatted} XP`.length), 290);
+	tt.logTime("xpCurrent rendered");
 	let temp = "./temp/" + genID(10) + ".png";
 	base.resize(1024, 340);
 	if (writeOut) {
 		await fsp.writeFile(temp, await base.encode(3)).catch(er => console.error(er));
 	}
 	let res = !writeOut && await base.encodeJPEG(85);
+	tt.logTime("image returned");
 	return writeOut ? temp : res;
 }
 

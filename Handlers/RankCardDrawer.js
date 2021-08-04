@@ -35,7 +35,7 @@ module.exports = {
 		let bgName = LinkMap.get(userData.personalbg) || LinkMap.get("spacegray");
 		let color = ColorMap.get(userData.personalcolor) || [255,255,255];
 		let design = "tetDesign" || userData.design || "tetDesign";
-		let avatar = member.user.dynamicAvatarURL("png",256);
+		let avatar = member.user.dynamicAvatarURL("png",128);
 		let resData = await new Promise((res) => {
 			let randID = TetLib.genID(50);
 			RankCardMap.set(randID, res);
