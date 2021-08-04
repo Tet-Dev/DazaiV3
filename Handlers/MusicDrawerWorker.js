@@ -121,6 +121,11 @@ function getHighestRes(thumbnails) {
 	tnails.sort((a, b) => b.width * b.height - a.width * a.height);
 	return tnails[0];
 }
+function getLowestRes(thumbnails) {
+	let tnails = Object.values(thumbnails);
+	tnails.sort((a, b) =>  a.width * a.height-b.width * b.height);
+	return tnails[0];
+}
 /**
  * 
  * @param {String} title 
@@ -182,7 +187,7 @@ async function generateUpNext(dat) {
 			}
 			let tempImg = new Image(645, 63);
 			let binfo = await getVideo(nextSongs[i].info.identifier);
-			let ithumb = await fetch(binfo.snippet.thumbnails.standard.url);
+			let ithumb = await fetch(getHighestRes(binfo.snippet.thumbnails).url);
 			ithumb = await Image.decode(await ithumb.buffer());
 			ithumb.crop(Math.round((ithumb.width / 2) - ((ithumb.height - 90) / 2)), 45, ithumb.height - 90, ithumb.height - 90);
 			ithumb.resize(57, 57);

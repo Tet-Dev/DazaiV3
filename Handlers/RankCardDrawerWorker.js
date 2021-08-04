@@ -190,7 +190,7 @@ async function generateTetCard(level, xp, next, currentFormatted, nextFormatted,
 	if (writeOut) {
 		await fsp.writeFile(temp, await base.encode(3)).catch(er => console.error(er));
 	}
-	let res = !writeOut && await base.encode(3);
+	let res = !writeOut && await base.encodeJPEG(85);
 	return writeOut ? temp : res;
 }
 
@@ -245,15 +245,15 @@ async function generateGrifyCard(level, xp, next, currentFormatted, nextFormatte
 	let temp = "./temp/" + genID(10) + ".png";
 	base.resize(1024, 340);
 	if (writeOut) {
-		await fsp.writeFile("./test.png", await base.encode(3)).catch(er => console.error(er));
+		await fsp.writeFile("./test.png", await base.encode(9)).catch(er => console.error(er));
 	}
-	return writeOut ? temp : await base.encode(3);
+	return writeOut ? temp : await base.encode(9);
 }
 async function generateCardData(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut, design) {
 	const data = [level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name, writeOut]
 	return {
 		data: design === "tetDesign" ? await generateTetCard(...data) : await generateGrifyCard(...data),
-		type: "png"
+		type: "jpeg"
 	}
 }
 async function generateGIFCard(level, xp, next, currentFormatted, nextFormatted, colorschemeR, colorschemeG, colorschemeB, rank, avatar, bgimg, name,writeout, design) {
@@ -305,7 +305,7 @@ let moneyIcon;
 //	image.composite(moneyIcon, 785, 100);
 //	let balance = await Image.renderTextFromCache(cachedNoto24, `「${nFormatter(bal)}」DC`,Image.rgbToColor(...color));
 //	image.composite(balance, 825, 97);
-//	fs.writeFileSync("./test.png", await image.encode(3));
+//	fs.writeFileSync("./test.png", await image.encode(9));
 //}
 
 // queue.push({
