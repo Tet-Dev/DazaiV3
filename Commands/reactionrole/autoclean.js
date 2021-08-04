@@ -80,13 +80,13 @@ module.exports = new SettingCommand({
 		return "`rero autoclean` to remove any Reros that belong to a deleted message!";
 		// });
 	},
-	run: (async (client, { msg, params }) => {
-		let guildData = await client.SQLHandler.getGuild(msg.guildID);
+	run: (async (client, { channel, params }) => {
+		let guildData = await client.SQLHandler.getGuild(channel.guild.id);
 		let emoteslist = guildData.reactionroles ? parseEmotes(guildData.reactionroles) : [];
 		if (emoteslist.length == 0) return "No Reaction Roles to clean!";
 		let count = 0;
 		let failed = 0;
-		let editMsg = await client.createMessage(msg.channel.id,"Checking for Dead Messages");
+		let editMsg = await client.createMessage(channel.id,"Checking for Dead Messages");
 		
 		let inter = setInterval(async () => {
 			await editMsg.edit({content: "Searched through "+count +" messages out of "+emoteslist.length+" messages. "+failed+" Dead ReRos Found."});
@@ -104,7 +104,7 @@ module.exports = new SettingCommand({
 			}
 		}));
 		
-		await (client.SQLHandler.updateGuild(msg.guildID,{reactionroles : stringifyEmotes(nel)}));
+		await (client.SQLHandler.updateGuild(channel.guild.id,{reactionroles : stringifyEmotes(nel)}));
 		clearInterval(inter);
 		editMsg.delete();
 		return "Removed "+(emoteslist.length - nel.length)+" Inactive Reaction Roles!";

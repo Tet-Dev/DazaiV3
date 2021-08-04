@@ -63,27 +63,27 @@ module.exports = new SettingCommand({
 		// permission
 	},
 	displayName: "List Reaction Roles",
-	getValue: async (client, { msg }) => {
-		let guildData = await client.SQLHandler.getGuild(msg.guildID);
+	getValue: async (client, { msg,channel }) => {
+		let guildData = await client.SQLHandler.getGuild(channel.guild.id);
 		let emoteslist = guildData.reactionroles ? parseEmotes(guildData.reactionroles) : [];
 		return "**" + emoteslist.length + "** out of ** 100 ** Reaction Roles Active\n*To list all of them, do `rero list`";
 		// });
 	},
 	run: (async (client, { msg, params }) => {
-		let guildData = await client.SQLHandler.getGuild(msg.guildID);
+		let guildData = await client.SQLHandler.getGuild(channel.guild.id);
 		let emoteslist = guildData.reactionroles ? parseEmotes(guildData.reactionroles) : [];
 		if (emoteslist.length == 0) return "No Reaction Roles!";
 		let fieldArr = emoteslist.map((x, ind) => {
 			return {
 				name: "Reaction Role #" + ind,
-				value: "Emote: " + getEmoteByID(msg.member.guild, x.emote) + " | Role Given: <@&" + x.roleID + "> | [Go To Message](https://discord.com/channels/" + msg.channel.guild.id + "/" + x.channel + "/" + x.id + ")"
+				value: "Emote: " + getEmoteByID(channel.guild, x.emote) + " | Role Given: <@&" + x.roleID + "> | [Go To Message](https://discord.com/channels/" + channel.guild.guild.id + "/" + x.channel.id + "/" + x.id + ")"
 			};
 		}).chunk_inefficient((emoteslist.length >= 11 ? 10 : emoteslist.length));
 		let pagi = fieldArr.map((x) => {
 			return { fields: x };
 		});
 		if (pagi.length == 1) {
-			client.createMessage(msg.channel.id, { embed: { fields: fieldArr } });
+			client.createMessage(channel.guild.id, { embed: { fields: fieldArr } });
 		}
 		const paginatedEmbed = await EmbedPaginator.createPaginationEmbed(msg, pagi);
 

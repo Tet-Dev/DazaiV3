@@ -1,5 +1,5 @@
 const { DataClient } = require("eris-boiler");
-const { SettingCommand } = require("eris-boiler/lib");
+const { SettingCommand, RoleArgument } = require("eris-boiler/lib");
 const AuditLogHandler = require("../../Handlers/AuditLogHandler");
 
 
@@ -8,7 +8,7 @@ module.exports = new SettingCommand({
 	description: "set the Moderator Permissions Role for the server",
 	options: {
 		permissionNode: "admin",
-		parameters: ["Moderator Permissions Role name/id/mention"],
+		parameters: [new RoleArgument("mod_perms_role","Moderator Permissions Role name/id/mention",false)],
 		// permission
 	},
 	displayName: "Mod Permissions Role",
@@ -28,23 +28,23 @@ module.exports = new SettingCommand({
 
 		return `${roles.find(role => role.id === roleId, { name: "Unknown Role" }).name}`;
 	},
-	run: async (bot, { msg, params }) => {
+	run: async (bot, { msg, params,member}) => {
 		const [roleId] = params;
 		const fullParam = params.join(" ");
 
-		const guild = msg.channel.guild;
+		const guild = member.guild;
 		const role = guild.roles.get(roleId) || guild.roles.find((r) => r.name === fullParam || r.id === (fullParam.split("<@&")[1].split(">")[0]));
 
 		if (!role) {
 			return `Could not find role "${fullParam}"`;
 		}
 
-		const dbGuild = await bot.SQLHandler.getGuild(msg.guildID);
+		const dbGuild = await bot.SQLHandler.getGuild(guild.id);
 		if (role.id === dbGuild.modRole) {
 			return "Moderator Permissions is already set to that role!";
 		}
-		await AuditLogHandler.sendAuditLogMessage(msg.guildID,"Update Moderator Role", `New Moderator role:\n<@&${role.id}>`,0,msg.author);
-		await bot.SQLHandler.updateGuild(msg.guildID, { modRole: role.id });
+		await AuditLogHandler.sendAuditLogMessage(guild.id,"Update Moderator Role", `New Moderator role:\n<@&${role.id}>`,0,member.user);
+		await bot.SQLHandler.updateGuild(guild.id, { modRole: role.id });
 		return "Moderator Permissions set!";
 	}
 });

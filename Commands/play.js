@@ -1,10 +1,11 @@
-const { GuildCommand } = require("eris-boiler/lib");
+const { GuildCommand, StringArgument } = require("eris-boiler/lib");
 const ReactionHandler = require("eris-reactions");
 const { DataClient } = require("eris-boiler");
-const { Message } = require("eris");
+const { Message, TextChannel, Member } = require("eris");
 const MusicHandler = require("../Handlers/MusicV5");
 const SQLHandler = require("../Handlers/SQLHandler");
 const PrefixManager = require("../Handlers/PrefixManager");
+
 //------------------------------------------------ BASIC CONSTS
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 //------------------------------------------------
@@ -46,60 +47,61 @@ module.exports = new GuildCommand({
 		// Declare Types 
 		/** @type {DataClient} */
 		let bot = client;
-		/** @type {Message} */
-		let msg = context.msg;
+		/** @type {TextChannel} */
+		let channel = context.channel;
+		/** @type {Member} */
+		let member = context.member;
 		/** @type {Array<String>} */
 		let params = context.params;
 
-		let channelID = msg?.member?.voiceState?.channelID;
+		let channelID = member.voiceState?.channelID;
 		let search = params.join(" ");
 		if (channelID) {
-			await MusicHandler.joinVC(channelID, msg.channel);
+			await MusicHandler.joinVC(channelID, channel);
 			let spotifyType = search.match(/(?<=https:\/\/open.spotify.com\/)(playlist|album|track)\/\w+/);
 			let spotifyID;
 			if (spotifyType) {
 				[spotifyType, spotifyID] = spotifyType[0].split("/");
 				spotifyType = spotifyType.toLowerCase();
-				msg.channel.createMessage("Loading content..");
+				channel.createMessage("Loading content..");
 				let restracks;
 				if (spotifyType === "playlist") restracks = await MusicHandler.self.spotiPlaylist(spotifyID);
 				else if (spotifyType === "album") restracks = await MusicHandler.self.spotiAlbum(spotifyID);
 				else if (spotifyType === "track") {
 					let resTrack = await MusicHandler.self.spotiSong(spotifyID);
-					let resthing = MusicHandler.addToQueue(resTrack, msg, msg.guildID);
+					let resthing = MusicHandler.addToQueue(resTrack,channel, member, member.guild.id);
 					if (resthing)
-						msg.channel.createMessage(resthing);
+						channel.createMessage(resthing);
 					return;
 				}
 				restracks = restracks.filter(x => x);
 				let resthing;
 				if (restracks.length)
-					resthing = MusicHandler.addArrayToQueue(restracks, msg, msg.guildID);
+					resthing = MusicHandler.addArrayToQueue(restracks, member, member.guild.id);
 				if (resthing)
-					msg.channel.createMessage(resthing);
+					channel.createMessage(resthing);
 			}
 			else if (search.includes("list=")) {
-				// DazaiMsg(msg.channel.id, "Sorry! Playlists are Disabled atm!")
 				// return
 				let resTrack = await MusicHandler.self.resolveTrack(search);
-				let resthing = MusicHandler.addArrayToQueue(resTrack?.tracks,msg,msg.guildID);
+				let resthing = MusicHandler.addArrayToQueue(resTrack?.tracks, member, member.guild.id);
 				if (resthing)
-					msg.channel.createMessage(resthing);
+					channel.createMessage(resthing);
 			} else if (search.split("https://www\.youtube\.com/watch?").length > 1 || search.includes("https://youtu.be/")) {
 				let resTrack = await MusicHandler.self.resolveTrack(search);
-				let resthing = MusicHandler.addToQueue(resTrack?.tracks[0], msg, msg.guildID);
+				let resthing = MusicHandler.addToQueue(resTrack?.tracks[0],channel, member, member.guild.id);
 				if (resthing)
-					msg.channel.createMessage(resthing);
+					channel.createMessage(resthing);
 
 			} else {
 				let searchArr = await MusicHandler.self.getTracksFromSearch(search);
-				if ((await SQLHandler.getUser(msg.author.id)).autoSelectSongs){
-					let resthing = MusicHandler.addToQueue(searchArr.tracks[0], msg, msg.guildID);
+				if ((await SQLHandler.getUser(member.user.id)).autoSelectSongs) {
+					let resthing = MusicHandler.addToQueue(searchArr.tracks[0],channel, member, member.guild.id);
 					if (resthing)
-						msg.channel.createMessage(resthing);
+						channel.createMessage(resthing);
 					return;
 				}
-				if (!searchArr?.tracks || !searchArr?.tracks?.length) return msg.channel.createMessage("No results found!");
+				if (!searchArr?.tracks || !searchArr?.tracks?.length) return channel.createMessage("No results found!");
 				if (searchArr.tracks.length > 8) searchArr.tracks.length = 8;
 				const choices = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"];
 				let fields = searchArr.tracks.map((x, ind) => {
@@ -111,10 +113,10 @@ module.exports = new GuildCommand({
 					};
 				});
 
-				let promptMSG = await bot.createMessage(msg.channel.id, {
+				let promptMSG = await bot.createMessage(channel.id, {
 					embed: {
 						title: "Search Results",
-						description: `Select which one you would like to play! (To turn this off do \`${await PrefixManager(bot,msg)} prefs autoselectmusic on\``,
+						description: `Select which one you would like to play! (To turn this off do \`${await PrefixManager(bot, {guildID: member.guild.id})} prefs autoselectmusic on\``,
 						color: 0,
 						fields: fields,
 					},
@@ -135,14 +137,14 @@ module.exports = new GuildCommand({
 						}
 					}
 				})();
-				let choice = await getChoice(bot, promptMSG, msg.author.id);
+				let choice = await getChoice(bot, promptMSG, member.id);
 				if (!choice) return;
 				if (choice.name === "❌") promptMSG.delete();
 				for (var i = 0; i < choices.length; i++) {
 					if (choice.name === choices[i]) {
-						let resthing = MusicHandler.addToQueue(searchArr.tracks[i], msg, msg.guildID);
+						let resthing = MusicHandler.addToQueue(searchArr.tracks[i],channel, member, member.guild.id);
 						if (resthing)
-							msg.channel.createMessage(resthing);
+							channel.createMessage(resthing);
 						promptMSG.delete();
 						break;
 					}
@@ -157,7 +159,7 @@ module.exports = new GuildCommand({
 	options: {
 		permissionNode: "playSong",
 		aliases: ["p"],
-		parameters: ["Song Youtube Link / Spotify Playlist / Youtube Playlist / Song Name"]
+		parameters: [new StringArgument("song","Provide a search term. Accepts Spotify & Youtube URLs",false)]
 	}
 	// list of things in object passed to run: bot (Databot), msg (Message), params (String[])
 });

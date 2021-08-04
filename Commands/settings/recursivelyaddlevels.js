@@ -15,14 +15,14 @@ function parseLevelRewards(str) {
 module.exports = new SettingCommand({
 	name: "recursivelyAddMissedLevels",
 	getValue: () => "Adds back all the missed levels!",
-	run: (async (bot, { msg, params }) => {
-		if (!msg.guildID || msg.author.bot) return;
-		let guild = await bot.SQLHandler.getGuild(msg.guildID);
-		let fetchMsg = msg.channel.createMessage("Fetching all members. Time Limit : 1 Minute");
+	run: (async (bot, { msg, params,channel,user,member }) => {
+		if (!channel.guild.id || user.bot) return;
+		let guild = await bot.SQLHandler.getGuild(channel.guild.id);
+		let fetchMsg = channel.createMessage("Fetching all members. Time Limit : 1 Minute");
 		/**
 		 * @typedef {Array<Member>[]}
 		 */
-		let allMembers = await Promise.race([sleep(60000), msg.member.guild.fetchMembers({
+		let allMembers = await Promise.race([sleep(60000), member.guild.fetchMembers({
 			timeout: 61000
 		})]);
 		if (!allMembers) {
@@ -41,7 +41,7 @@ module.exports = new SettingCommand({
 			 * @typedef {LevellingHandler}
 			*/
 			let handler = bot.LevellingHandler;
-			let udata = await handler.getUserData(member.id, msg.guildID);
+			let udata = await handler.getUserData(member.id, channel.guild.id);
 			let awards = parseLvl.filter(x => x.level <= udata.level).map(x => x.roleID);
 			let rolesGained = 0;
 			let lastIndex;
@@ -80,7 +80,7 @@ module.exports = new SettingCommand({
 				});
 			}
 			if (rolesGained)
-				msg.channel.createMessage({
+				channel.createMessage({
 					embed: {
 						description: `${member.username}#${member.discriminator}'s Roles have been updated. Change in role count: ${rolesGained}; ${allMembers.length - i} more members to go!`
 					}

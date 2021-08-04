@@ -1,6 +1,6 @@
 const { DataClient } = require("eris-boiler");
 const SQLHandler = require("./Handlers/SQLHandler");
-const {join} = require("path");
+const { join } = require("path");
 const MusicHandler = require("./Handlers/MusicV5");
 const RankCardDrawer = require("./Handlers/RankCardDrawer");
 const PermissionsHandler = require("./Handlers/permissionHandler");
@@ -41,6 +41,22 @@ Object.defineProperty(Array.prototype, "chunk_inefficient", {
 			restMode: true,
 			defaultImageSize: 256,
 			sendIDOnly: true,
+			intents: [
+				"guilds",
+				"guildMembers",
+				"guildBans",
+				"guildEmojis",
+				"guildIntegrations",
+				"guildWebhooks",
+				"guildInvites",
+				"guildVoiceStates",
+				"guildMessages",
+				"guildMessageReactions",
+				"guildMessageTyping",
+				"directMessages",
+				"directMessageReactions",
+				"directMessageTyping",
+			]
 			// firstShardID: Number(process.env.shardID),
 			// lastShardID: Number(process.env.shardID),
 		},
@@ -64,17 +80,19 @@ Object.defineProperty(Array.prototype, "chunk_inefficient", {
 	bot.addEvents(join(__dirname, "Events"));
 	bot.snipes = new Map();
 	bot.esnipes = new Map();
-	bot.PermissionsHandler = new PermissionsHandler(SQLHandler,bot);
+	bot.PermissionsHandler = new PermissionsHandler(SQLHandler, bot);
 	bot.permissionsHandler = bot.PermissionsHandler;
 	bot.guildsColl = [];
+	
 	await bot.connect();
-	
-	
+
+
 	bot.on("ready", async () => {
 		MusicHandler.init();
 		bot.editStatus("online", {
 			name: "daz help | V3 coming out???",
 			type: 2,
 		});
+		bot.setupCommands();
 	});
 })();

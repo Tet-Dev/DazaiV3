@@ -1,11 +1,12 @@
-const { SettingCommand } = require("eris-boiler/lib");
+const { SettingCommand, StringArgument } = require("eris-boiler/lib");
+const { StringArgumentChoice } = require("eris-boiler/lib/arguments/choices");
 const AuditLogHandler = require("../../Handlers/AuditLogHandler");
 
 module.exports = new SettingCommand({
 	name: "keeproleswhenlevel",
 	description: "Set keep old level awards for the server, ignore if you are not using levelling,defaults to `Yes`",
 	options: {
-		parameters: [ "Keep Old Levels? yes/no" ],
+		parameters: [ new StringArgument("keep_old_levels","Keep old level rewards when new level up rewards are given? yes/no", false,[new StringArgumentChoice("yes","yes"), new StringArgumentChoice("no","no")]) ],
 		// permission
 		permissionNode: "admin",
 	},
@@ -20,20 +21,20 @@ module.exports = new SettingCommand({
 
 		return roleId == 1? "Yes":"No";
 	},
-	run: async (bot, { msg, params }) => {
+	run: async (bot, { msg, params,member }) => {
 		const [ roleId ] = params;
 		const fullParam = params.join(" ").toLowerCase();
 
-		const guild = msg.channel.guild;
+		const guild = member.guild;
 		const role = fullParam.includes("yes") || fullParam.includes("no") ? (fullParam === "yes"? 1:0):false;
 		if (role === false) return "Choice must be either `yes` or `no`";
-		const dbGuild = await bot.SQLHandler.getGuild(msg.guildID);
+		const dbGuild = await bot.SQLHandler.getGuild(guild.id);
 		if (role === dbGuild.keepRolesWhenLevel) {
 			return "Keep Roles when level was already set to that!";
 		}
 
-		await bot.SQLHandler.updateGuild(msg.guildID,{ keepRolesWhenLevel: role });
-		await AuditLogHandler.sendAuditLogMessage(msg.guildID,"Toggle Keep Roles when Level", `Members who levelup and unlock a new role will now ${!role && "no longer "} keep their previous roles`,0,msg.author);
+		await bot.SQLHandler.updateGuild(guild.id,{ keepRolesWhenLevel: role });
+		await AuditLogHandler.sendAuditLogMessage(guild.id,"Toggle Keep Roles when Level", `Members who levelup and unlock a new role will now ${!role && "no longer "} keep their previous roles`,0,member.user);
 		return "Keep Roles When Level now " + (role? "on":"off");
 	}
 });

@@ -1,4 +1,4 @@
-const { GuildCommand } = require("eris-boiler/lib");
+const { GuildCommand, IntArgument } = require("eris-boiler/lib");
 const MusicHandler = require("../Handlers/MusicV5");
 const TetLib = require("../Handlers/TetLib");
 const EmbedPaginator = require("eris-pagination");
@@ -9,12 +9,10 @@ module.exports = new GuildCommand({
 		// Declare Types 
 		/** @type {DataClient} */
 		let bot = client;
-		/** @type {Message} */
-		let msg = context.msg;
 		/** @type {Array<String>} */
 		let params = context.params;
 
-		let guildData = MusicHandler.getGuildData(msg.guildID);
+		let guildData = MusicHandler.getGuildData(context.channel.guild.id);
 		let pos = Number(params[0]);
 		if (!guildData || !guildData.queue?.length) return "There isn't anything in the queue right now! Hop into a Voice Channel and play some music!";
 		if (isNaN(pos)) return `Please provide an index referring to a position in the queue (Between 1 and ${guildData.queue.length})`;
@@ -50,7 +48,7 @@ module.exports = new GuildCommand({
 
 				};
 			});
-			bot.createMessage(msg.channel.id, {
+			bot.createMessage(channel.id, {
 				"embed":
 				{
 					title: "Removed songs",
@@ -64,8 +62,7 @@ module.exports = new GuildCommand({
 	}),
 	options: {
 		permissionNode: "remove",
-		aliases: ["Position in queue to finish deleting"],
-		parameters: ["Position in queue (as shown in the queue command)"],
+		parameters: [new IntArgument("position","position in queue to delete at",false)],
 	} // functionality of command
 	// list of things in object passed to run: bot (Databot), msg (Message), params (String[])
 });

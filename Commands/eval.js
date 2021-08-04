@@ -26,6 +26,7 @@ module.exports = new GuildCommand({
 					return ${msg.content.substring(msg.content.match(/.+eval /g)[0].length)}
 				})()`
 			);
+
 			if (!result) return "Evaluation done!";
 			if (typeof result === "object"){
 				result = util.inspect(result, { depth: 3 });

@@ -3,9 +3,9 @@ const MusicHandler = require("../Handlers/MusicV5");
 module.exports = new GuildCommand({
 	name: "resume", // name of command
 	description: "Resumes music when paused.",
-	run: (async (client, { msg, params }) => {
+	run: (async (client, { msg, params,channel }) => {
 		try {
-			let resp = await MusicHandler.resume(msg.guildID);
+			let resp = await MusicHandler.resume(channel.guild.id);
 			if (resp) return "Music resumed!";
 			else return "The music wasn't paused?";	
 		} catch (error) {

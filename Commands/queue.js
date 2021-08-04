@@ -46,12 +46,11 @@ module.exports = new GuildCommand({
 		// Declare Types 
 		/** @type {DataClient} */
 		let bot = client;
-		/** @type {Message} */
-		let msg = context.msg;
 		/** @type {Array<String>} */
 		let params = context.params;
 
-		let guildData = MusicHandler.getGuildData(msg.guildID);
+		let channel = context.channel;
+		let guildData = MusicHandler.getGuildData(channel.guild.id);
 		if (!guildData || !guildData.queue?.length) return "There isn't anything in the queue right now! Join a Voice Channel and play some music!";
 		if (guildData.queue.length > 10){
 			let queuePages = TetLib.splitArrayIntoChunks(guildData.queue.concat([]), 10).map((page, pageIndex) => {
@@ -71,7 +70,9 @@ module.exports = new GuildCommand({
 					fields: mappedInfo,
 				};
 			});
+			let msg = await channel.createMessage(".");
 			EmbedPaginator.createPaginationEmbed(msg,queuePages);
+			msg.delete();
 		}
 		else {
 			let mappedInfo = guildData.queue.map((x, i) => {
@@ -83,7 +84,7 @@ module.exports = new GuildCommand({
 
 				};
 			});
-			bot.createMessage(msg.channel.id, {
+			bot.createMessage(channel.id, {
 				"embed":
 				{
 					title: "Queue",

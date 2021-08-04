@@ -13,7 +13,7 @@ module.exports = new GuildCommand({
 		/** @type {Array<String>} */
 		let params = context.params;
 
-		let guildData = MusicHandler.getGuildData(msg.guildID);
+		let guildData = MusicHandler.getGuildData(context.channel.guild.id);
 		if (!guildData || !guildData.queue?.length) return "There isn't anything in the queue right now! Hop into a Voice Channel and play some music!";
 		TetLib.shuffle(guildData.queue);
 		return "Shuffled Queue!";

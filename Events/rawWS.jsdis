@@ -97,10 +97,6 @@ const tips = [
 module.exports = new DiscordEvent({
 	name: "rawWS",
 	run: async (bot, data, id) => {
-		// if (data.t.includes("VOICE")){
-		// 	// console.log(data);
-		// }
-		// console.log(data);
 		if (data.t === "GUILD_CREATE"){
 			let dataAssign = Object.assign({},data.d);
 
@@ -118,7 +114,6 @@ module.exports = new DiscordEvent({
 				);
 			}
 			bot.guildsColl.push(dataAssign);
-			// console.log(data);
 		}
 		if (data.t !== "INTERACTION_CREATE") return;
 
