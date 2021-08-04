@@ -25,7 +25,7 @@ module.exports = new DiscordEvent({
 			bot.cooldownMaps = cooldownMaps;
 		if (!msg.guildID || msg.author.bot) return true;
 		if (cooldownMaps.has(msg.author.id) && cooldownMaps.get(msg.author.id) > Date.now() / 1000) return;
-		cooldownMaps.set(msg.author.id, (Date.now() / 1000));
+		cooldownMaps.set(msg.author.id, (Date.now() / 1000)+60);
 		let guild = await SQLHandler.getGuild(msg.guildID);
 		let UserCurve = await LevellingHandler.getUserCurve(msg.author.id, msg.guildID);
 		let guildCurve = guild.xpCurve;

@@ -16,10 +16,10 @@ module.exports = new Command({
 				// description: 
 				fields: [
 					{ name: "Thread Uptime", value: moment.duration(process.uptime() * 1000).humanize(), inline},
-					{ name: "Hearbeat Uptime", value: moment.duration(bot.uptime).humanize() ,inline},
+					{ name: "Heartbeat Uptime", value: moment.duration(bot.uptime).humanize() ,inline},
 					{ name: "Servers/Guilds", value: bot.guilds.size, inline },
-					{ name: "CPU", value: `${os.cpus().length} ${os.cpus()[0].model} CPUS`, inline },
-					{ name: "Ping(ms)", value: msg.member?.guild?.shard?.latency || bot.shards.random().latency , inline },
+					{ name: "CPU", value: `${os.cpus().length} ${os.cpus()[0].model} CPUs`, inline },
+					{ name: "Ping (ms)", value: msg.member?.guild?.shard?.latency || bot.shards.random().latency , inline },
 					{ name: "Shard ID", value: msg.member ? msg.member.guild.shard.id : "DM Channel/Unknown", inline },
 					
 					{ name: "Streaming Music to", value: `${Array.from(MusicHandler.guildData.values()).filter(x => x.playing).length} Servers/Guilds`, inline },

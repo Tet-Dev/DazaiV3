@@ -24,12 +24,12 @@ module.exports = {
 	 */
 	generate: async (member, userData) => {
 		let LBData = await LevellingHandler.getPositionInGuild(member.guild.id, member.id);
-		let xpData = LBData.leaderboard[LBData.position] || { exp: 0, level: 0 };
+		let xpData = LBData.leaderboard[LBData.position-1] || { exp: 0, level: 0 };
 		let currentXP = xpData.exp;
 		let level = xpData.level;
 		let currentXPFormatted = TetLib.formatNumber(currentXP);
 		let nextLevel = Math.round(100 * level ** 1.3);
-		let nextLevelFormatted = TetLib.formatNumber(currentXP);
+		let nextLevelFormatted = TetLib.formatNumber(nextLevel);
 		let username = TetLib.getMemberDisplayName(member, true);
 		let position = LBData.position;
 		let bgName = LinkMap.get(userData.personalbg) || LinkMap.get("spacegray");
@@ -40,7 +40,7 @@ module.exports = {
 			let randID = TetLib.genID(50);
 			RankCardMap.set(randID, res);
 			rankCardWorker.send(JSON.stringify({
-				type: !bgName.endsWith(".png") ? 0 : 1,
+				type: bgName.endsWith(".gif") ? 0 : 1,
 				data: [level, currentXP, nextLevel, currentXPFormatted, nextLevelFormatted, color[0], color[1], color[2], position, avatar, bgName, username ,false,design],
 				key: randID
 			}));
