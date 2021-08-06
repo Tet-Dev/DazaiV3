@@ -31,7 +31,7 @@
 		"eris-boiler": "github:tet-dev/eris-boiler#interactions",
 		"eris-collector": "^1.0.1",
 		"eris-lavalink": "^1.0.2",
-		"eris-pagination": "github:tet-dev/eris-pagination",
+		"eris-pagination": "eris-pagination",
 		"eris-reactions": "^0.1.4",
 		"erlpack": "github:abalabahaha/erlpack",
 		"eventemitter3": "^4.0.7",
