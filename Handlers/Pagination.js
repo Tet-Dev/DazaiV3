@@ -53,7 +53,7 @@ class Pagination {
     });
   }
   async updateMessage() {
-    this.currentPage = (this.embeds.length-1 + this.currentPage) % (this.embeds.length-1);
+    this.currentPage = (this.embeds.length + this.currentPage) % (this.embeds.length);
     await this.message.edit({
       embed: this.embeds[this.currentPage],
       content: `Page ${this.currentPage + 1} of ${this.embeds.length}`
