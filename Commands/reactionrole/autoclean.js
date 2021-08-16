@@ -8,7 +8,6 @@ function text_truncate(str, len) {
 	array.length = len - 3;
 	return array.join("") + "...";
 }
-const EmbedPaginator = require("eris-pagination");
 // Object.defineProperty(Array.prototype, "chunk_inefficient", {
 // 	value: function (chunkSize) {
 // 		var array = this;

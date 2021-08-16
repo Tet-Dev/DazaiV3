@@ -14,7 +14,6 @@ function getNextMessageForPrompt(bot, channel, user) {
 		}, 300000);
 	});
 }
-const EmbedPaginator = require("eris-pagination");
 const AuditLogHandler = require("../../Handlers/AuditLogHandler");
 const Pagination = require("../../Handlers/Pagination");
 function parseLevelRewards(str) {
