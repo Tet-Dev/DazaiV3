@@ -10,7 +10,7 @@ const prefixMap = new Map();
 module.exports = async (bot,msg) => {
 	/** @type {Eris.Message} */
 	const message = msg;
-	if (message.channel.type == 1){
+	if (!message.guildID){
 		return "daz";
 	}
 	let prefix = prefixMap.get(message.guildID);

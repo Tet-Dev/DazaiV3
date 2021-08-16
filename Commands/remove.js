@@ -6,12 +6,13 @@ module.exports = new GuildCommand({
 	name: "remove", // name of command
 	description: "Removes a song from the queue.",
 	run: (async (client, context) => {
+		/** @type {import("eris").TextChannel} */
+		const channel = context.channel;
 		// Declare Types 
 		/** @type {DataClient} */
 		let bot = client;
 		/** @type {Array<String>} */
 		let params = context.params;
-
 		let guildData = MusicHandler.getGuildData(context.channel.guild.id);
 		let pos = Number(params[0]);
 		if (!guildData || !guildData.queue?.length) return "There isn't anything in the queue right now! Hop into a Voice Channel and play some music!";

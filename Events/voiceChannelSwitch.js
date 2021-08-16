@@ -13,9 +13,9 @@ module.exports = new DiscordEvent({
 				await sleep(500);
 				await MusicHandler.resume(mem.guild.id);
 			}
-			if (bot.getChannel(bot.voiceConnections.get(mem.guild.id).channelId).voiceMembers.filter(member=>!member.bot).length === 0) {
+			if (bot.getChannel(bot.voiceConnections.get(mem.guild.id)?.channelId).voiceMembers.filter(member=>!member.bot).length === 0) {
 				setTimeout(() => {
-					if (bot.getChannel(bot.voiceConnections.get(mem.guild.id).channelId).voiceMembers.filter(member=>!member.bot).length === 0){
+					if (bot.getChannel(bot.voiceConnections.get(mem.guild.id)?.channelId).voiceMembers.filter(member=>!member.bot).length === 0){
 						MusicHandler.getGuildData(mem.guild.id).channelBound.createMessage({
 							embed: {
 								color: 0xFF0000,
