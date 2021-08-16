@@ -96,12 +96,6 @@ module.exports = new SettingCommand({
 		// if (pagi.length == 1) {
 		await client.SQLHandler.updateGuild(context.channel.guild.id, { reactionroles: stringifyEmotes(emoteslist) });
 		client.createMessage(channel.id, { embed: { title: "Reaction Role Removed! ", fields: fieldArr } });
-		// }
-		// const paginatedEmbed = await EmbedPaginator.createPaginationEmbed(msg, pagi);
-
-
-
-
 
 	}),// functionality of command
 	// list of things in object passed to run: bot (DataClient), msg (Message), params (String[])
