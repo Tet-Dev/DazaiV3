@@ -8,7 +8,6 @@ function text_truncate(str, len) {
 	array.length = len - 3;
 	return array.join("") + "...";
 }
-const EmbedPaginator = require("eris-pagination");
 const Pagination = require("../../Handlers/Pagination");
 function isEmoji(str) {
 	var ranges = [
@@ -77,7 +76,7 @@ module.exports = new SettingCommand({
 		let fieldArr = emoteslist.map((x, ind) => {
 			return {
 				name: "Reaction Role #" + ind,
-				value: "Emote: " + getEmoteByID(channel.guild, x.emote) + " | Role Given: <@&" + x.roleID + "> | [Go To Message](https://discord.com/channels/" + channel.guild.guild.id + "/" + x.channel.id + "/" + x.id + ")"
+				value: "Emote: " + getEmoteByID(channel.guild, x.emote) + " | Role Given: <@&" + x.roleID + "> | [Go To Message](https://discord.com/channels/" + channel.guild.id + "/" + x.channel.id + "/" + x.id + ")"
 			};
 		}).chunk_inefficient((emoteslist.length >= 11 ? 10 : emoteslist.length));
 		let pagi = fieldArr.map((x) => {
