@@ -66,7 +66,7 @@ module.exports = new GuildCommand({
 				});
 				return {
 					title: "Queue",
-					description: "Whats up next",
+					description: "What's up next?",
 					fields: mappedInfo,
 				};
 			});
@@ -86,7 +86,7 @@ module.exports = new GuildCommand({
 				"embed":
 				{
 					title: "Queue",
-					description: "Whats up next",
+					description: "What's up next?",
 					fields: mappedInfo,
 				}
 			});
