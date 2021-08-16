@@ -33,19 +33,19 @@ class Pagination {
 
     let collector = new ReactionCollector(process.bot, this.message, this.reactorFilter, { time: this.options.timeout || 60 * 1000 * 5 });
     collector.on("collect", (m, emoji, userID) => {
-      if (emoji === "⏮") {
+      if (emoji.name === "⏮") {
         this.currentPage = 0;
         this.updateMessage();
       }
-      if (emoji === "⏭") {
+      if (emoji.name === "⏭") {
         this.currentPage = this.embeds.length - 1;
         this.updateMessage();
       }
-      if (emoji === "◀") {
+      if (emoji.name === "◀") {
         this.currentPage--;
         this.updateMessage();
       }
-      if (emoji === "▶") {
+      if (emoji.name === "▶") {
         this.currentPage++;
         this.updateMessage();
       }
