@@ -52,7 +52,7 @@ module.exports = new GuildCommand({
 		let channel = context.channel;
 		let guildData = MusicHandler.getGuildData(channel.guild.id);
 		if (!guildData || !guildData.queue?.length) return "There isn't anything in the queue right now! Join a Voice Channel and play some music!";
-		if (guildData.queue.length > 10){
+		if (guildData.queue.length > 10) {
 			let queuePages = TetLib.splitArrayIntoChunks(guildData.queue.concat([]), 10).map((page, pageIndex) => {
 				let mappedInfo = page.map((x, i) => {
 					/** @type {import("../Handlers/MusicV5").SongRequest} */
@@ -61,7 +61,7 @@ module.exports = new GuildCommand({
 						name: `[ ${pageIndex * 10 + i + 1} ] ${item.trackData.info.title}`,
 						value: `${SecsToFormat(Math.round(item.trackData.info.length / 1000))} | Requested by ${item.requester.mention}| [[Link]](${item.trackData.info.uri})`,
 						inline: false,
-	
+
 					};
 				});
 				return {
@@ -70,7 +70,7 @@ module.exports = new GuildCommand({
 					fields: mappedInfo,
 				};
 			});
-			new Pagination(queuePages, channel.id, (m,emoji,userID)=> ((userID.id? userID.id : userID) === context.member.id))
+			new Pagination(queuePages, channel.id, (m, emoji, userID) => {console.log(emoji,userID.id ? userID.id : userID,context.member.id)  ; return ((userID.id ? userID.id : userID) === context.member.id) })
 		}
 		else {
 			let mappedInfo = guildData.queue.map((x, i) => {
