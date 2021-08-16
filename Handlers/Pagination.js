@@ -49,7 +49,7 @@ class Pagination {
         this.currentPage++;
         this.updateMessage();
       }
-      this.message.removeReaction(emoji.name, emoji,userID.id ? userID.id : userID,context.member.id).catch(err => {console.trace(err)});
+      this.message.removeReaction(emoji.name,userID.id ? userID.id : userID).catch(err => {console.trace(err)});
     });
   }
   async updateMessage() {
