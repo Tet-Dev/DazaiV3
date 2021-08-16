@@ -1,7 +1,7 @@
 const { ReactionCollector, MessageCollector } = require("eris-collector");
 /** @type {import("eris-boiler").DataClient} */
 let bot = process.bot
-class PaginationEmbed {
+class Pagination {
   /**
    * @param {Array<import("eris").Embed>} embeds
    * @param {String} channelID
@@ -63,4 +63,4 @@ class PaginationEmbed {
  * @typedef {Object} PaginationEmbedOptions
  * @property {Number} timeout
  */
-module.exports = PaginationEmbed;
+module.exports = Pagination;

@@ -4,7 +4,7 @@ const { DataClient } = require("eris-boiler");
 const { Message } = require("eris");
 const MusicHandler = require("../Handlers/MusicV5");
 const TetLib = require("../Handlers/TetLib");
-const PaginationEmbed = require("../Handlers/PaginationEmbed");
+const Pagination = require("../Handlers/Pagination");
 //------------------------------------------------ BASIC CONSTS
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 //------------------------------------------------
@@ -70,7 +70,7 @@ module.exports = new GuildCommand({
 					fields: mappedInfo,
 				};
 			});
-			new PaginationEmbed(queuePages, channel.id, (m,emoji,userID)=> userID === context.member.id)
+			new Pagination(queuePages, channel.id, (m,emoji,userID)=> userID === context.member.id)
 		}
 		else {
 			let mappedInfo = guildData.queue.map((x, i) => {
