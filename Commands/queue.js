@@ -70,7 +70,7 @@ module.exports = new GuildCommand({
 					fields: mappedInfo,
 				};
 			});
-			new Pagination(queuePages, channel.id, (m,emoji,userID)=> {console.log("reaction!",m,emoji,userID,context.member.id);return userID === context.member.id})
+			new Pagination(queuePages, channel.id, (m,emoji,userID)=> ((userID.id? userID.id || userID) === context.member.id))
 		}
 		else {
 			let mappedInfo = guildData.queue.map((x, i) => {
