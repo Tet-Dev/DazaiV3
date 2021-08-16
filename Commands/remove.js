@@ -1,7 +1,7 @@
 const { GuildCommand, IntArgument } = require("eris-boiler/lib");
 const MusicHandler = require("../Handlers/MusicV5");
 const TetLib = require("../Handlers/TetLib");
-const EmbedPaginator = require("eris-pagination");
+const Pagination = require("../Handlers/Pagination");
 module.exports = new GuildCommand({
 	name: "remove", // name of command
 	description: "Removes a song from the queue.",
@@ -37,7 +37,7 @@ module.exports = new GuildCommand({
 					fields: mappedInfo,
 				};
 			});
-			EmbedPaginator.createPaginationEmbed(msg, queuePages);
+			new Pagination(queuePages, channel.id, (m, emoji, userID) => ((userID.id ? userID.id : userID) === context.member.id))
 		} else {
 			let mappedInfo = items.map((x, i) => {
 				let item = x;

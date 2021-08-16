@@ -1,5 +1,6 @@
 const { SettingCommand, ChannelArgument, StringArgument, RoleArgument } = require("eris-boiler/lib");
 const { ReactionCollector, MessageCollector } = require("eris-collector");
+const Pagination = require("../../Handlers/Pagination");
 
 function getNextMessageForPrompt(bot, channel,user) {
 	return new Promise((res, rej) => {
@@ -125,7 +126,7 @@ module.exports = new SettingCommand({
 				if (pagi.length == 1) {
 					client.createMessage(channel.id, { embed: { fields: fieldArr } });
 				}
-				const paginatedEmbed = await EmbedPaginator.createPaginationEmbed(msg, pagi);
+				new Pagination(pagi, channel.id, (m, emoji, userID) => ((userID.id ? userID.id : userID) === user.id))
 			}
 
 			channel.createMessage("Next, please either ping the role or type the role ID out (ex `@Role`)");

@@ -16,6 +16,7 @@ function getNextMessageForPrompt(bot, channel, user) {
 }
 const EmbedPaginator = require("eris-pagination");
 const AuditLogHandler = require("../../Handlers/AuditLogHandler");
+const Pagination = require("../../Handlers/Pagination");
 function parseLevelRewards(str) {
 	if (!str) return [];
 	return str.split("||").map(x => {
@@ -92,12 +93,7 @@ module.exports = new SettingCommand({
 				bot.createMessage(channel.id, { embed: pagi[0] });
 			}
 			let refmsg = await channel.createMessage(".");
-			const paginatedEmbed = await EmbedPaginator.createPaginationEmbed(refmsg, pagi, { timeout: 120000 });
-			refmsg.delete();
-			setTimeout(() => {
-				paginatedEmbed.edit({ content: "Reaction Time Ended, Reaction buttons will no longer work for this embed!" });
-			}, 120000);
-			// chunk_inefficient
+			new Pagination(pagi,channel.id, (m, emoji, userID) => ((userID.id ? userID.id : userID) === member.id))
 		} else if (params[0].toLowerCase() === "delete") {
 			await bot.createMessage(channel.id, "What Level Reward would you like to delete (Enter the ID found in `settings levelreward list` or `cancel` to cancel");
 			let res1 = await getNextMessageForPrompt(bot, channel, user);
