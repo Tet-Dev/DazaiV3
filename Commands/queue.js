@@ -70,7 +70,6 @@ module.exports = new GuildCommand({
 					fields: mappedInfo,
 				};
 			});
-			channel.createMessage("Updated!")
 			new PaginationEmbed(queuePages, channel.id, (m,emoji,userID)=> userID === context.member.id)
 		}
 		else {
