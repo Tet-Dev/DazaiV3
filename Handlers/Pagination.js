@@ -18,7 +18,7 @@ class Pagination {
     this.currentPage = 0;
     /** @type {import("eris").Message} */
     this.message = null;
-
+    this.start();
   }
   async start() {
 
