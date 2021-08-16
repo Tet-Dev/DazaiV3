@@ -15,7 +15,6 @@ class PermissionsHandler {
 		this.allPerms = allPerms;
 	}
 	async checkForPerm(mem, permName) {
-console.log(mem.permissions,(mem.permissions || mem.permission).has("administrator"))
 		if (!mem.guild.name) mem.guild = await bot.getRESTGuild(mem.guild.id);
 		mem = await bot.getRESTGuildMember(mem.guild.id,mem.id);
 		if ((mem.permissions || mem.permission).has("administrator")) return true;
