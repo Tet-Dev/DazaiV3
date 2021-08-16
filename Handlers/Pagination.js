@@ -27,9 +27,9 @@ class Pagination {
       content: `Page ${this.currentPage + 1} of ${this.embeds.length}`
     });
     this.message.addReaction("⏮");
-    this.message.addReaction("⏭");
     this.message.addReaction("◀");
     this.message.addReaction("▶");
+    this.message.addReaction("⏭");
 
     let collector = new ReactionCollector(process.bot, this.message, this.reactorFilter, { time: this.options.timeout || 60 * 1000 * 5 });
     collector.on("collect", (m, emoji, userID) => {
@@ -49,9 +49,10 @@ class Pagination {
         this.currentPage++;
         this.updateMessage();
       }
+      this.message.removeReaction(emoji.name, userID).catch(err => {});
     });
   }
-  async updateMessage(){
+  async updateMessage() {
     await this.message.edit({
       embed: this.embeds[this.currentPage],
       content: `Page ${this.currentPage + 1} of ${this.embeds.length}`
