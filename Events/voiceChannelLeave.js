@@ -9,9 +9,9 @@ module.exports = new DiscordEvent({
 			if (mem.id === bot.user.id) {
 				MusicHandler.stop(mem.guild.id);
 			}
-			if (bot.getChannel(bot.voiceConnections.get(mem.guild.id).channelId).voiceMembers.filter(member=>!member.bot).length === 0) {
+			if (bot.getChannel(bot?.voiceConnections?.get(mem.guild.id)?.channelId)?.voiceMembers.filter(member=>!member?.bot).length === 0) {
 				setTimeout(() => {
-					if (bot.getChannel(bot.voiceConnections.get(mem.guild.id).channelId).voiceMembers.filter(member=>!member.bot).length === 0){
+					if (bot.getChannel(bot?.voiceConnections?.get(mem.guild.id)?.channelId)?.voiceMembers.filter(member=>!member?.bot).length === 0){
     
 						MusicHandler.getGuildData(mem.guild.id).channelBound.createMessage({
 							embed: {

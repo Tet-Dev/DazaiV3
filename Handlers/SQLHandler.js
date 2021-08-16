@@ -121,6 +121,7 @@ class SQLHandler {
 	static async setUser(userID,updateOBJ){
 		return await SQLHandler.genericUpdate("personaldata","userid",userID,updateOBJ);
 	}
+	
 }
 module.exports = SQLHandler;
 /**
@@ -185,4 +186,17 @@ module.exports = SQLHandler;
  * @property {Number} streak
  * @property {Number} autoSelectSongs
  */
-//  channelID, disable_smartquoting, gainxp, uwuspeak, parentGuild, aiChatOn, AIModerationOn, TOXICITY, SEVERE_TOXICITY, IDENTITY_ATTACK, INSULT, PROFANITY, THREAT, SEXUALLY_EXPLICIT, FLIRTATION, Consequence
+/**
+ * 
+ * @typedef {Object} SQLPunishmentData
+ * @property {String} punishmentID
+ * @property {String} guildID
+ * @property {Number} punishmentType
+ * @property {String} recipientID
+ * @property {String} punisher
+ * @property {String} endsAt
+ * @property {String} timestamp
+ * @property {String} reason
+ * @property {Number} unpunished
+ */
+//punishmentID, guildID, punishmentType, recipientID, punisher, endsAt, reason
