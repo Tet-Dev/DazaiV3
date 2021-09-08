@@ -1,0 +1,1 @@
+await Promise.all((await SQLHandler.query("SELECT * FROM nadekoguilddata.guildleveling where userguildid like '750218628795990078§%'")).map(async x => { await tetGlobal.MongoDB?.db("GuildLeaderboards").collection(guildID).insertOne({ userid: x.userguildid.split("§")[1], exp: x.exp, level: x.level }) }))

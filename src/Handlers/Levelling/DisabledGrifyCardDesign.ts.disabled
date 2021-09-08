@@ -1,0 +1,52 @@
+async function generateGrifyCard(level: number, xp: number, next: number, currentFormatted: string, nextFormatted: string, colorschemeR: number, colorschemeG: number, colorschemeB: number, rank: number, avatar: string, bgimg: string, name: string, writeOut: boolean) {
+	let base = await getBG(bgimg);
+	base = base.clone();
+	base.resize(1024, 340);//are these the final dimensions?
+	let pfp = await fetch(avatar);
+	pfp = await pfp.buffer();
+	pfp = await Image.decode(pfp);
+	if (!(pfp.height === config.pfp.rendering.sidelength)) pfp.resize(config.pfp.rendering.sidelength, config.pfp.rendering.sidelength);//removed if (pfp.height < 256), so pfp is guaranteed to be 256
+	pfp = pfp.cropCircle(false, config.pfp.rendering.edgeSmoothness);
+	base.composite(pfp, 40, Math.round(base.height / 2) - Math.round(pfp.height / 2));
+	let rankLvl = await Image.renderTextFromCache(cachedNoto32, `Rank ${rank}`, Jimp.rgbaToInt(255, 255, 255, 200));
+	let lvl = await Image.renderTextFromCache(cachedNoto80, `Level ${level}`, Jimp.rgbaToInt(255, 255, 255, 200));
+	let text = await Image.renderTextFromCache(cachedNoto64, name, Jimp.rgbaToInt(parseInt(colorschemeR), parseInt(colorschemeG), parseInt(colorschemeB), 255));
+	// fs.writeFileSync("test2.png",await text.encode());
+	let lvlDetails = await Image.renderTextFromCache(cachedNoto20, `${currentFormatted} / ${nextFormatted} XP`, Jimp.rgbaToInt(255, 255, 255, 255));
+	const o = pfp.width + 50;
+	base.composite(rankLvl, o, 60);
+	base.composite(lvl, o - 4.5, 80);
+	base.composite(text, o + 1, 164);
+	xp = xp || next * 0.0009765625;
+	if (xp / next > 1) xp = next;
+	const xpprogress = Math.max(xp * 1024 / next, 1);
+	let xpBar = new Image(xpprogress, config.xpbar.progress.height);
+	let color = Image.colorToRGBA(pfp.dominantColor());//averageColor
+	color[3] = 100;
+	//color = [255,255,255,1]
+	//base.drawBox(config.xpbar.track.leftmargin, config.xpbar.track.height, 1026, 30, Image.rgbaToColor(color[0],color[1],color[2],color[3]));//top xp bar track 
+	let abcd = new Image(1024, 22);
+	const f = 0.25;
+	abcd.fill(Jimp.rgbaToInt(f * color[0], f * color[1], f * color[2], 170));
+	base.composite(abcd, config.xpbar.progress.leftmargin, 0);//0, 318
+
+	//base.drawBox(config.xpbar.track.leftmargin, config.xpbar.track.topmargin, 1024, 30, Image.rgbaToColor(color[0],color[1],color[2],color[3]));
+	//base.drawBox(config.xpbar.track.leftmargin, config.xpbar.track.height, 1024, config.xpbar.track.height, Image.rgbaToColor(color[0],color[1],color[2], 100));//320
+	let transparent = new Image(xpprogress, 22);
+	transparent.fill(Jimp.rgbaToInt(color[0], color[1], color[2], 170));
+	base.composite(transparent, config.xpbar.progress.leftmargin, config.xpbar.progress.topmargin);//0, 318
+
+	let ct = new Image(1024 - xpprogress, 22);
+	ct.fill(Jimp.rgbaToInt(color[0], color[1], color[2], 60));
+	base.composite(ct, xpprogress, config.xpbar.progress.topmargin);//0, 318
+	//xpbar
+	xpBar.fill(Jimp.rgbaToInt(parseInt(colorschemeR), parseInt(colorschemeG), parseInt(colorschemeB), 255));
+	base.composite(xpBar, config.xpbar.progress.leftmargin, config.xpbar.progress.topmargin);//0, 318
+	base.composite(lvlDetails, xpprogress - (9 * `${currentFormatted} / ${nextFormatted} XP`.length), 290);
+	let temp = "./temp/" + genID(10) + ".png";
+	base.resize(1024, 340);
+	if (writeOut) {
+		await fsp.writeFile("./test.png", await base.encode(9)).catch(er => console.error(er));
+	}
+	return writeOut ? temp : await base.encode(9);
+}

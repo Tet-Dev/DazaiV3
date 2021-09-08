@@ -1,50 +1,85 @@
 {
-	"name": "dazai",
-	"version": "3.0.0",
-	"description": "Dazai, the discord bot!",
-	"main": "server.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node server.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Tet-Dev/DazaiV3.git"
-	},
-	"keywords": [
-		"dazai",
-		"discord",
-		"bot"
-	],
-	"author": "Tet",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/Tet-Dev/DazaiV3/issues"
-	},
-	"homepage": "https://github.com/Tet-Dev/DazaiV3#readme",
-	"dependencies": {
-		"@discordjs/opus": "^0.5.0",
-		"axios": "^0.21.1",
-		"booru": "^2.4.0",
-		"bufferutil": "^4.0.3",
-		"eris": "github:tet-dev/eris#dev",
-		"eris-boiler": "github:tet-dev/eris-boiler#interactions",
-		"eris-collector": "^1.0.1",
-		"eris-lavalink": "^1.0.2",
-		"eris-reactions": "^0.1.4",
-		"erlpack": "^0.1.3",
-		"eventemitter3": "^4.0.7",
-		"ffmpeg-static": "^4.4.0",
-		"imagescript": "github:tet-dev/imagescript",
-		"jimp": "^0.16.1",
-		"lodash": "^4.17.21",
-		"moment": "^2.29.1",
-		"mysql2": "^2.2.5",
-		"simple-git": "^2.44.0",
-		"sodium-native": "3.2",
-		"spotilink": "^1.4.5",
-		"superagent": "^6.1.0",
-		"youtube-node": "^1.3.3",
-		"zlib-sync": "^0.1.7"
-	}
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "setup": "npm i --legacy-peer-deps",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "dazai3.1",
+  "author": "John Li (Tet)",
+  "module": "dist/dazai3.1.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/dazai3.1.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/dazai3.1.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^5.0.3",
+    "@types/node": "^10.17.60",
+    "husky": "^7.0.2",
+    "size-limit": "^5.0.3",
+    "ts-node": "^10.2.1",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
+    "typescript": "^3.9.10"
+  },
+  "dependencies": {
+    "@discordjs/opus": "^0.5.0",
+    "axios": "^0.21.1",
+    "booru": "^2.4.0",
+    "bufferutil": "^4.0.3",
+    "erela.js": "^2.3.3",
+    "eris": "github:tet-dev/eris#dev",
+    "eris-boiler": "github:tet-dev/eris-boiler#interactions",
+    "eris-collector": "^1.0.1",
+    "eris-lavalink": "^1.0.2",
+    "eris-reactions": "github:tet-dev/eris-reactions",
+    "erlpack": "^0.1.3",
+    "eventemitter3": "^4.0.7",
+    "ffmpeg-static": "^4.4.0",
+    "imagescript": "github:tet-dev/imagescript#new",
+    "jimp": "^0.16.1",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "mongodb": "^4.1.1",
+    "mysql2": "^2.2.5",
+    "simple-git": "^2.44.0",
+    "sodium-native": "3.2",
+    "spotilink": "^1.4.5",
+    "superagent": "^6.1.0",
+    "ts-import": "^2.0.39",
+    "uwuifier": "^4.0.4",
+    "youtube-node": "^1.3.3",
+    "zlib-sync": "^0.1.7"
+  }
 }
