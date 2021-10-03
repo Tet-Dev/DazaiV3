@@ -1,5 +1,10 @@
 import tetGlobal from "../../tetGlobal";
 
+export type LevelData = {
+  level: number;
+  exp: number;
+  userid: string;
+};
 export class LevellingHandler {
   static async getGuildLeaderboard(guildId: string) {
     if (!(await tetGlobal.MongoDB?.db("GuildLeaderboards").collections())?.some((c) => c.collectionName === guildId)) {
@@ -16,14 +21,17 @@ export class LevellingHandler {
       level: -1,
       xp: -1,
     });
-    return await leaderboard?.toArray();
+    return await leaderboard?.toArray() as LevelData[];
 
 
 
   }
   static async getUser(guildID: string, userid: string) {
     let user = await tetGlobal.MongoDB?.db("GuildLeaderboards").collection(guildID).findOne({ userid: userid });
-    return user;
+    return user as LevelData;
+  }
+  static async updateUser(guildID: string, userid: string, level: number, exp: number) {
+    await tetGlobal.MongoDB?.db("GuildLeaderboards").collection(guildID).updateOne({ userid: userid }, { $set: { level: level, exp: exp } }, { upsert: true });
   }
   static async getUserPositionData(guildID: string, userid: string) {
     //get leaderboard array
@@ -31,10 +39,10 @@ export class LevellingHandler {
     //get user data
     let user = (await this.getUser(guildID, userid))!;
     //perform a binary search to find the user's position
-    let userApprox = 100*user.level^1.5+user.xp;
-    let approxLeaderboard = leaderboard.map(x=>100*x.level^1.5+x.xp);
-    let position = this.binarySearchDesc(approxLeaderboard, userApprox, 0, approxLeaderboard.length-1);
-    
+    let userApprox = 100 * user.level ** 1.5 + user.exp;
+    let approxLeaderboard = leaderboard.map(x => 100 * x.level ** 1.5 + x.exp);
+    let position = this.binarySearchDesc(approxLeaderboard, userApprox, 0, approxLeaderboard.length - 1);
+
 
     //search both forwards and backwards to find the user's position
 
@@ -49,7 +57,7 @@ export class LevellingHandler {
   }
 
   //a binary search function that works on a descedning array
-  static binarySearchDesc(array: any[], value: any, start: number, end: number) : number {
+  static binarySearchDesc(array: any[], value: any, start: number, end: number): number {
     if (start > end) {
       return -1;
     }

@@ -6,8 +6,9 @@ export const top = new GuildCommand({
   options: {
     aliases: ["leaderboard", "lb", "top10", "top10xp"],
   },
-  run: async (bot,context) => {
+  run: async (_bot,_context) => {
 
     return "WIP";
   }
 })
+export default top;

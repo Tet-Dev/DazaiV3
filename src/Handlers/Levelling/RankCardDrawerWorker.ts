@@ -6,7 +6,7 @@ import TetLib from "../../Helpers/TetLib";
 import { spawn } from "child_process";
 const fsp = fs.promises;
 // let noto = fs.readFileSync("./assets/noto.otf");//read font files
-let pop = fs.readFileSync("./assets/pop.ttf");
+let pop = fs.readFileSync("./assets/ubuntu.ttf");//fs.readFileSync("./assets/pop.ttf");
 // let pop = fs.readFileSync("./assets/ubuntu.ttf");
 /** @type {String,Image} */
 const pfpCache = new Map();
@@ -173,15 +173,20 @@ async function generateTetCard(level: number, xp: number, next: number, currentF
 	if (xp / next > 1)
 		xp = next;
 	console.log(xp, next);
-	let xpBar = new Image(Math.max(xp * 1024 / next, 1), 30);
+	let xpBar = new Image(Math.max(xp * 1024 / next, 1) || 1, 30);
+	let xpKnob = new Image(30, 30);
+
 	let color = Image.colorToRGBA(pfp.averageColor());
 	color[3] = 100;
 	base.drawBox(0, 320, 1024, 30, Image.rgbaToColor(color[0], color[1], color[2], color[3]));
 	tt.logTime("xpBar rendered");
 	xpBar.fill(Jimp.rgbaToInt(colorschemeR, colorschemeG, colorschemeB, 255));
+	xpKnob.fill(Jimp.rgbaToInt(colorschemeR, colorschemeG, colorschemeB, 255));
+	xpKnob.cropCircle(true, 0);
 	tt.logTime("xpBar filled");
 	base.composite(xpBar, 0, 318);
 	tt.logTime("xpBar composited");
+	base.composite(xpKnob, (Math.max(xp * 1024 / next, 1) || 1)-15, 318);
 	base.composite(lvlDetails, 950 - (9 * `${currentFormatted} / ${nextFormatted} XP`.length), 290);
 	tt.logTime("xpCurrent rendered");
 	let temp = "./temp/" + TetLib.genID(10) + ".png";

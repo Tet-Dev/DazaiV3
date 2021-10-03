@@ -14,16 +14,71 @@ export const createGuildData = async (guildId: string, guildData?: any) => {
   else
     return null;
 }
-export const getGuild = async (guildId: string, createIfNull: boolean) => {
-  let getGuild = await tetGlobal.MongoDB?.db('GuildData').collection('guilds').findOne({
-    guildId,
+export type GuildData = {
+  guildId: string,
+  prefix: string,
+  auditLogChannel: string,
+  inviter: string,
+  levelrewards: { level: number, roleID: string }[],
+  keepRolesWhenLevel: number,
+  giveRolesWhenJoin: string,
+  reactionroles: { emoji: string, roleID: string }[],
+  joinmsg: string,
+  joinDMMessage: string,
+  leavemsg: string,
+  levelmsg: string,
+  levelmsgChannel: string,
+  joinChannel: string,
+  leaveChannel: string,
+  xpCurve: string,
+  beta: number,
+  blacklistedChannels: string[],
+  xp: boolean
+}
+export const getGuildData = async (guildId: string, disableCreateIfNull?: boolean) => {
+  let result = await tetGlobal.MongoDB?.db('Guilds').collection('GuildData').findOne({
+    guildId
   });
-  if (getGuild)
-    return getGuild;
-  else if (createIfNull)
-    return await createGuildData(guildId);
+  if (result)
+    return result as GuildData;
   else
-    return null;
+    if (!disableCreateIfNull)
+      return await createGuildData(guildId) as GuildData;
+    else
+      return null;
+}
+export const updateGuildData = async (guildId: string, guildData: GuildData) => {
+  let result = await tetGlobal.MongoDB?.db('Guilds').collection('GuildData').updateOne({
+    guildId
+  }, {
+    $set: guildData
+  }, {
+    upsert: true
+  });
+  if (result?.acknowledged)
+    return true;
+  else
+    return false;
+}
+export const deleteGuildData = async (guildId: string) => {
+  let result = await tetGlobal.MongoDB?.db('Guilds').collection('GuildData').deleteOne({
+    guildId
+  });
+  if (result?.acknowledged)
+    return true;
+  else
+    return false;
+}
+export const createUserData = async (userId: string, userData?: any) => {
+  let result = await tetGlobal.MongoDB?.db('Users').collection('UserData').insertOne({
+    userId,
+    ...userData
+  });
+  if (result?.acknowledged)
+    return {
+      userId,
+      ...userData
+    }
 }
 
 export const init = () => {

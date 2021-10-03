@@ -42,7 +42,13 @@ const bot = new ErisBoiler.DataClient(tetGlobal.Env.token, options);
 SQLHandler.init();
 const commandFolders = fs.readdirSync(join(__dirname, 'Commands'));
 for (const folder of commandFolders) {
+  if (folder.startsWith('_')) continue;
   bot.addCommands(join(__dirname, 'Commands', folder));
+}
+const eventFolders = fs.readdirSync(join(__dirname, 'Events'));
+for (const folder of eventFolders) {
+  if (folder.startsWith('_')) continue;
+  bot.addEvents(join(__dirname, 'Events', folder));
 }
 bot.connect();
 DatabaseHandler.init();

@@ -2,9 +2,9 @@ import { StringArgument, GuildCommand } from "eris-boiler";
 import ReactionCollector, { dataType } from "../../Handlers/ReactionsCollector";
 import MusicHandler from "../../Handlers/Music/MusicMain";
 import { Message, VoiceChannel } from "eris";
-import { getGuild, getUser } from "../../Handlers/DatabaseHandler";
+import { getGuildData, getUser, GuildData } from "../../Handlers/DatabaseHandler";
 import TetLib from "../../Helpers/TetLib";
-const {parseTime , text_truncate} = TetLib;
+const { parseTime, text_truncate } = TetLib;
 //------------------------------------------------ BASIC CONSTS
 // const sleep = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
 //------------------------------------------------
@@ -51,7 +51,7 @@ module.exports = new GuildCommand({
       if (tracks.length !== 1 && !(await getUser(member?.user.id || ""))?.autoSelectSongs) {
         const fields = tracks.map((track, i) => {
           let title = track.title;
-          let length = parseTime(track.duration/1000);
+          let length = parseTime(track.duration / 1000);
           let author = track.author;
           return {
             name: `${choices[i]} ) ${text_truncate(title, 30)}`,
@@ -63,7 +63,7 @@ module.exports = new GuildCommand({
         let promptMSG = await bot!.createMessage(channel.id, {
           embed: {
             title: "Search Results",
-            description: `Select which one you would like to play! (To turn this off do \`${(await getGuild(member!.guild.id, false).catch(() => { }))?.prefix || "daz "}prefs autoselectmusic on\``,
+            description: `Select which one you would like to play! (To turn this off do \`${(await getGuildData(member!.guild.id).catch(() => { }) as GuildData)?.prefix || "daz "}prefs autoselectmusic on\``,
             color: 0,
             fields: fields,
           },
@@ -96,7 +96,7 @@ module.exports = new GuildCommand({
             break;
           }
         }
-      }else {
+      } else {
         let track = tracks[0];
         MusicHandler.addSongToQueue(member?.guild.id!, channelID, channel.id, track);
       }
