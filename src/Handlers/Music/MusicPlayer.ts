@@ -91,8 +91,10 @@ export class MusicManager extends EventEmitter {
     if (!player.playing && !player.paused && !player.queue.size) {
       player.play();
       console.log('Requesting play');
+      return true;
     }
-    console.log(player.queue, player.queue.size, player.playing, player.paused);
+    return false;
+    // console.log(player.queue, player.queue.size, player.playing, player.paused);
   }
   async removeQueuedSong(guildID: string, index: number) {
     const player = this.getGuildData(guildID);

@@ -59,7 +59,7 @@ export class InteractionCollector {
       this.interactions.delete(`${message.id} ${handler.interactionid}`);
       message.edit({
         components: [],
-      });
+      }).catch(() => {});
     }, timeout);
   }
   deleteInteraction(messageID: string, interactionID: string) {

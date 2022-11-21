@@ -23,7 +23,7 @@ export const play = {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
     const start = Date.now();
-    const initAck = interaction.createMessage('Searching for songs...');
+    const initAck = interaction.acknowledge() //.createMessage('Searching for songs...');
     if (!interaction.data.options?.[0]) {
       return interaction.createFollowup(
         'Please provide a song name or URL to play!'
@@ -126,22 +126,25 @@ export const play = {
           (interaction.data as ComponentInteractionSelectMenuData).values?.map(
             async value => {
               const track = results[parseInt(value)];
-              MusicManager.getInstance().queueSong(
-                interaction.member!.guild.id,
-                track
-              );
-              await interaction.createMessage({
-                embeds: [
-                  {
-                    title: 'Added to queue!',
-                    description: `\`\`\`${track.title} has been added to the queue!\`\`\``,
-                    color: 11629370,
-                    thumbnail: {
-                      url: `${track.thumbnail}`,
+              if (
+                !MusicManager.getInstance().queueSong(
+                  interaction.member!.guild.id,
+                  track
+                )
+              )
+                await interaction.createMessage({
+                  embeds: [
+                    {
+                      title: 'Added to queue!',
+                      description: `\`\`\`${track.title} has been added to the queue!\`\`\``,
+                      color: 11629370,
+                      thumbnail: {
+                        url: `${track.thumbnail}`,
+                      },
                     },
-                  },
-                ],
-              });
+                  ],
+                });
+                interaction.deleteOriginalMessage()
             }
           );
         },
