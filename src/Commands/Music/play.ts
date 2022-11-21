@@ -1,117 +1,159 @@
-import { StringArgument, GuildCommand } from "eris-boiler";
-import ReactionCollector, { dataType } from "../../Handlers/ReactionsCollector";
-import MusicHandler from "../../Handlers/Music/MusicMain";
-import { Message, VoiceChannel } from "eris";
-import { getGuildData, getUser, GuildData } from "../../Handlers/DatabaseHandler";
-import TetLib from "../../Helpers/TetLib";
-const { parseTime, text_truncate } = TetLib;
-//------------------------------------------------ BASIC CONSTS
-// const sleep = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
-//------------------------------------------------
-
-
-
-function getChoice(msg: Message, userid: string) {
-  return new Promise(async (res) => {
-    let filter = (userID: string) => userID === userid;
-    let collector = new ReactionCollector(msg, filter, {
-      maxMatches: 1,
-      time: 1000 * 60,
-    });
-    collector.once("end", (collected: dataType[]) => {
-      if (collected[0]?.emoji.name) {
-        res(collected[0].emoji);
-      }
-      else {
-        msg.delete().catch(() => { });
-        res(null);
-      }
-    })
-  });
-}
-module.exports = new GuildCommand({
-  name: "play", // name of command
-  description: "Plays music.",
-  run: (async (bot, { channel, member, params }) => {
-    let channelID = member!.voiceState?.channelID;
-    let search = params.join(" ");
-    if (channelID) {
-
-      console.log((bot?.getChannel(channelID) as VoiceChannel).permissionsOf(bot?.user.id!), bot?.user.id)
-      if (!(bot?.getChannel(channelID) as VoiceChannel).permissionsOf(bot?.user.id!).has("voiceConnect"))
-        return "I don't have permission to connect to the voice channel.";
-      if (!search) return "Please provide a search term."
-      const searchResults = await MusicHandler.self.Manager.search(search, member?.user);
-      if (searchResults.exception) return `There was an error loading your track!\`Severity : ${searchResults.exception.severity}\` \`\`\`${searchResults.exception.message}\`\`\``
-      if (searchResults.tracks.length === 0) return "No results found.";
-      let tracks = searchResults.tracks;
-      tracks.length = Math.min(tracks.length, 8);
-      const choices = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"];
-      console.log((await getUser(member?.user.id || ""))?.autoSelectSongs)
-      if (tracks.length !== 1 && !(await getUser(member?.user.id || ""))?.autoSelectSongs) {
-        const fields = tracks.map((track, i) => {
-          let title = track.title;
-          let length = parseTime(track.duration / 1000);
-          let author = track.author;
-          return {
-            name: `${choices[i]} ) ${text_truncate(title, 30)}`,
-            value: `**Length:** ${length}\n**Author:** ${author}\n`,
-            inline: false
-          }
-        });
-
-        let promptMSG = await bot!.createMessage(channel.id, {
-          embed: {
-            title: "Search Results",
-            description: `Select which one you would like to play! (To turn this off do \`${(await getGuildData(member!.guild.id).catch(() => { }) as GuildData)?.prefix || "daz "}prefs autoselectmusic on\``,
-            color: 0,
-            fields: fields,
-          },
-        });
-        promptMSG.addReaction("❌");
-        (async () => {
-
-          for (var i = 0; i < fields.length; i++) {
-
-            try {
-              let failed = false;
-              await promptMSG.addReaction(choices[i]).catch(() => {
-                failed = true;
-              });
-              if (failed) break;
-            } catch (er) {
-              break;
-            }
-          }
-        })();
-
-        let choice = await getChoice(promptMSG, member!.id) as { name: string };
-        if (!choice) return "";
-        if (choice.name === "❌") promptMSG.delete();
-        for (var i = 0; i < choices.length; i++) {
-          if (choice.name === choices[i]) {
-            let track = tracks[i];
-            MusicHandler.addSongToQueue(member?.guild.id!, channelID, channel.id, track);
-            promptMSG.delete();
-            break;
-          }
-        }
-      } else {
-        let track = tracks[0];
-        MusicHandler.addSongToQueue(member?.guild.id!, channelID, channel.id, track);
-      }
-
-
-
-    } else {
-      return "You are not in a vc!";
+import {
+  ComponentInteractionSelectMenuData,
+  Constants,
+  InteractionDataOptionsString,
+} from 'eris';
+import { Command } from '../../types/misc';
+import { InteractionCollector } from '../../Handlers/InteractionCollector';
+import { MusicManager } from '../../Handlers/Music/MusicPlayer';
+export const play = {
+  name: 'play',
+  description: 'Play a song from youtube!',
+  args: [
+    {
+      name: 'Song Name/URL',
+      description:
+        'The name of the song/the URL of the song/playlist URL (Spotify + Youtube)',
+      type: Constants.ApplicationCommandOptionTypes.STRING,
+      required: true,
+    },
+  ],
+  type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+  execute: async (bot, { interaction }) => {
+    if (!interaction.guildID || !interaction.member)
+      return interaction.createMessage('This is a guild only command!');
+    const start = Date.now();
+    const initAck = interaction.createMessage('Searching for songs...');
+    if (!interaction.data.options?.[0]) {
+      return interaction.createFollowup(
+        'Please provide a song name or URL to play!'
+      );
     }
-    return "";
-  }),
-  options: {
-    // permissionNode: "playSong",
-    aliases: ["p"],
-    parameters: [new StringArgument("song", "Provide a search term. Accepts Spotify & Youtube URLs", false, undefined)]
-  }
-  // list of things in object passed to run: bot (Databot), msg (Message), params (String[])
-});
+    const songs = await MusicManager.getInstance().search(
+      (interaction.data.options[0] as InteractionDataOptionsString).value,
+      interaction.member
+    );
+    await initAck;
+    if (songs.error) {
+      return interaction.createFollowup({
+        embeds: [
+          {
+            title: 'An error has occured while trying to search for `${Music}`',
+            description:
+              '```\nee\n```\nThink this is a mistake? [Report it!](https://invite.dazai.app/)',
+            color: 16728385,
+            thumbnail: {
+              url:
+                'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+            },
+          },
+        ],
+      });
+    }
+    if (!interaction.member?.voiceState.channelID) {
+      return interaction.createFollowup(
+        'You are not in a voice channel! Please join one to use this command!'
+      );
+    }
+    MusicManager.getInstance().connect(
+      interaction.member.guild.id,
+      interaction.member.voiceState.channelID,
+      interaction.channel.id
+    );
+    if (songs.type !== 'search') {
+      const { tracks } = songs;
+      tracks?.map(track => {
+        MusicManager.getInstance().queueSong(
+          interaction.member!.guild.id,
+          track
+        );
+      });
+      return interaction.createFollowup({
+        embeds: [
+          {
+            title: 'Added to queue!',
+            description: `\`\`\`${songs.tracks?.length} songs have been added to the queue!\`\`\``,
+            color: 11629370,
+            thumbnail: {
+              url: 'https://i.imgur.com/8QZ7Z9A.png',
+            },
+          },
+        ],
+      });
+    }
+    const results = songs.tracks?.slice(0, 10);
+    const msg = await interaction.createFollowup({
+      embeds: [
+        {
+          title: 'Music Search Results',
+          description: 'Select a song below to play!',
+          color: 11629370,
+          fields: results.map(track => {
+            return {
+              name: track.title,
+              value: `🕓 ${track.duration}  [「 Video Link 」](${track.uri})\n👤 ${track.author}`,
+            };
+          }),
+          thumbnail: {
+            url:
+              'https://i.pinimg.com/736x/07/2b/7e/072b7e2858a9621ec86427f70931362d.jpg',
+          },
+        },
+      ],
+      components: [
+        {
+          type: Constants.ComponentTypes.ACTION_ROW,
+          components: [
+            {
+              type: Constants.ComponentTypes.SELECT_MENU,
+              custom_id: 'songSelect',
+              placeholder: 'Select a song',
+              options: results.map((track, i) => {
+                return {
+                  label: `${track.title} | ${track.author}`.substring(0, 100),
+                  value: i.toString(),
+                };
+              }),
+            },
+          ],
+        },
+      ],
+    });
+    InteractionCollector.getInstance().collectInteraction(
+      {
+        interactionid: 'songSelect',
+        run: async (bot, interaction) => {
+          (interaction.data as ComponentInteractionSelectMenuData).values?.map(
+            async value => {
+              const track = results[parseInt(value)];
+              MusicManager.getInstance().queueSong(
+                interaction.member!.guild.id,
+                track
+              );
+              await interaction.createMessage({
+                embeds: [
+                  {
+                    title: 'Added to queue!',
+                    description: `\`\`\`${track.title} has been added to the queue!\`\`\``,
+                    color: 11629370,
+                    thumbnail: {
+                      url: `${track.thumbnail}`,
+                    },
+                  },
+                ],
+              });
+            }
+          );
+        },
+        limit: 1,
+        whitelistUsers: [(interaction.user || interaction.member?.user!).id],
+      },
+      msg,
+      1000 * 20
+    );
+    // (bot as  ErisComponents.Client);
+    return;
+  },
+} as Command;
+
+export default play;

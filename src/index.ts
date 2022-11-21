@@ -1,67 +1,83 @@
-import * as ErisBoiler from 'eris-boiler';
 import { join } from 'path';
-import * as DatabaseHandler from './Handlers/DatabaseHandler';
-import SQLHandler from './Handlers/SQLHandler';
-import tetGlobal from './tetGlobal';
-import * as fs from 'fs';
-import MusicHandler from './Handlers/Music/MusicMain';
-import RankCardDrawer from './Handlers/Levelling/RankCardDrawer';
-const options: ErisBoiler.DataClientOptions = {
-  oratorOptions: {
-    defaultPrefix: 'daz' // sets the default prefix to !!
-  },
-  statusManagerOptions: {
-    defaultStatus: { // sets default discord activity
-      type: 0,
-      name: 'daz help | Rewrite???'
-    },
-    mode: 'random' // sets activity mode to random, the bot will change status on an interval
-  },
-  erisOptions: {
-    restMode: true,
-    defaultImageSize: 256,
-    intents: [
-      'guilds',
-      'guildMembers',
-      'guildBans',
-      'guildEmojis',
-      'guildIntegrations',
-      'guildWebhooks',
-      'guildInvites',
-      'guildVoiceStates',
-      'guildMessages',
-      'guildMessageReactions',
-      // 'guildMessageTyping',
-      'directMessages',
-      'directMessageReactions',
-      // 'directMessageTyping',
-    ]
-  },
+import Eris, { CommandClient } from 'eris';
+// import * as DatabaseHandler from './Handlers/DatabaseHandler';
+// import SQLHandler from './Handlers/SQLHandler';
+import * as fs from 'fs/promises';
+import { EnvData, env } from './env';
+import { BotClient, Command } from './types/misc';
+import { SlashCommandHandler } from './Handlers/SlashCommandHandler';
+import { MusicManager } from './Handlers/Music/MusicPlayer';
+// import MusicHandler from './Handlers/Music/MusicMain';
+// import RankCardDrawer from './Handlers/Levelling/RankCardDrawer';
+const options: Eris.CommandClientOptions & Eris.ClientOptions = {
+  prefix: 'daz',
+  restMode: true,
+  defaultImageSize: 256,
+  intents: [
+    'guilds',
+    'guildMembers',
+    'guildBans',
+    'guildEmojis',
+    'guildIntegrations',
+    'guildWebhooks',
+    'guildInvites',
+    'guildVoiceStates',
+    'guildMessages',
+    'guildMessageReactions',
+    // 'guildMessageTyping',
+    'directMessages',
+    'directMessageReactions',
+    // 'directMessageTyping',
+  ],
+  owner: 'Tet#6000',
+  name: 'Dazai',
 };
-const bot = new ErisBoiler.DataClient(tetGlobal.Env.token, options);
-SQLHandler.init();
-const commandFolders = fs.readdirSync(join(__dirname, 'Commands'));
-for (const folder of commandFolders) {
-  if (folder.startsWith('_')) continue;
-  bot.addCommands(join(__dirname, 'Commands', folder));
+globalThis.env = env;
+globalThis.bot = new CommandClient(env.token, options);
+declare global {
+  var bot: BotClient;
+  var env: EnvData;
 }
-const eventFolders = fs.readdirSync(join(__dirname, 'Events'));
-for (const folder of eventFolders) {
-  if (folder.startsWith('_')) continue;
-  bot.addEvents(join(__dirname, 'Events', folder));
-}
+
+// SQLHandler.init();
+const recursivelyAddCommands = async (dir: string) => {
+  const files = await fs.readdir(dir);
+  // recursively add folders
+  for (const file of files) {
+    console.log(file);
+    const path = join(dir, file);
+    if ((await fs.lstat(path)).isDirectory()) {
+      recursivelyAddCommands(path);
+      continue;
+    }
+    // add commands
+    if (file.endsWith('.js') || file.endsWith('.ts')) {
+      const command = (await import(join(dir, file))).default as Command;
+      SlashCommandHandler.getInstance().loadCommand(command);
+      console.log(command);
+    }
+  }
+};
+recursivelyAddCommands(join(__dirname, 'Commands'));
+// add commands
+
+// const commandFolders = fs.readdir(join(__dirname, 'Commands'));
+// for (const folder of commandFolders) {
+//   if (folder.startsWith('_')) continue;
+//   // import all commands from the folder
+//   join(__dirname, 'Commands', folder);
+// }
+// const eventFolders = fs.readdirSync(join(__dirname, 'Events'));
+// for (const folder of eventFolders) {
+//   if (folder.startsWith('_')) continue;
+//   bot.addEvents(join(__dirname, 'Events', folder));
+// }
 bot.connect();
-DatabaseHandler.init();
-let called = false;
-const onceCall = () => {
-  if (called) return;
-  called = true;
-  MusicHandler.init();
-  RankCardDrawer.init();
-};
+// DatabaseHandler.init();
 bot.on('ready', () => {
-  tetGlobal.Bot = bot;
-  onceCall();
+  console.log('Ready!');
+
+  MusicManager.getInstance().musicManager.init(bot.user.id);
 });
 
 // bot.
