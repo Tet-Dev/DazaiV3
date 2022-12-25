@@ -7,6 +7,8 @@ import { EnvData, env } from './env';
 import { BotClient, Command } from './types/misc';
 import { SlashCommandHandler } from './Handlers/SlashCommandHandler';
 import { MusicManager } from './Handlers/Music/MusicPlayer';
+import { MongoClient } from 'mongodb';
+import server from './Server/server';
 // import MusicHandler from './Handlers/Music/MusicMain';
 // import RankCardDrawer from './Handlers/Levelling/RankCardDrawer';
 const options: Eris.CommandClientOptions & Eris.ClientOptions = {
@@ -37,6 +39,7 @@ globalThis.bot = new CommandClient(env.token, options);
 declare global {
   var bot: BotClient;
   var env: EnvData;
+  var MongoDB: MongoClient;
 }
 
 // SQLHandler.init();
@@ -58,7 +61,7 @@ const recursivelyAddCommands = async (dir: string) => {
     }
   }
 };
-recursivelyAddCommands(join(__dirname, 'Commands'));
+recursivelyAddCommands(join(__dirname, 'Commands')).then();
 // add commands
 
 // const commandFolders = fs.readdir(join(__dirname, 'Commands'));
@@ -73,11 +76,14 @@ recursivelyAddCommands(join(__dirname, 'Commands'));
 //   bot.addEvents(join(__dirname, 'Events', folder));
 // }
 bot.connect();
+console.log('Connecting...');
 // DatabaseHandler.init();
 bot.on('ready', () => {
   console.log('Ready!');
-
+  server();
   MusicManager.getInstance().musicManager.init(bot.user.id);
 });
 
-// bot.
+bot.on('error', (err) => {
+  console.error(err);
+});

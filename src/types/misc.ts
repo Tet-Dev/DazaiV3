@@ -7,6 +7,9 @@ import {
   CommandInteraction,
   ComponentInteraction,
 } from 'eris';
+import { APIUser } from 'discord-api-types/v10';
+import { NextFunction, Request, Response } from 'express';
+import { Socket } from 'socket.io';
 export type Command = {
   name: string;
   description: string;
@@ -33,3 +36,30 @@ export type ComponentInteractionHandler = {
   interactionid: string;
 };
 export type BotClient = CommandClient;
+export enum RESTMethods {
+  GET = 'get',
+  POST = 'post',
+  PUT = 'put',
+  DELETE = 'delete',
+}
+export interface RESTHandler {
+  path: string;
+  method: RESTMethods;
+  sendUser: boolean;
+  run: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    user?: APIUser
+  ) => void | Promise<void> | any | Promise<any>;
+}
+export interface SocketHandler {
+  event: string;
+  method: RESTMethods;
+  sendUser?: boolean;
+  run: (
+    socket: Socket,
+    user?: APIUser,
+    ...args: any[]
+  ) => void | Promise<void> | any | Promise<any>;
+}
