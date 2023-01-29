@@ -20,7 +20,7 @@ export class SlashCommandHandler {
   }
   async onReady() {
     const create = this.devMode ? this.createDevCommand : bot.createCommand;
-    this.commands.forEach(async command => {
+    this.commands.forEach(async (command) => {
       await create(command);
     });
   }
@@ -31,7 +31,15 @@ export class SlashCommandHandler {
 
   loadCommand(command: Command) {
     this.commands.set(command.name, command);
-    if (bot.ready) this.registerCommand(command);
+    if (command.aliases) {
+      command.aliases.forEach((alias) => {
+        this.commands.set(alias, command);
+        if (bot.ready) this.registerCommand(command);
+      });
+    }
+    if (bot.ready) {
+      this.registerCommand(command);
+    }
   }
   getCommand(name: string): Command | undefined {
     return this.commands.get(name);

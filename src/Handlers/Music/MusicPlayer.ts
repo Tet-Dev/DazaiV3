@@ -1,5 +1,5 @@
-import { Manager, Player, Track } from 'erela.js';
-import { Member, TextChannel } from 'eris';
+import { Manager, Player, Track, UnresolvedTrack } from 'erela.js';
+import { Member, TextChannel, User } from 'eris';
 import EventEmitter from 'events';
 import { MusicCardManager } from './MusicCardManager';
 
@@ -27,14 +27,14 @@ export class MusicManager extends EventEmitter {
       autoPlay: true,
     });
     this.musicManager.createNode(env.LavalinkNodes[0]);
-    bot.on('rawWS', d => {
+    bot.on('rawWS', (d) => {
       if (!['VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE'].includes(d.t!)) return;
       //@ts-ignore
       this.musicManager.updateVoiceState(d);
       console.log({ voiceState: d });
     });
     // this.musicManager.on('nodeRaw', d => console.log(d));
-    this.musicManager.on('nodeConnect', node => {
+    this.musicManager.on('nodeConnect', (node) => {
       console.log(`Node ${node.options.identifier} connected`);
     });
     this.musicManager.on('nodeError', (node, error) => {
@@ -42,7 +42,7 @@ export class MusicManager extends EventEmitter {
         `Node ${node.options.identifier} had an error: ${error.message}`
       );
     });
-    this.musicManager.on('playerDisconnect', player => {
+    this.musicManager.on('playerDisconnect', (player) => {
       this.guildMap.delete(player.guild);
       player.destroy(true);
     });
@@ -50,7 +50,6 @@ export class MusicManager extends EventEmitter {
       console.log('Track started', { track });
       if (player.textChannel) {
         const card = await MusicCardManager.getInstance().getUpNextImage(track);
-        console.log({ card });
         if (!card) return;
         const text = bot.getChannel(player.textChannel) as TextChannel;
         text.createMessage('', { file: card, name: 'card.png' });
@@ -85,7 +84,7 @@ export class MusicManager extends EventEmitter {
   }
   queueSong(guildID: string, song: Track) {
     const player = this.getGuildData(guildID);
-    if (!player) return;
+    if (!player) return undefined;
     //@ts-ignore
     player.queue.add(song);
     if (!player.playing && !player.paused && !player.queue.size) {
@@ -140,8 +139,25 @@ export class MusicManager extends EventEmitter {
   }
   async skip(guildID: string) {
     const player = this.getGuildData(guildID);
-    if (!player) return;
+    if (!player) return null;
+    let track = player.queue.current;
     player.stop();
+    return track;
+  }
+  static getJSONOfTrack(track: UnresolvedTrack | Track) {
+    const user = track.requester as User;
+    return {
+      title: track.title,
+      url: track.uri,
+      duration: track.duration,
+      thumbnail: track.displayThumbnail?.('maxresdefault') || track.thumbnail,
+      requestedBy: {
+        id: user.id,
+        username: user.username,
+        discriminator: user.discriminator,
+        avatar: user.avatarURL,
+      },
+    };
   }
 }
 export type GuildMusicData = {

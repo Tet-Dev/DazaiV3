@@ -17,7 +17,7 @@ export const play = {
     const start = Date.now();
     const res = await MusicManager.getInstance().resume(interaction.guildID);
     if (res === null) {
-      return interaction.createFollowup('There is no song playing right now!');
+      return interaction.createMessage('There is no song playing right now!');
     }
     if (res) {
       return interaction.createMessage({

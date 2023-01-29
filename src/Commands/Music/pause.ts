@@ -6,7 +6,7 @@ import {
 import { Command } from '../../types/misc';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
 import { MusicManager } from '../../Handlers/Music/MusicPlayer';
-export const play = {
+export const pause = {
   name: 'pause',
   description: 'Pause the current song! (Or resume it if it is already paused)',
   args: [],
@@ -17,7 +17,7 @@ export const play = {
     const start = Date.now();
     const res = await MusicManager.getInstance().pause(interaction.guildID);
     if (res === null) {
-      return interaction.createFollowup('There is no song playing right now!');
+      return interaction.createMessage('There is no song playing right now!');
     }
     if (res) {
       return interaction.createMessage({
@@ -50,4 +50,4 @@ export const play = {
   },
 } as Command;
 
-export default play;
+export default pause;

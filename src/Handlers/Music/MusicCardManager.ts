@@ -36,7 +36,7 @@ export class MusicCardManager {
         }
         const cb = this.jobMap.get(data.nonce);
 
-        console.log({ cb });
+        // console.log({ cb });
         if (cb) cb(buffer);
       });
       this.workers.push(worker);

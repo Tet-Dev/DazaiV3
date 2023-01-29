@@ -45,14 +45,15 @@ export class InteractionCollector {
       }
       handler.limit--;
     }
-    await interaction.acknowledge();
+    !handler.doNotAcknowledge && await interaction.acknowledge();
     handler.run(bot, interaction);
     return;
   }
   collectInteraction(
     handler: ComponentInteractionHandler,
     message: Message,
-    timeout: number
+    timeout: number,
+    
   ) {
     this.interactions.set(`${message.id} ${handler.interactionid}`, handler);
     setTimeout(() => {

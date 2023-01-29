@@ -11,4 +11,9 @@ export type DiscordGuildData = {
   id: string;
   icon: string | null;
   roles: APIRole[];
+  member: {
+    nickname: string | null;
+    roles: string[];
+    
+  }
 };

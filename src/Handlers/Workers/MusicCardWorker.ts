@@ -94,7 +94,6 @@ async function generateBaseCard(data: {
     layout
     // imagescript
   );
-  console.log('Rendered title', data);
   const durationText = await Image.renderText(
     inter600,
     32,
@@ -103,7 +102,6 @@ async function generateBaseCard(data: {
     layout
     // Image.WRAP_STYLE_WORD
   );
-  console.log('Rendered duration', data);
   const authorText = await Image.renderText(
     inter500,
     24,
@@ -112,7 +110,6 @@ async function generateBaseCard(data: {
     layout
     // Image.WRAP_STYLE_WORD
   );
-  console.log('Rendered author', data);
   const requesterText = await Image.renderText(
     inter400,
     20,

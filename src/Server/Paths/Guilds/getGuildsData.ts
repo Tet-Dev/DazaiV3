@@ -20,9 +20,9 @@ export const getAllGuilds = {
           name: guild.name,
           id: guild.id,
           icon:
-            guild.dynamicIconURL('gif', 256) ||
-            guild.dynamicIconURL('png', 256) ||
-            null,
+            `https://cdn.discordapp.com/icons/${guild?.id}/${guild?.icon}.${
+              guild?.icon?.startsWith('a_') ? 'gif' : 'png'
+            }?size=256` || null,
           roles: guild.roles.map(
             (r) =>
               ({
@@ -30,6 +30,10 @@ export const getAllGuilds = {
                 permissions: r.permissions.toString(),
               } as APIRole)
           ),
+          member: {
+            nickname: member.nick || null,
+            roles: member.roles,
+          },
         } as DiscordGuildData;
         return { id: guildID, guild: data };
       })

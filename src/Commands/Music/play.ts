@@ -23,7 +23,7 @@ export const play = {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
     const start = Date.now();
-    const initAck = interaction.acknowledge() //.createMessage('Searching for songs...');
+    const initAck = interaction.acknowledge(); //.createMessage('Searching for songs...');
     if (!interaction.data.options?.[0]) {
       return interaction.createFollowup(
         'Please provide a song name or URL to play!'
@@ -38,13 +38,11 @@ export const play = {
       return interaction.createFollowup({
         embeds: [
           {
-            title: 'An error has occured while trying to search for `${Music}`',
-            description:
-              '```\nee\n```\nThink this is a mistake? [Report it!](https://invite.dazai.app/)',
+            title: `An error has occured while trying to search for \`${(interaction.data.options[0] as InteractionDataOptionsString).value}\``,
+            description: `\`\`\`\n${songs.message}\n\`\`\`\nThink this is a mistake? [Report it!](https://invite.dazai.app/)`,
             color: 16728385,
             thumbnail: {
-              url:
-                'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+              url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
             },
           },
         ],
@@ -62,7 +60,7 @@ export const play = {
     );
     if (songs.type !== 'search') {
       const { tracks } = songs;
-      tracks?.map(track => {
+      tracks?.map((track) => {
         MusicManager.getInstance().queueSong(
           interaction.member!.guild.id,
           track
@@ -88,15 +86,14 @@ export const play = {
           title: 'Music Search Results',
           description: 'Select a song below to play!',
           color: 11629370,
-          fields: results.map(track => {
+          fields: results.map((track) => {
             return {
               name: track.title,
               value: `🕓 ${track.duration}  [「 Video Link 」](${track.uri})\n👤 ${track.author}`,
             };
           }),
           thumbnail: {
-            url:
-              'https://i.pinimg.com/736x/07/2b/7e/072b7e2858a9621ec86427f70931362d.jpg',
+            url: 'https://i.pinimg.com/736x/07/2b/7e/072b7e2858a9621ec86427f70931362d.jpg',
           },
         },
       ],
@@ -124,7 +121,7 @@ export const play = {
         interactionid: 'songSelect',
         run: async (bot, interaction) => {
           (interaction.data as ComponentInteractionSelectMenuData).values?.map(
-            async value => {
+            async (value) => {
               const track = results[parseInt(value)];
               if (
                 !MusicManager.getInstance().queueSong(
@@ -144,7 +141,7 @@ export const play = {
                     },
                   ],
                 });
-                interaction.deleteOriginalMessage()
+              interaction.deleteOriginalMessage();
             }
           );
         },

@@ -16,6 +16,7 @@ export type Command = {
   args: ApplicationCommandOptions[];
   // type any part of Constants.CommandOptionTypes
   type: typeof Constants.ApplicationCommandTypes[keyof typeof Constants.ApplicationCommandTypes];
+  aliases?: string[];
   execute: (
     bot: BotClient,
     context: {
@@ -34,6 +35,7 @@ export type ComponentInteractionHandler = {
   whitelistUsers?: string[];
   blacklistUsers?: string[];
   interactionid: string;
+  doNotAcknowledge?: boolean;
 };
 export type BotClient = CommandClient;
 export enum RESTMethods {
