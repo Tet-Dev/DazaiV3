@@ -78,7 +78,7 @@ recursivelyAddCommands(join(__dirname, 'Commands')).then();
 bot.connect();
 console.log('Connecting...');
 // DatabaseHandler.init();
-bot.on('ready', () => {
+bot.once('ready', () => {
   console.log('Ready!');
   server();
   MusicManager.getInstance().musicManager.init(bot.user.id);
