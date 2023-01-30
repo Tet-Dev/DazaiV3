@@ -88,7 +88,7 @@ export const getMusicStatus = {
     }
     if (removeSong || removeSongIndex) {
       // check
-      if (!removeSong || !removeSongIndex) {
+      if (!removeSong || (!removeSongIndex && removeSongIndex !== 0)) {
         return res.status(400).json({
           error: 'Both removeSong (url) and removeSongIndex are required',
         });
