@@ -44,6 +44,22 @@ export const queue = {
             },
           },
         ],
+        components: [
+          {
+            type: Constants.ComponentTypes.ACTION_ROW,
+            components: [
+              {
+                type: Constants.ComponentTypes.BUTTON,
+                label: 'View Online',
+                emoji: {
+                  name: '🌐',
+                },
+                style: 5,
+                url: `http://localhost:3000/app/guild/${interaction.guildID}/music?`,
+              },
+            ],
+          },
+        ],
       });
     }
     if (res) {
@@ -91,6 +107,20 @@ export const queue = {
       const msg = await interaction.createFollowup({
         embeds: [embeds[page - 1]],
         components: [
+          {
+            type: Constants.ComponentTypes.ACTION_ROW,
+            components: [
+              {
+                type: Constants.ComponentTypes.BUTTON,
+                label: 'View Online',
+                emoji: {
+                  name: '🌐',
+                },
+                style: 5,
+                url: `http://localhost:3000/app/guild/${interaction.guildID}/music?`,
+              },
+            ],
+          },
           {
             type: Constants.ComponentTypes.ACTION_ROW,
             components: [

@@ -20,12 +20,18 @@ export const getQueue = {
     if (track.error) {
       return res.status(400).json({ error: track.message });
     }
-    if (track.type !== 'track') {
-      return res.status(400).json({ error: 'Not a track' });
+    if (track.type !== 'track' && track.type !== 'playlist') {
+      return res.status(400).json({ error: 'Not a track or playlist' });
     }
     const player = MusicManager.getInstance().getGuildData(guildID);
     if (!player) {
       return res.status(404).json({ error: 'No player found' });
+    }
+    if (track.type === 'playlist') {
+      track.tracks.map((t) => MusicManager.getInstance().queueSong(guildID, t));
+      return res.json({
+        tracks: track.tracks.map(MusicManager.getJSONOfTrack),
+      });
     }
     const playRes = MusicManager.getInstance().queueSong(
       guildID,

@@ -38,7 +38,10 @@ export const play = {
       return interaction.createFollowup({
         embeds: [
           {
-            title: `An error has occured while trying to search for \`${(interaction.data.options[0] as InteractionDataOptionsString).value}\``,
+            title: `An error has occured while trying to search for \`${
+              (interaction.data.options[0] as InteractionDataOptionsString)
+                .value
+            }\``,
             description: `\`\`\`\n${songs.message}\n\`\`\`\nThink this is a mistake? [Report it!](https://invite.dazai.app/)`,
             color: 16728385,
             thumbnail: {
@@ -75,6 +78,22 @@ export const play = {
             thumbnail: {
               url: 'https://i.imgur.com/8QZ7Z9A.png',
             },
+          },
+        ],
+        components: [
+          {
+            type: Constants.ComponentTypes.ACTION_ROW,
+            components: [
+              {
+                type: Constants.ComponentTypes.BUTTON,
+                label: 'View Online',
+                emoji: {
+                  name: '🌐',
+                },
+                style: 5,
+                url: `http://localhost:3000/app/guild/${interaction.guildID}/music?`,
+              },
+            ],
           },
         ],
       });
@@ -151,6 +170,7 @@ export const play = {
       msg,
       1000 * 20
     );
+    
     // (bot as  ErisComponents.Client);
     return;
   },

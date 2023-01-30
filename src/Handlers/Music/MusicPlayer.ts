@@ -1,5 +1,5 @@
 import { Manager, Player, Track, UnresolvedTrack } from 'erela.js';
-import { Member, TextChannel, User } from 'eris';
+import { Constants, Member, TextChannel, User } from 'eris';
 import EventEmitter from 'events';
 import { MusicCardManager } from './MusicCardManager';
 
@@ -52,7 +52,27 @@ export class MusicManager extends EventEmitter {
         const card = await MusicCardManager.getInstance().getUpNextImage(track);
         if (!card) return;
         const text = bot.getChannel(player.textChannel) as TextChannel;
-        text.createMessage('', { file: card, name: 'card.png' });
+        text.createMessage(
+          {
+            components: [
+              {
+                type: Constants.ComponentTypes.ACTION_ROW,
+                components: [
+                  {
+                    type: Constants.ComponentTypes.BUTTON,
+                    label: 'View Online',
+                    emoji: {
+                      name: '🌐',
+                    },
+                    style: 5,
+                    url: `http://localhost:3000/app/guild/${player.guild}/music?`,
+                  },
+                ],
+              },
+            ],
+          },
+          { file: card, name: 'card.png' }
+        );
       }
     });
     this.musicManager.on('trackEnd', (player, track) => {
@@ -151,6 +171,7 @@ export class MusicManager extends EventEmitter {
       url: track.uri,
       duration: track.duration,
       thumbnail: track.displayThumbnail?.('maxresdefault') || track.thumbnail,
+      author: track.author,
       requestedBy: {
         id: user.id,
         username: user.username,
