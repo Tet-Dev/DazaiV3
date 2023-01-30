@@ -1,4 +1,5 @@
 import { APIUser } from 'discord-api-types/v10';
+import nfetch from 'Handlers/FixedNodeFetch';
 const userMap = new Map<
   string,
   {
@@ -26,7 +27,7 @@ export const getDiscordUser = async (
       return user;
     }
   }
-  const res = await fetch('https://discord.com/api/v10/users/@me', {
+  const res = await nfetch('https://discord.com/api/v10/users/@me', {
     headers: {
       Authorization: token,
     },
