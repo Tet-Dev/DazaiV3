@@ -65,7 +65,7 @@ export class MusicManager extends EventEmitter {
                       name: '🌐',
                     },
                     style: 5,
-                    url: `http://localhost:3000/app/guild/${player.guild}/music?`,
+                    url: `${env.website}/app/guild/${player.guild}/music?`,
                   },
                 ],
               },

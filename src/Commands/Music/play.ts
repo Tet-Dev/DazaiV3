@@ -91,7 +91,7 @@ export const play = {
                   name: '🌐',
                 },
                 style: 5,
-                url: `http://localhost:3000/app/guild/${interaction.guildID}/music?`,
+                url: `${env.website}/app/guild/${interaction.guildID}/music?`,
               },
             ],
           },
