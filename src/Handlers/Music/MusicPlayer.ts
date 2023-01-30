@@ -99,7 +99,7 @@ export class MusicManager extends EventEmitter {
   disconnect(guildID: string) {
     const player = this.guildMap.get(guildID);
     if (!player) return;
-    player.destroy();
+    player.destroy(true);
     this.guildMap.delete(guildID);
   }
   queueSong(guildID: string, song: Track) {

@@ -13,15 +13,12 @@ export const getMusicStatus = {
       return res.status(404).json({ error: 'No player found' });
     }
     const track = player.queue.current;
-    if (!track) {
-      return res.status(404).json({ error: 'No track found' });
-    }
     const status = player.playing ? 'playing' : 'paused';
     // get all people in the voice channel
     const voiceChannel = bot.getChannel(player.voiceChannel!) as VoiceChannel;
     voiceChannel.voiceMembers;
     const data = {
-      track: MusicManager.getJSONOfTrack(track),
+      track: track ? MusicManager.getJSONOfTrack(track) : null,
       status,
       position: player.position,
       queue: player.queue.map(MusicManager.getJSONOfTrack),

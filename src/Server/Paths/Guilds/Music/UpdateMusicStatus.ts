@@ -10,8 +10,16 @@ export const getMusicStatus = {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const { paused, skip, seekTo, removeSong, removeSongIndex, purgeQueue } =
-      req.body;
+    const {
+      paused,
+      skip,
+      seekTo,
+      removeSong,
+      removeSongIndex,
+      purgeQueue,
+      disconnect,
+      shuffle
+    } = req.body;
     const player = MusicManager.getInstance().getGuildData(guildID);
     if (!player) {
       return res.status(404).json({ error: 'No player found' });
@@ -132,6 +140,50 @@ export const getMusicStatus = {
           {
             title: 'Queue Purged',
             description: `Removed all songs from the queue.`,
+            color: 16728385,
+            thumbnail: {
+              url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
+            },
+            footer: {
+              text: `${user.username}#${user.discriminator} via dashboard`,
+            },
+          },
+        ],
+      });
+    }
+    if (disconnect) {
+      const guilddata = await MusicManager.getInstance().getGuildData(guildID);
+      if (!guilddata) {
+        return res.status(404).json({ error: 'No player found' });
+      }
+      MusicManager.getInstance().disconnect(guildID);
+      bot.createMessage(player.textChannel!, {
+        embeds: [
+          {
+            title: 'Disconnected',
+            description: `Disconnected from the voice channel.`,
+            color: 16728385,
+            thumbnail: {
+              url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
+            },
+            footer: {
+              text: `${user.username}#${user.discriminator} via dashboard`,
+            },
+          },
+        ],
+      });
+    }
+    if (shuffle) {
+      const guilddata = await MusicManager.getInstance().getGuildData(guildID);
+      if (!guilddata) {
+        return res.status(404).json({ error: 'No player found' });
+      }
+      MusicManager.getInstance().getGuildData(guildID)?.queue.shuffle();
+      bot.createMessage(player.textChannel!, {
+        embeds: [
+          {
+            title: 'Queue Shuffled',
+            description: `Shuffled the queue.`,
             color: 16728385,
             thumbnail: {
               url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
