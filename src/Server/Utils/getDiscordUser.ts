@@ -1,5 +1,5 @@
 import { APIUser } from 'discord-api-types/v10';
-import nfetch from 'Handlers/FixedNodeFetch';
+import nfetch from '../../Handlers/FixedNodeFetch';
 const userMap = new Map<
   string,
   {
