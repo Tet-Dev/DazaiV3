@@ -5,7 +5,7 @@ import { RESTHandler, RESTMethods } from '../../../../types/misc';
 export const getMusicStatus = {
   method: RESTMethods.GET,
   path: '/guilds/:guildID/music/channels',
-  sendUser: false,
+  sendUser: true,
   run: async (req, res, next, user) => {
     const guildID = req.params.guildID;
     const allChannels = bot.guilds
