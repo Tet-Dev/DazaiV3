@@ -24,7 +24,10 @@ export const getLeaderboard = {
       leaderboard.map(async (xp) => {
         let user =
           bot.users.get(xp.userID) ||
-          (await bot.getRESTGuildMember(guildID, xp.userID).catch((e) => null));
+          (await bot
+            .getRESTGuildMember(guildID, xp.userID)
+            .catch((e) => null)) ||
+          (await bot.getRESTUser(xp.userID).catch((e) => null));
         console.log(user);
         return {
           ...xp,

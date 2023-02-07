@@ -9,7 +9,7 @@ export class SlashCommandHandler {
     return SlashCommandHandler.instance;
   }
   commands: Map<string, Command> = new Map();
-  devMode: boolean = true;
+  devMode: boolean = false;
   private constructor() {
     if (bot.ready) this.onReady();
     else bot.on('ready', this.onReady.bind(this));
