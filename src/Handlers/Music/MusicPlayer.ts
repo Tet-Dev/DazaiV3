@@ -31,7 +31,7 @@ export class MusicManager extends EventEmitter {
       if (!['VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE'].includes(d.t!)) return;
       //@ts-ignore
       this.musicManager.updateVoiceState(d);
-      console.log({ voiceState: d });
+      // console.log({ voiceState: d });
     });
     // this.musicManager.on('nodeRaw', d => console.log(d));
     this.musicManager.on('nodeConnect', (node) => {
