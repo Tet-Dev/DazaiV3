@@ -4,7 +4,7 @@ import Eris, { CommandClient } from 'eris';
 // import SQLHandler from './Handlers/SQLHandler';
 import * as fs from 'fs/promises';
 import { EnvData, env } from './env';
-import { BotClient, Command } from './types/misc';
+import { BotClient, Command, EventHandler } from './types/misc';
 import { SlashCommandHandler } from './Handlers/SlashCommandHandler';
 import { MusicManager } from './Handlers/Music/MusicPlayer';
 import { MongoClient } from 'mongodb';
@@ -61,7 +61,27 @@ const recursivelyAddCommands = async (dir: string) => {
     }
   }
 };
+SlashCommandHandler.getInstance().devMode = true;
 recursivelyAddCommands(join(__dirname, 'Commands')).then();
+const recursivelyAddEvents = async (dir: string) => {
+  const files = await fs.readdir(dir);
+  // recursively add folders
+  for (const file of files) {
+    console.log(file);
+    const path = join(dir, file);
+    if ((await fs.lstat(path)).isDirectory()) {
+      recursivelyAddEvents(path);
+      continue;
+    }
+    // add commands
+    if (file.endsWith('.js') || file.endsWith('.ts')) {
+      const event = (await import(join(dir, file)))
+        .default as EventHandler<any>;
+      bot.on(event.event, event.run.bind(null, bot));
+      console.log(event);
+    }
+  }
+};
 // add commands
 
 // const commandFolders = fs.readdir(join(__dirname, 'Commands'));
@@ -75,6 +95,8 @@ recursivelyAddCommands(join(__dirname, 'Commands')).then();
 //   if (folder.startsWith('_')) continue;
 //   bot.addEvents(join(__dirname, 'Events', folder));
 // }
+globalThis.MongoDB = new MongoClient(env.MongoURL);
+MongoDB.connect()
 bot.connect();
 console.log('Connecting...');
 // DatabaseHandler.init();
@@ -82,8 +104,17 @@ bot.once('ready', () => {
   console.log('Ready!');
   server();
   MusicManager.getInstance().musicManager.init(bot.user.id);
+  recursivelyAddEvents(join(__dirname, 'Events')).then();
 });
 
 bot.on('error', (err) => {
   console.error(err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error(err);
+  bot.createMessage(
+    '798446171294924831',
+    `An error occured: \`\`\`${err}\`\`\``
+  );
 });

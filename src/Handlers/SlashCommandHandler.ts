@@ -16,16 +16,33 @@ export class SlashCommandHandler {
     bot.on('interactionCreate', this.handleInteraction.bind(this));
   }
   createDevCommand(command: Command) {
-    bot.createGuildCommand('739559911033405592', command);
+    bot.createGuildCommand('1061108960268124210', {
+      ...command,
+      options: command.args,
+    }).catch(e=>{
+      console.error(e);
+      console.log(command);
+    });
+  }
+  createCommand(command: Command) {
+    bot.createCommand({
+      ...command,
+      options: command.args,
+    });
   }
   async onReady() {
-    const create = this.devMode ? this.createDevCommand : bot.createCommand;
+    await bot.getCommands().then((commands) => {
+      commands.forEach((cmd) => {
+        bot.deleteCommand(cmd.id);
+      });
+    });
+    const create = this.devMode ? this.createDevCommand : this.createCommand;
     this.commands.forEach(async (command) => {
       await create(command);
     });
   }
   async registerCommand(command: Command) {
-    const create = this.devMode ? this.createDevCommand : bot.createCommand;
+    const create = this.devMode ? this.createDevCommand : this.createCommand;
     await create(command);
   }
 

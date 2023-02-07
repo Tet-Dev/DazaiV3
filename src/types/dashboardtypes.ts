@@ -1,4 +1,4 @@
-import { APIGuild, APIRole } from "discord-api-types/v10";
+import { APIGuild, APIRole } from 'discord-api-types/v10';
 export type DiscordOauthBundle = {
   access_token: string;
   token_type: string;
@@ -14,6 +14,5 @@ export type DiscordGuildData = {
   member: {
     nickname: string | null;
     roles: string[];
-    
-  }
+  };
 };

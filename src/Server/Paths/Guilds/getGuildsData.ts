@@ -4,7 +4,7 @@ import { RESTHandler } from '../../../types/misc';
 
 export const getAllGuilds = {
   method: 'post',
-  path: '/api/guilds/multi',
+  path: '/guilds/multi',
   run: async (req, res, next, user) => {
     const { guildIDs } = req.body as { guildIDs: string[] };
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
@@ -26,14 +26,27 @@ export const getAllGuilds = {
           roles: guild.roles.map(
             (r) =>
               ({
-                ...r,
-                permissions: r.permissions.toString(),
+                id: r.id,
+                name: r.name,
+                color: r.color,
+                hoist: r.hoist,
+                position: r.position,
+                managed: r.managed,
+                mentionable: r.mentionable,
+                tags: r.tags,
+                unicode_emoji: r.unicodeEmoji,
+                icon: r.icon,
+                permissions: r.permissions.toJSON().allow,
               } as APIRole)
           ),
-          member: {
-            nickname: member.nick || null,
-            roles: member.roles,
-          },
+          banner: guild.bannerURL || null,
+          background: guild.splashURL || null,
+          member: member
+            ? {
+                nickname: member.nick || null,
+                roles: member.roles,
+              }
+            : null,
         } as DiscordGuildData;
         return { id: guildID, guild: data };
       })

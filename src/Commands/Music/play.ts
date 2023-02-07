@@ -11,7 +11,7 @@ export const play = {
   description: 'Play a song from youtube!',
   args: [
     {
-      name: 'Song Name/URL',
+      name: 'song',
       description:
         'The name of the song/the URL of the song/playlist URL (Spotify + Youtube)',
       type: Constants.ApplicationCommandOptionTypes.STRING,
@@ -23,7 +23,23 @@ export const play = {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
     const start = Date.now();
-    const initAck = interaction.acknowledge(); //.createMessage('Searching for songs...');
+    const player = MusicManager.getInstance().getGuildData(interaction.guildID);
+    if (!player) {
+      return interaction.createMessage({
+        embeds: [
+          {
+            title: `Bot is not in a voice channel!`,
+            description: `Please use \`/connect\` to connect me to a voice channel!`,
+            color: 16728385,
+            thumbnail: {
+              url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+            },
+          },
+        ],
+      });
+    }
+
+    const initAck = await interaction.acknowledge(); //.createMessage('Searching for songs...');
     if (!interaction.data.options?.[0]) {
       return interaction.createFollowup(
         'Please provide a song name or URL to play!'
@@ -170,7 +186,7 @@ export const play = {
       msg,
       1000 * 20
     );
-    
+
     // (bot as  ErisComponents.Client);
     return;
   },
