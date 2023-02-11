@@ -130,7 +130,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   });
   let nameImg = await Image.renderText(
     pop,
-    48,
+    username.length > 12 ? 32 : 48,
     `${username}`,
     Jimp.rgbaToInt(255, 255, 255, 255),
     layout
@@ -147,12 +147,12 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   // create Data Canvas
   const dataCanvas = new Image(
     684,
-    nameImg.height + lvlImg.height + rankImg.height - 12 * 3
+    nameImg.height + lvlImg.height + rankImg.height - 12 * 2
   );
   // create Name Canvas
   const nameCanvas = new Image(
     nameImg.width + 6 + discImg.width,
-    nameImg.height
+    nameImg.height + 12
   );
   nameCanvas.composite(nameImg, 0, 0);
 
@@ -160,7 +160,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
     nameCanvas.composite(
       discImg,
       nameImg.width + 6,
-      nameCanvas.height - discImg.height - 12
+      nameCanvas.height - discImg.height - 13
     );
   }
   dataCanvas.composite(rankImg, 0, -6);
