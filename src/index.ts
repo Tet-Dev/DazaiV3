@@ -61,6 +61,7 @@ const recursivelyAddCommands = async (dir: string) => {
     }
   }
 };
+//@ts-ignore
 SlashCommandHandler.getInstance().devMode = !!env.devmode;
 recursivelyAddCommands(join(__dirname, 'Commands')).then();
 const recursivelyAddEvents = async (dir: string) => {
@@ -96,7 +97,7 @@ const recursivelyAddEvents = async (dir: string) => {
 //   bot.addEvents(join(__dirname, 'Events', folder));
 // }
 globalThis.MongoDB = new MongoClient(env.MongoURL);
-MongoDB.connect()
+MongoDB.connect();
 bot.connect();
 console.log('Connecting...');
 // DatabaseHandler.init();
