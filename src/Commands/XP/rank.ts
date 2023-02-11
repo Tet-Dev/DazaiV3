@@ -1,11 +1,10 @@
 import {
   ComponentInteractionSelectMenuData,
   Constants,
-  InteractionDataOptionsString,
+  InteractionDataOptionsUser,
 } from 'eris';
+import { XPManager } from '../../Handlers/Levelling/XPManager';
 import { Command } from '../../types/misc';
-import { InteractionCollector } from '../../Handlers/InteractionCollector';
-import { MusicManager } from '../../Handlers/Music/MusicPlayer';
 export const rank = {
   name: 'rank',
   description: 'Get your rank card!',
@@ -21,20 +20,27 @@ export const rank = {
   execute: async (bot, { interaction }) => {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
-    const start = Date.now();
-    
-    return interaction.createMessage({
-      embeds: [
-        {
-          title: 'Music Resumed',
-          description: 'Music has been resumed! use `/pause` to resume it!',
-          color: 4456364,
-          thumbnail: {
-            url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
-          },
-        },
-      ],
-    });
+    const selectedUserID = (
+      interaction.data?.options?.[0] as InteractionDataOptionsUser
+    )?.value;
+    const user = selectedUserID
+      ? bot.users.get(selectedUserID) || (await bot.getRESTUser(selectedUserID))
+      : interaction.user || interaction.member?.user;
+    if (!user) return interaction.createMessage('User not found!');
+    console.log(user);
+    const ackPromise = interaction.acknowledge()
+    const guildCard = await XPManager.getInstance().generateRankCard(
+      interaction.guildID,
+      user.id
+    );
+    await ackPromise;
+    return interaction.createFollowup(
+      {},
+      {
+        file: Buffer.from(guildCard.buffer),
+        name: `Dazai_RankCard_${user.username}.${guildCard.type}`,
+      }
+    );
   },
 } as Command;
 

@@ -61,7 +61,7 @@ const recursivelyAddCommands = async (dir: string) => {
     }
   }
 };
-SlashCommandHandler.getInstance().devMode = false;
+// SlashCommandHandler.getInstance().devMode = true;
 recursivelyAddCommands(join(__dirname, 'Commands')).then();
 const recursivelyAddEvents = async (dir: string) => {
   const files = await fs.readdir(dir);

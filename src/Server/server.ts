@@ -5,10 +5,14 @@ import cors from 'cors';
 import { RESTHandler } from '../types/misc';
 import { getDiscordUser } from './Utils/getDiscordUser';
 import { join } from 'path';
-import { readFileSync } from "fs";
+import { readFileSync } from 'fs';
 const server = express();
 server.use(cors());
-server.use(express.json());
+server.use(
+  express.json({
+    limit: '20mb',
+  })
+);
 
 export default function initServer() {
   const importAllHandlers = async (path: string, failedImports: string[]) => {

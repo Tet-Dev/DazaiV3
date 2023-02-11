@@ -1,6 +1,7 @@
 import { Constants } from 'eris';
 import { Command } from '../../types/misc';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
+import { InventoryManager } from '../../Handlers/Crates/InventoryManager';
 export const ping = {
   name: 'ping',
   description: 'Pings the bot',
@@ -11,6 +12,16 @@ export const ping = {
     await interaction.createMessage('Pinging...');
     const end = Date.now();
     let clicks = 0;
+    await InventoryManager.getInstance().addCardToInventory(
+      interaction.user?.id!,
+      interaction.guildID!,
+      `63e699573f39ec65519ce162`
+    );
+    await InventoryManager.getInstance().selectCard(
+      interaction.user?.id!,
+      interaction.guildID!,
+      `63e699573f39ec65519ce162`
+    );
     const msg = await interaction.createFollowup({
       content: `Pong! Took ${end - start}ms`,
       components: [

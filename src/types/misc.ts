@@ -55,6 +55,7 @@ export enum RESTMethods {
   POST = 'post',
   PUT = 'put',
   DELETE = 'delete',
+  PATCH = 'patch',
 }
 export interface RESTHandler {
   path: string;

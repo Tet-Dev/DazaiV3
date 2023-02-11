@@ -1,4 +1,6 @@
+import { InventoryManager } from '../Crates/InventoryManager';
 import { LevellingRewards } from './LevelRewards';
+import { RankCardManager } from './RankCardManager';
 
 export type GuildXPPreference = {
   guildID: string;
@@ -202,5 +204,30 @@ export class XPManager {
       .limit(limit)
       .toArray();
     return data as unknown as GuildMemeberXP[];
+  }
+  async generateRankCard(guildID: string, userID: string) {
+    const guildXP = await this.getGuildXPPreference(guildID);
+    const memberXP = await this.getGuildMemberXP(guildID, userID);
+    const top = await this.getLeaderboard(guildID, 1000);
+    const rank = top.findIndex((x) => x.userID === userID) + 1;
+    const user =
+      (await bot.users.get(userID)) ?? (await bot.getRESTUser(userID));
+    const inventory = await InventoryManager.getInstance().getSelectedCard(
+      userID,
+      guildID
+    );
+    const rankCardBuffer = await RankCardManager.getInstance().getRankCardImage(
+      {
+        avatar: user.dynamicAvatarURL('png', 256),
+        username: user.username,
+        discriminator: user.discriminator,
+        level: memberXP.level,
+        rank,
+        xp: memberXP.xp,
+        xpToNext: this.getRequiredXPForLevel(memberXP.level + 1),
+        background: inventory ? inventory.url : undefined,
+      }
+    );
+    return rankCardBuffer;
   }
 }
