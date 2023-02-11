@@ -29,6 +29,11 @@ export const createRankCard = {
     //     error: 'Invalid card rarity, cannot create event or secret rare cards',
     //   });
     // }
+    // check if permissions are valid
+    res.status(400).json({
+      error: 'Cannot create a card at this time',
+    });
+    return;
     const currentCardCount = await getGuildCards(guildID);
     if (currentCardCount.length >= 10) {
       return res.status(400).json({

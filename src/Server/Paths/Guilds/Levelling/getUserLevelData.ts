@@ -1,4 +1,5 @@
 import { Constants, TextableChannel, VoiceChannel } from 'eris';
+import { InventoryManager } from '../../../../Handlers/Crates/InventoryManager';
 import { XPManager } from '../../../../Handlers/Levelling/XPManager';
 import { MusicManager } from '../../../../Handlers/Music/MusicPlayer';
 import { RESTHandler, RESTMethods } from '../../../../types/misc';
@@ -28,7 +29,6 @@ export const getLeaderboard = {
             .getRESTGuildMember(guildID, xp.userID)
             .catch((e) => null)) ||
           (await bot.getRESTUser(xp.userID).catch((e) => null));
-        console.log(user);
         return {
           ...xp,
           user: {
@@ -39,6 +39,9 @@ export const getLeaderboard = {
             banner: user?.banner,
             color: user?.accentColor,
           },
+          card: await InventoryManager.getInstance()
+            .getSelectedCard(xp.userID, guildID)
+            .then((x) => (x ? x.url : null)),
         };
       })
     );
