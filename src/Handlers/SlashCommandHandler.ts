@@ -15,8 +15,8 @@ export class SlashCommandHandler {
     else bot.on('ready', this.onReady.bind(this));
     bot.on('interactionCreate', this.handleInteraction.bind(this));
   }
-  createDevCommand(command: Command) {
-    bot
+  async createDevCommand(command: Command) {
+    await bot
       .createGuildCommand('1061108960268124210', {
         ...command,
         options: command.args,
@@ -25,7 +25,7 @@ export class SlashCommandHandler {
         console.error(e);
         console.log(command);
       });
-    bot
+    await bot
       .createGuildCommand('739559911033405592', {
         ...command,
         options: command.args,
@@ -36,7 +36,7 @@ export class SlashCommandHandler {
       });
   }
   createCommand(command: Command) {
-    bot.createCommand({
+    return bot.createCommand({
       ...command,
       options: command.args,
     });
@@ -75,9 +75,14 @@ export class SlashCommandHandler {
 
   async onReady() {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
-    this.commands.forEach(async (command) => {
+    const commands = Array.from(this.commands.values());
+
+    for (let i = 0; i < commands.length; i++) {
+      const command = commands[i];
       await create(command);
-    });
+      console.log(`registered ${command.name}, ${i + 1}/${commands.length}`);
+    }
+    console.log('registered all commands');
   }
   async registerCommand(command: Command) {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
