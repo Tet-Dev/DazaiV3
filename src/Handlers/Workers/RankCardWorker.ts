@@ -276,7 +276,7 @@ let genSlots = 4;
       (async () => {
         genSlots--;
         let item = queue.shift()!;
-        console.log('Processing', item.nonce);
+        console.log('Processing', item.nonce, genSlots);
         const bufferData = await generateRankCard(item.data);
         process.send?.({
           nonce: item.nonce,
