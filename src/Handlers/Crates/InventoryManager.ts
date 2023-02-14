@@ -123,7 +123,7 @@ export class InventoryManager {
       inventory.cards.find((card) => card.id === inventory.selectedCard)
         ?.cardID ||
       globalInventory.cards.find(
-        (card) => card.id === globalInventory.selectedCard
+        (card) => card.id === inventory.selectedCard
       )?.cardID;
     const cardData = cardID && (await getCard(cardID));
     return cardData;
