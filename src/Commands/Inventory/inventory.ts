@@ -75,7 +75,7 @@ export const inventory = {
     }
     const userCrates = (await CrateManager.getInstance().getUserCrates(
       interaction.member ? interaction.member.user.id : interaction.user?.id!,
-      interaction.guildID,
+      `@global`,
       true
     )) as Crate[];
     if (userCrates.filter((x) => x.guildID === '@global').length < 2) {
