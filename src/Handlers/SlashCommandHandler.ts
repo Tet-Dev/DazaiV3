@@ -54,7 +54,7 @@ export class SlashCommandHandler {
         commands.map((cmd) => {
           cmd.application_id === bot.user.id &&
             bot
-              .deleteGuildCommand(cmd.id, '1061108960268124210')
+              .deleteGuildCommand('1061108960268124210', cmd.id)
               .catch((e) => console.error({ e, cmd }));
         })
       )
@@ -66,16 +66,13 @@ export class SlashCommandHandler {
           commands.map(
             (cmd) =>
               cmd.application_id === bot.user.id &&
-              bot.deleteGuildCommand(cmd.id, '739559911033405592')
+              bot.deleteGuildCommand('739559911033405592', cmd.id)
           )
         )
       );
   }
 
   async onReady() {
-    if (this.devMode) {
-      await this.purgeDevCommands();
-    }
     const create = this.devMode ? this.createDevCommand : this.createCommand;
     this.commands.forEach(async (command) => {
       await create(command);

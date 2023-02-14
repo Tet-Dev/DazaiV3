@@ -57,11 +57,11 @@ export class CrateManager {
     );
     return userCrates as UserCrate[];
   }
-  async getCrateTemplate(crateID: string) {
+  async getCrateTemplate(templateID: string) {
     const crate = await MongoDB.db('Crates')
       .collection('crateTemplates')
       .findOne({
-        _id: new ObjectID(crateID),
+        _id: new ObjectID(templateID),
       });
     return crate as CrateTemplate | null;
   }
@@ -130,7 +130,7 @@ export class CrateManager {
       guildID,
       userID,
       createdAt: Date.now(),
-      itemID: item._id as string,
+      itemID: item._id.toString() as string,
     } as Crate;
     await MongoDB.db('Crates')
       .collection('userCrates')
