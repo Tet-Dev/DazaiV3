@@ -51,26 +51,23 @@ export const inventory = {
           `63eb39f288bdaa3a2df23e35`
         );
         if (!crateTemplate) return;
-        await CrateManager.getInstance().generateCrate(
-          crateTemplate,
-          interaction.guildID,
-          interaction.member
-            ? interaction.member.user.id
-            : interaction.user?.id!
-        );
-        await CrateManager.getInstance().generateCrate(
-          crateTemplate,
-          interaction.guildID,
-          interaction.member
-            ? interaction.member.user.id
-            : interaction.user?.id!
-        );
+        // random between 2-4 crates
+        const crateCount = Math.floor(Math.random() * 3) + 2;
+        for (let i = 0; i < crateCount; i++)
+          await CrateManager.getInstance().generateCrate(
+            crateTemplate,
+            interaction.guildID,
+            interaction.member
+              ? interaction.member.user.id
+              : interaction.user?.id!
+          );
+
         interaction.createFollowup({
           embeds: [
             {
-              title: 'You have been given 2 crates!',
+              title: `Free Crates!`,
               description:
-                'As a new user, you have been given 2 crates! You can open them by using going to the inventory and clicking on the crates!',
+                `As a new user, you have been given \`${crateCount}\` crates! You can open them by using going to the inventory and clicking on the crates!`,
             },
           ],
         });
