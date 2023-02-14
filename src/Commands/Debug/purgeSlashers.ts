@@ -16,8 +16,12 @@ export const purge = {
     await interaction.acknowledge();
     let start = Date.now();
     await Promise.all([
-      SlashCommandHandler.getInstance().purgeCommands(),
-      SlashCommandHandler.getInstance().purgeDevCommands(),
+      SlashCommandHandler.getInstance()
+        .purgeCommands()
+        .catch((e) => console.log(e)),
+      SlashCommandHandler.getInstance()
+        .purgeDevCommands()
+        .catch((e) => console.log(e)),
     ]);
     interaction.createFollowup(
       `Purged all slash commands!, took ${
