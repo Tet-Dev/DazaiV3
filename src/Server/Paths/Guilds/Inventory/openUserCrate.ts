@@ -15,6 +15,8 @@ export const getUserCrates = {
     if (!crate) return res.status(404).json({ error: 'Crate not found' });
     if (crate.userID !== user.id)
       return res.status(403).json({ error: 'Forbidden, not your crate' });
+    if (crate.opened)
+      return res.status(403).json({ error: 'Crate already opened' });
     const result = await CrateManager.getInstance().openCrate(crateID);
     if (!result) return res.status(500).json({ error: 'Failed to open crate' });
     return res.json(result);
