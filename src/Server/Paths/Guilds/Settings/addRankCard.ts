@@ -11,6 +11,9 @@ export const createRankCard = {
   sendUser: true,
   run: async (req, res, next, user) => {
     const guildID = req.params.guildID;
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const { name, description, rarity, base64 } = req.body as {
       name: string;
       description: string;
@@ -24,16 +27,32 @@ export const createRankCard = {
     if (!Object.values(CardRarity).includes(rarity as CardRarity)) {
       return res.status(400).json({ error: 'Invalid card rarity' });
     }
+    // check user persm
+    const member =
+      bot.guilds.get(guildID)?.members.get(user.id) ??
+      (await bot.getRESTGuildMember(guildID, user.id));
+    if (!member) {
+      return res.status(400).json({ error: 'Not a member of this guild' });
+    }
+    const perms =
+      member.permissions.has('administrator') ||
+      member.permissions.has('manageGuild');
+    if (!perms) {
+      return res
+        .status(400)
+        .json({ error: 'Missing permissions, need manage guild or admin' });
+    }
+
     // if (rarity === CardRarity.EVENT_RARE || rarity === CardRarity.SECRET_RARE) {
     //   return res.status(400).json({
     //     error: 'Invalid card rarity, cannot create event or secret rare cards',
     //   });
     // }
     // check if permissions are valid
-    res.status(400).json({
-      error: 'Cannot create a card at this time',
-    });
-    return;
+    // res.status(400).json({
+    //   error: 'Cannot create a card at this time',
+    // });
+    // return;
     const currentCardCount = await getGuildCards(guildID);
     if (currentCardCount.length >= 10) {
       return res.status(400).json({

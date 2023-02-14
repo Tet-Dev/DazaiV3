@@ -4,8 +4,10 @@ import {
   CardType,
   Crate,
   CrateTemplate,
+  UserCrate,
 } from 'constants/cardNames';
 import { getCard } from './CardManager';
+import { InventoryManager } from './InventoryManager';
 
 export class CrateManager {
   static instance: CrateManager;
@@ -16,22 +18,44 @@ export class CrateManager {
   private constructor() {
     // this.init();
   }
-  async getUserCrate(crateID: string) {
-    const crate = await MongoDB.db('Crates')
+  async getUserCrate(crateID: string, raw?: boolean) {
+    const crate = (await MongoDB.db('Crates')
       .collection('userCrates')
       .findOne({
         _id: new ObjectID(crateID),
-      });
-    return crate as Crate | null;
+      })) as Crate | null;
+    if (raw) return crate;
+    const userCrate =
+      crate &&
+      ({
+        ...crate,
+        item: await getCard(crate.itemID),
+      } as UserCrate | null);
+    return userCrate;
   }
-  async getUserCrates(userID: string) {
+  async getUserCrates(userID: string, guildID?: string, raw?: boolean) {
     const crates = await MongoDB.db('Crates')
       .collection('userCrates')
       .find({
         userID,
+        ...(guildID && { guildID }),
       })
       .toArray();
-    return crates as Crate[];
+    if (raw) return crates;
+    console.log(
+      { crates },
+      {
+        userID,
+        guildID,
+      }
+    );
+    const userCrates = await Promise.all(
+      crates.map(async (crate) => ({
+        ...crate,
+        item: await getCard(crate.itemID),
+      }))
+    );
+    return userCrates as UserCrate[];
   }
   async getCrateTemplate(crateID: string) {
     const crate = await MongoDB.db('Crates')
@@ -49,6 +73,23 @@ export class CrateManager {
       })
       .toArray();
     return crates as CrateTemplate[];
+  }
+  async createCrateTemplate(
+    crateTemplate: Partial<CrateTemplate>,
+    guildID: string
+  ) {
+    const template = {
+      _id: new ObjectID(),
+      name: crateTemplate.name,
+      description: crateTemplate.description,
+      items: crateTemplate.items,
+      dropRates: crateTemplate.dropRates,
+      guild: guildID,
+    } as CrateTemplate;
+    await MongoDB.db('Crates')
+      .collection('crateTemplates')
+      .insertOne(template as CrateTemplate & { _id: ObjectID });
+    return template;
   }
   async generateCrate(
     crateTemplate: CrateTemplate,
@@ -89,7 +130,7 @@ export class CrateManager {
       guildID,
       userID,
       createdAt: Date.now(),
-      item,
+      itemID: item._id as string,
     } as Crate;
     await MongoDB.db('Crates')
       .collection('userCrates')
@@ -97,7 +138,7 @@ export class CrateManager {
     return crate;
   }
   async openCrate(crateID: string) {
-    const crate = await this.getUserCrate(crateID);
+    const crate = (await this.getUserCrate(crateID, true)) as Crate | null;
     if (!crate) return null;
     await MongoDB.db('Crates')
       .collection('userCrates')
@@ -112,8 +153,11 @@ export class CrateManager {
           },
         }
       );
-    // apply the item to the user
+    await InventoryManager.getInstance().addCardToInventory(
+      crate.userID,
+      crate.guildID || `@global`,
+      crate.itemID
+    );
     return crate;
   }
-  
 }

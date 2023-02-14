@@ -38,9 +38,9 @@ export class InventoryManager {
       await MongoDB.db('Guilds')
         .collection('userData')
         .insertOne(defaultInventory(userID, guildID));
-      return defaultInventory(userID, guildID) as DefaultInventoryType | null;
+      return defaultInventory(userID, guildID) as DefaultInventoryType;
     }
-    return inventory as DefaultInventoryType | null;
+    return inventory as DefaultInventoryType;
   }
   async getUserInventories(userID: string) {
     const inventories = await MongoDB.db('Guilds')

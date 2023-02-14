@@ -16,13 +16,24 @@ export class SlashCommandHandler {
     bot.on('interactionCreate', this.handleInteraction.bind(this));
   }
   createDevCommand(command: Command) {
-    bot.createGuildCommand('1061108960268124210', {
-      ...command,
-      options: command.args,
-    }).catch(e=>{
-      console.error(e);
-      console.log(command);
-    });
+    bot
+      .createGuildCommand('1061108960268124210', {
+        ...command,
+        options: command.args,
+      })
+      .catch((e) => {
+        console.error(e);
+        console.log(command);
+      });
+    bot
+      .createGuildCommand('739559911033405592', {
+        ...command,
+        options: command.args,
+      })
+      .catch((e) => {
+        console.error(e);
+        console.log(command);
+      });
   }
   createCommand(command: Command) {
     bot.createCommand({
@@ -30,12 +41,41 @@ export class SlashCommandHandler {
       options: command.args,
     });
   }
+  async purgeCommands() {
+    await bot
+      .getCommands()
+      .then((commands) =>
+        Promise.all(commands.map((cmd) => bot.deleteCommand(cmd.id)))
+      );
+  }
+  async purgeDevCommands() {
+    await bot.getGuildCommands('1061108960268124210').then((commands) =>
+      Promise.all(
+        commands.map((cmd) => {
+          cmd.application_id === bot.user.id &&
+            bot
+              .deleteGuildCommand(cmd.id, '1061108960268124210')
+              .catch((e) => console.error({ e, cmd }));
+        })
+      )
+    );
+    await bot
+      .getGuildCommands('739559911033405592')
+      .then((commands) =>
+        Promise.all(
+          commands.map(
+            (cmd) =>
+              cmd.application_id === bot.user.id &&
+              bot.deleteGuildCommand(cmd.id, '739559911033405592')
+          )
+        )
+      );
+  }
+
   async onReady() {
-    await bot.getCommands().then((commands) => {
-      commands.forEach((cmd) => {
-        bot.deleteCommand(cmd.id);
-      });
-    });
+    if (this.devMode) {
+      await this.purgeDevCommands();
+    }
     const create = this.devMode ? this.createDevCommand : this.createCommand;
     this.commands.forEach(async (command) => {
       await create(command);
