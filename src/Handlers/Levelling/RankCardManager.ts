@@ -21,12 +21,13 @@ export class RankCardManager {
   jobMap: Map<string, (data: { buffer: Buffer; type: string }) => void> =
     new Map();
   workers: ChildProcess[] = [];
+  nextWorker = 0;
   constructor() {
     this.jobMap = new Map();
     this.init();
   }
   init(count?: number) {
-    for (let i = 0; i < (count || env.MusicDrawers || 1); i++) {
+    for (let i = 0; i < (count || env.RankCardDrawers || 2); i++) {
       const worker = fork(join(__dirname, '../Workers/RankCardWorker'), [
         // '-r',
         // 'ts-node/register',
@@ -64,10 +65,12 @@ export class RankCardManager {
       const nonce = (Math.random() * 1000000000).toString(36);
       this.jobMap.set(nonce, res);
       console.log('Sending job to worker', nonce);
-      this.workers[~~(this.workers.length * Math.random())].send({
+      this.workers[this.nextWorker].send({
         nonce,
         data,
       });
+      this.nextWorker++;
+      if (this.nextWorker >= this.workers.length) this.nextWorker = 0;
     }) as Promise<{ buffer: Buffer; type: string }>;
   }
 }
