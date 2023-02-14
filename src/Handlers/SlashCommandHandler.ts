@@ -42,34 +42,35 @@ export class SlashCommandHandler {
     });
   }
   async purgeCommands() {
-    await bot
-      .getCommands()
-      .then((commands) =>
-        Promise.all(commands.map((cmd) => bot.deleteCommand(cmd.id)))
-      );
-  }
-  async purgeDevCommands() {
-    await bot.getGuildCommands('1061108960268124210').then((commands) =>
-      Promise.all(
-        commands.map((cmd) => {
-          cmd.application_id === bot.user.id &&
-            bot
-              .deleteGuildCommand('1061108960268124210', cmd.id)
-              .catch((e) => console.error({ e, cmd }));
-        })
+    const cmds = await bot.getCommands();
+    console.log('purging commands', cmds);
+    await Promise.all(
+      cmds.map((cmd) =>
+        bot
+          .deleteCommand(cmd.id)
+          .then((x) => console.log(`deleted ${cmd.name}`))
       )
     );
-    await bot
-      .getGuildCommands('739559911033405592')
-      .then((commands) =>
-        Promise.all(
-          commands.map(
-            (cmd) =>
-              cmd.application_id === bot.user.id &&
-              bot.deleteGuildCommand('739559911033405592', cmd.id)
-          )
-        )
-      );
+  }
+  async purgeDevCommands() {
+    console.log('purging dev commands');
+    const gcmds1 = await bot.getGuildCommands('1061108960268124210');
+    const gcmds2 = await bot.getGuildCommands('739559911033405592');
+    console.log('purging dev commands', gcmds1, gcmds2);
+    await Promise.all(
+      gcmds1.map((cmd) =>
+        bot
+          .deleteGuildCommand('1061108960268124210', cmd.id)
+          .then((x) => console.log(`deleted gcmd ${cmd.name}`))
+      )
+    );
+    await Promise.all(
+      gcmds2.map((cmd) =>
+        bot
+          .deleteGuildCommand('739559911033405592', cmd.id)
+          .then((x) => console.log(`deleted gcmd ${cmd.name}`))
+      )
+    );
   }
 
   async onReady() {
