@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { PartialBy } from 'types/misc';
+import { PartialBy } from '../../types/misc';
 
 export interface GuildReward {
   _id: string | ObjectId;

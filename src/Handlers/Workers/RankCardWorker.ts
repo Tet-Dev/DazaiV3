@@ -3,11 +3,11 @@ import * as imagescript from 'imagescript';
 import nfetch from '../FixedNodeFetch';
 import Jimp from 'jimp';
 import { readFileSync, writeFileSync } from 'fs';
-import { RankCardGenerationDataBundle } from 'Handlers/Levelling/RankCardManager';
 import { spawn } from 'child_process';
 import ffmpeg from 'ffmpeg-static';
 import { Readable } from 'stream';
 import { readFile, unlink, writeFile } from 'fs/promises';
+import { RankCardGenerationDataBundle } from '../Levelling/RankCardManager';
 const genID = (length: number) => {
   var result = '';
   var characters =

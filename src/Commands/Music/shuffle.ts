@@ -10,7 +10,7 @@ import {
 } from 'eris';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
 import { MusicManager } from '../../Handlers/Music/MusicPlayer';
-import { Command } from 'types/misc';
+import { Command } from '../../types/misc';
 
 export const queue = {
   name: 'shuffle',

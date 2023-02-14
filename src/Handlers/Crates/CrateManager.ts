@@ -1,11 +1,11 @@
 import { ObjectID } from 'bson';
 import {
+  Crate,
+  UserCrate,
+  CrateTemplate,
   CardRarity,
   CardType,
-  Crate,
-  CrateTemplate,
-  UserCrate,
-} from 'constants/cardNames';
+} from '../../constants/cardNames';
 import { getCard } from './CardManager';
 import { InventoryManager } from './InventoryManager';
 
@@ -100,7 +100,7 @@ export class CrateManager {
     let drawnRarity = null as null | CardRarity;
     const totalDropChance = Object.values(crateTemplate.dropRates).reduce(
       (a, b) => a + b
-    );
+    ) as number;
     for (const rarityName of Object.keys(
       crateTemplate.dropRates
     ) as CardRarity[]) {

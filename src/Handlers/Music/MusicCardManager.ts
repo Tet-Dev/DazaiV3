@@ -18,7 +18,7 @@ export class MusicCardManager {
   }
   init(count?: number) {
     for (let i = 0; i < (count || env.MusicDrawers || 1); i++) {
-      const worker = fork(join(__dirname, '../Workers/MusicCardWorker.ts'), [
+      const worker = fork(join(__dirname, '../Workers/MusicCardWorker'), [
         '-r',
         'ts-node/register',
       ]);

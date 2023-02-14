@@ -1,7 +1,7 @@
 import { lstat, readdir } from 'fs/promises';
 import { join } from 'path';
 import { Server } from 'socket.io';
-import { SocketHandler } from 'types/misc';
+import { SocketHandler } from '../types/misc';
 import { getDiscordUser } from './Utils/getDiscordUser';
 
 const eventMap = new Map<string, SocketHandler>();
