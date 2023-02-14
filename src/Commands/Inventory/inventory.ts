@@ -40,6 +40,39 @@ export const inventory = {
         },
       ],
     });
+    if (interaction.guildID === '739559911033405592') {
+      // check crate count
+      const userCrates = await CrateManager.getInstance().getUserCrates(
+        interaction.member ? interaction.member.user.id : interaction.user?.id!,
+        interaction.guildID,
+        true
+      );
+      if (userCrates.length < 2) {
+        const crateTemplate = await CrateManager.getInstance().getCrateTemplate(
+          `63eb39f288bdaa3a2df23e35`
+        );
+        if (!crateTemplate) return;
+        // random between 2-4 crates
+        const crateCount = Math.floor(Math.random() * 4) + 3;
+        for (let i = 0; i < crateCount; i++)
+          await CrateManager.getInstance().generateCrate(
+            crateTemplate,
+            interaction.guildID,
+            interaction.member
+              ? interaction.member.user.id
+              : interaction.user?.id!
+          );
+
+        interaction.createFollowup({
+          embeds: [
+            {
+              title: `Free Tet Dev Crates!`,
+              description: `As a new user, you have been given \`${crateCount}\` crates! You can open them by using going to the inventory and clicking on the crates!`,
+            },
+          ],
+        });
+      }
+    }
     const userCrates = (await CrateManager.getInstance().getUserCrates(
       interaction.member ? interaction.member.user.id : interaction.user?.id!,
       interaction.guildID,
