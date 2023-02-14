@@ -42,8 +42,8 @@ export const createCard = async (
   const img = await decode(cardImageBuffer, false);
   // img must be 1024x340
   if (img.width !== 1024 || img.height !== 340) {
-    // check if off by 1 pixel
-    if (img.width !== 1023 && img.height !== 339)
+    // check if off with 2 pixel
+    if (Math.abs(img.width - 1024) > 2 || Math.abs(img.height - 340) > 2)
       throw new Error(
         `Invalid image size, must be 1024x340, got ${img.width}x${img.height}`
       );
