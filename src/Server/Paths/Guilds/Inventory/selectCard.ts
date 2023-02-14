@@ -13,8 +13,14 @@ export const selectCard = {
       user.id,
       guildID
     );
+    const globalInventory =
+      await InventoryManager.getInstance().getUserInventory(user.id, `@global`);
+
     // chec if card is in inventory
-    if (!inventory.cards.find((x) => x.id === cardID)) {
+    if (
+      !inventory.cards.find((x) => x.id === cardID) &&
+      !globalInventory.cards.find((x) => x.id === cardID)
+    ) {
       return res.status(400).json({ error: 'Card not in inventory' });
     }
     // check if card is already selected

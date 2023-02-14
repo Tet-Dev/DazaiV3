@@ -102,8 +102,13 @@ export class InventoryManager {
   async selectCard(userID: string, guildID: string, cardID: string) {
     // check if card exists in inventory
     const inventory = await this.getUserInventory(userID, guildID);
+    const globalInventory = await this.getUserInventory(userID, '@global');
     if (!inventory) return;
-    if (!inventory.cards.find((card) => card.id === cardID)) return;
+    if (
+      !inventory.cards.find((card) => card.id === cardID) &&
+      !globalInventory.cards.find((card) => card.id === cardID)
+    )
+      return;
     await this.updateInventory(userID, guildID, {
       selectedCard: cardID,
     });
@@ -111,11 +116,15 @@ export class InventoryManager {
   }
   async getSelectedCard(userID: string, guildID: string) {
     const inventory = await this.getUserInventory(userID, guildID);
+    const globalInventory = await this.getUserInventory(userID, '@global');
     if (!inventory) return;
     // find cardID in inventory
-    const cardID = inventory.cards.find(
-      (card) => card.id === inventory.selectedCard
-    )?.cardID;
+    const cardID =
+      inventory.cards.find((card) => card.id === inventory.selectedCard)
+        ?.cardID ||
+      globalInventory.cards.find(
+        (card) => card.id === globalInventory.selectedCard
+      )?.cardID;
     const cardData = cardID && (await getCard(cardID));
     return cardData;
   }
