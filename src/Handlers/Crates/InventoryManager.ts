@@ -122,10 +122,23 @@ export class InventoryManager {
     const cardID =
       inventory.cards.find((card) => card.id === inventory.selectedCard)
         ?.cardID ||
-      globalInventory.cards.find(
-        (card) => card.id === inventory.selectedCard
-      )?.cardID;
+      globalInventory.cards.find((card) => card.id === inventory.selectedCard)
+        ?.cardID;
     const cardData = cardID && (await getCard(cardID));
     return cardData;
+  }
+  async findItemFromID(itemID: string) {
+    const inventory = (await MongoDB.db('Guilds')
+      .collection('userData')
+      .findOne({
+        'cards.id': itemID,
+      })) as DefaultInventoryType;
+    if (!inventory) return null
+    const cardID = inventory?.cards.find((card) => card.id === itemID)?.cardID;
+    const cardData = cardID && (await getCard(cardID));
+    return {
+      card: cardData,
+      inventory,
+    };
   }
 }

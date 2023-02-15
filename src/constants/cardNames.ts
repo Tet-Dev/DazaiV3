@@ -10,6 +10,36 @@ export enum CardRarity {
   EVENT_RARE = 'event_rare',
   SECRET_RARE = 'secret_rare',
 }
+export const rarityNameMap = {
+  [CardRarity.COMMON]: 'Common',
+  [CardRarity.RARE]: 'Rare',
+  [CardRarity.SUPER_RARE]: 'Super Rare',
+  [CardRarity.EPIC]: 'Epic',
+  [CardRarity.LEGENDARY]: 'Legendary',
+  [CardRarity.MYTHIC]: 'Mythic',
+  [CardRarity.EVENT_RARE]: 'Event Rare',
+  [CardRarity.SECRET_RARE]: 'Secret Rare',
+};  
+export const rarityEmojiMap = {
+  [CardRarity.COMMON]: '⬜️',
+  [CardRarity.RARE]: '🟩',
+  [CardRarity.SUPER_RARE]: '🟦',
+  [CardRarity.EPIC]: '🟪',
+  [CardRarity.LEGENDARY]: '✨',
+  [CardRarity.MYTHIC]: '🟥',
+  [CardRarity.EVENT_RARE]: '🟨',
+  [CardRarity.SECRET_RARE]: '◼️',
+};
+export const rarityColorMap = {
+  [CardRarity.COMMON]: 0xffffff,
+  [CardRarity.RARE]: 0x78ffac,
+  [CardRarity.SUPER_RARE]: 0x5cdeff,
+  [CardRarity.EPIC]: 0xdc73ff,
+  [CardRarity.LEGENDARY]: 0xff19e8,
+  [CardRarity.MYTHIC]: 0xff7569,
+  [CardRarity.EVENT_RARE]: 0xffffad,
+  [CardRarity.SECRET_RARE]: 0x000000,
+};
 
 export type CardType = {
   _id: string | ObjectId;
@@ -33,7 +63,7 @@ export type Crate = {
 };
 export type UserCrate = {
   _id: string | ObjectId;
-  item: CardType
+  item: CardType;
   userID: string;
   guildID: string;
   createdAt: number;
