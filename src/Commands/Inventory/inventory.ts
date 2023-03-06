@@ -4,6 +4,7 @@ import {
   Constants,
   EmbedField,
   EmbedOptions,
+  InteractionDataOptionsBoolean,
   InteractionDataOptionsNumber,
   InteractionDataOptionsUser,
   Member,
@@ -19,6 +20,7 @@ import { CrateManager } from '../../Handlers/Crates/CrateManager';
 import { InventoryManager } from '../../Handlers/Crates/InventoryManager';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
 import { MusicManager } from '../../Handlers/Music/MusicPlayer';
+import TetLib from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
 
 const parseInventoryItem = (
@@ -45,14 +47,30 @@ export const inventory = {
       type: Constants.ApplicationCommandOptionTypes.USER,
       required: false,
     },
+    {
+      name: 'show_global',
+      description:
+        'Whether to show global dazai cards in inventory (Default: false)',
+      type: Constants.ApplicationCommandOptionTypes.BOOLEAN,
+    },
   ],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
   execute: async (bot, { interaction }) => {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
     const selectedUserID = (
-      interaction.data?.options?.[0] as InteractionDataOptionsUser
+      TetLib.findCommandParam(
+        interaction.data?.options,
+        'user'
+      ) as InteractionDataOptionsUser
     )?.value;
+    const showGlobal = (
+      TetLib.findCommandParam(
+        interaction.data?.options,
+        'show_global'
+      ) as InteractionDataOptionsBoolean
+    )?.value;
+
     const user = selectedUserID
       ? bot.users.get(selectedUserID) || (await bot.getRESTUser(selectedUserID))
       : interaction.user || interaction.member?.user;
@@ -64,8 +82,8 @@ export const inventory = {
     );
     const globalInventory =
       await InventoryManager.getInstance().getUserInventory(user.id, '@global');
-    if (!globalInventory.cards.length && !inventory.cards.length) {
-      await interaction.createMessage({
+    if (!globalInventory.cards.length || !inventory.cards.length) {
+      return await interaction.createMessage({
         embeds: [
           {
             title: `Cannot view ${user.username}'s inventory`,
@@ -77,74 +95,45 @@ export const inventory = {
           },
         ],
       });
-      if (interaction.guildID === '739559911033405592') {
-        // check crate count
-        const userCrates = await CrateManager.getInstance().getUserCrates(
-          interaction.member
-            ? interaction.member.user.id
-            : interaction.user?.id!,
-          interaction.guildID,
-          true
-        );
-        if (userCrates.length < 2) {
-          const crateTemplate =
-            await CrateManager.getInstance().getCrateTemplate(
-              `63eb39f288bdaa3a2df23e35`
-            );
-          if (!crateTemplate) return;
-          // random between 2-4 crates
-          const crateCount = Math.floor(Math.random() * 4) + 3;
-          for (let i = 0; i < crateCount; i++)
-            await CrateManager.getInstance().generateCrate(
-              crateTemplate,
-              interaction.guildID,
-              interaction.member
-                ? interaction.member.user.id
-                : interaction.user?.id!
-            );
-
-          interaction.createFollowup({
+    }
+    if (!showGlobal) {
+      if (!inventory.cards.length) {
+        if (globalInventory.cards.length)
+          return await interaction.createMessage({
             embeds: [
               {
-                title: `Free Tet Dev Crates!`,
-                description: `As a new user, you have been given \`${crateCount}\` crates! You can open them by using going to the inventory and clicking on the crates!`,
+                title: `Cannot view ${user.username}'s inventory`,
+                description: `This user's server inventory is empty, however they have \`${
+                  globalInventory.cards.length
+                }\` global cards! To view these, use \`\`\`/inventory show_global:True ${
+                  selectedUserID ? `user:<@!${user.id}>` : ``
+                }\`\`\``,
+                color: 16728385,
+                thumbnail: {
+                  url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+                },
               },
             ],
           });
-        }
-      }
-      const userCrates = (await CrateManager.getInstance().getUserCrates(
-        interaction.member ? interaction.member.user.id : interaction.user?.id!,
-        `@global`,
-        true
-      )) as Crate[];
-      if (userCrates.filter((x) => x.guildID === '@global').length < 2) {
-        const crateTemplate = await CrateManager.getInstance().getCrateTemplate(
-          `63eb4ebb0296c1c2c951ba82`
-        );
-        if (!crateTemplate) return console.log(`Crate template not found!`);
-        // random between 2-4 crates
-        const crateCount = Math.floor(Math.random() * 3) + 2;
-        for (let i = 0; i < crateCount; i++)
-          await CrateManager.getInstance().generateCrate(
-            crateTemplate,
-            `@global`,
-            interaction.member
-              ? interaction.member.user.id
-              : interaction.user?.id!
-          );
-
-        interaction.createFollowup({
-          embeds: [
-            {
-              title: `Free Crates!`,
-              description: `As a new user, you have been given \`${crateCount}\` crates! You can open them by using going to the inventory and clicking on the crates!`,
-            },
-          ],
-        });
+        else
+          return await interaction.createMessage({
+            embeds: [
+              {
+                title: `Cannot view ${user.username}'s inventory`,
+                description: `This user's inventory is empty!`,
+                color: 16728385,
+                thumbnail: {
+                  url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+                },
+              },
+            ],
+          });
       }
     }
-    const cardData = inventory.cards.concat(globalInventory.cards);
+
+    const cardData = showGlobal
+      ? inventory.cards.concat(globalInventory.cards)
+      : inventory.cards;
     const cards = (
       await Promise.all(
         Array.from(
