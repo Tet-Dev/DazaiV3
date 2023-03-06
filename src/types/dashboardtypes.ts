@@ -15,4 +15,5 @@ export type DiscordGuildData = {
     nickname: string | null;
     roles: string[];
   };
+  hasAdmin?: boolean;
 };

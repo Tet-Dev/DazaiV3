@@ -48,6 +48,10 @@ export const getAllGuilds = {
             roles: member.roles,
           }
         : null,
+      hasAdmin: member
+        ? member.permissions.has('administrator') ||
+          member.permissions.has('manageGuild')
+        : false,
     } as DiscordGuildData;
     res.status(200).send(data);
   },
