@@ -14,6 +14,9 @@ export const createRankCard = {
   run: async (req, res, next, user) => {
     const guildID = req.params.guildID;
     const cardID = req.params.cardID;
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const { name, description, rarity } = req.body as {
       name: string;
       description: string;
@@ -36,13 +39,26 @@ export const createRankCard = {
     if (card.guild !== guildID) {
       return res.status(400).json({ error: 'Card does not belong to guild' });
     }
+    const member =
+      bot.guilds.get(guildID)?.members.get(user.id) ??
+      (await bot.getRESTGuildMember(guildID, user.id));
+    if (!member) {
+      return res.status(400).json({ error: 'Not a member of this guild' });
+    }
+    const perms =
+      member.permissions.has('administrator') ||
+      member.permissions.has('manageGuild');
+    if (!perms) {
+      return res
+        .status(400)
+        .json({ error: 'Missing permissions, need manage guild or admin' });
+    }
     await updateCard(cardID, {
       name,
       description,
       rarity: rarity as CardRarity,
     });
     return res.json({ success: true });
-    
   },
 } as RESTHandler;
 export default createRankCard;
