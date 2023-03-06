@@ -82,7 +82,7 @@ export const inventory = {
     );
     const globalInventory =
       await InventoryManager.getInstance().getUserInventory(user.id, '@global');
-    if (!globalInventory.cards.length || !inventory.cards.length) {
+    if (!globalInventory.cards.length && !inventory.cards.length) {
       return await interaction.createMessage({
         embeds: [
           {
