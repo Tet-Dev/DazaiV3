@@ -180,6 +180,7 @@ export class MusicManager extends EventEmitter {
       },
     };
   }
+
 }
 export type GuildMusicData = {
   queue: MusicInfo[];

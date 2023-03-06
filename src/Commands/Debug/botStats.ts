@@ -1,42 +1,80 @@
-import { Constants } from 'eris';
+import Eris, { Constants } from 'eris';
 import { Command } from '../../types/misc';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
+import { MusicManager } from '../../Handlers/Music/MusicPlayer';
 export const ping = {
   name: 'botstats',
   description: 'Gets Bot Statistics',
   args: [],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
   execute: async (bot, { interaction }) => {
+    if (!interaction.guildID)
+      return interaction.createMessage(
+        'This command can only be used in a server!'
+      );
     // const start = Date.now();
     // await interaction.createMessage('Pinging...');
     // const end = Date.now();
     // let clicks = 0;
+    // check the shard id of the bot
+    const guild =
+      bot.guilds.get(interaction.guildID) ??
+      (await bot.getRESTGuild(interaction.guildID));
+    const shard = guild.shard;
+    const fields = [
+      {
+        name: 'Discord Ping',
+        value: `${shard.latency}ms`,
+        inline: true,
+      },
+      {
+        name: 'Server Count (per Instance)',
+        value: `${bot.guilds.size}`,
+        inline: true,
+      },
+      {
+        name: 'Shard ID',
+        value: `${shard.id}`,
+        inline: true,
+      },
+      {
+        name: 'Shard Count',
+        value: `${bot.shards.size}`,
+        inline: true,
+      },
+      {
+        name: 'Memory Usage',
+        value: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
+        inline: true,
+      },
+      {
+        name: 'Uptime',
+        value: `${Math.floor(bot.uptime / 1000 / 60 / 60)}h ${
+          Math.floor(bot.uptime / 1000 / 60) % 60
+        }m ${Math.floor(bot.uptime / 1000) % 60}s`,
+        inline: true,
+      },
+      {
+        name: 'Node.js Version',
+        value: `${process.version}`,
+        inline: true,
+      },
+      {
+        name: 'Music servers',
+        value: `${MusicManager.getInstance().guildMap.size}`,
+        inline: true,
+      },
+      {
+        name: 'Developer',
+        value: `<@!295391243318591490>`,
+      },
+    ] as Eris.EmbedField[];
     const msg = await interaction.createMessage({
       embeds: [
         {
           title: 'Bot Statistics :heartbeat:',
           color: 11629370,
-          fields: [
-            {
-              name: 'Discord Ping',
-              value: '50ms',
-              inline: true,
-            },
-            {
-              name: 'Server Count (Shard)',
-              value: '6942',
-              inline: true,
-            },
-            {
-              name: 'Shard ID',
-              value: '5',
-              inline: true,
-            },
-            {
-              name: 'Uptime',
-              value: '69323s',
-            },
-          ],
+          fields,
           thumbnail: {
             url: bot.user.dynamicAvatarURL('png', 1024),
           },
