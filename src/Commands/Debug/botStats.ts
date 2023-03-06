@@ -23,8 +23,8 @@ export const ping = {
     const shard = guild.shard;
     const fields = [
       {
-        name: 'Discord Ping',
-        value: `${shard.latency}ms`,
+        name: 'Message Latency',
+        value: `${Date.now() - interaction.createdAt}ms`,
         inline: true,
       },
       {
@@ -38,7 +38,7 @@ export const ping = {
         inline: true,
       },
       {
-        name: 'Shard Count',
+        name: 'Shards',
         value: `${bot.shards.size}`,
         inline: true,
       },
