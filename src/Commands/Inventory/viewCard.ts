@@ -20,7 +20,7 @@ import { MusicManager } from '../../Handlers/Music/MusicPlayer';
 import { Command } from '../../types/misc';
 export const inventory = {
   name: 'item',
-  description: 'Get your inventory!',
+  description: 'View items in inventories!',
   args: [
     {
       name: 'item_id',

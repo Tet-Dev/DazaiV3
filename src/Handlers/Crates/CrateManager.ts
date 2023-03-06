@@ -69,11 +69,34 @@ export class CrateManager {
     const crates = await MongoDB.db('Crates')
       .collection('crateTemplates')
       .find({
-        guildID,
+        guild: guildID,
       })
       .toArray();
     return crates as CrateTemplate[];
   }
+  async updateCrateTemplate(
+    crateTemplateID: string,
+    crateTemplate: Partial<CrateTemplate>
+  ) {
+    const template = {
+      name: crateTemplate.name,
+      description: crateTemplate.description,
+      items: crateTemplate.items,
+      dropRates: crateTemplate.dropRates,
+    } as CrateTemplate;
+    await MongoDB.db('Crates')
+      .collection('crateTemplates')
+      .updateOne(
+        {
+          _id: new ObjectID(crateTemplateID),
+        },
+        {
+          $set: template,
+        }
+      );
+    return template;
+  }
+
   async createCrateTemplate(
     crateTemplate: Partial<CrateTemplate>,
     guildID: string

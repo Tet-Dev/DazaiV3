@@ -1,4 +1,4 @@
-import { CommandInteraction, Interaction } from 'eris';
+import Eris, { CommandInteraction, Interaction } from 'eris';
 import { Command } from '../types/misc';
 
 export class SlashCommandHandler {
@@ -72,11 +72,41 @@ export class SlashCommandHandler {
       )
     );
   }
+  commandExists(
+    command: Command,
+    commandList: Eris.ApplicationCommand<Eris.ApplicationCommandTypes>[]
+  ) {
+    const commandInList = commandList.find((x) => x.name === command.name);
+    console.log({
+      commandInList,
+      command,
+    });
+    if (!commandInList) return false;
+    if (!commandInList.options?.length && !command.args.length) return true;
+    if (commandInList.options?.length !== command.args.length) return false;
 
+    const diffArgs = commandInList.options.some((x, i) => {
+      if (x.name !== command.args[i].name) return true;
+      if (x.type !== command.args[i].type) return true;
+      if (x.description !== command.args[i].description) return true;
+      return false;
+    });
+    if (diffArgs) return false;
+    // check name and description
+    if (commandInList.name !== command.name) return false;
+    if (commandInList.description !== command.description) return false;
+    return true;
+  }
   async onReady() {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
-    const commands = Array.from(this.commands.values());
+    const cmds = await (this.devMode
+      ? bot.getGuildCommands('1061108960268124210')
+      : bot.getCommands());
+    const cmdArr = Array.from(this.commands.values());
+    const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));
 
+    console.log('registering commands, skipping over existing ones', cmds);
+    // for every command in this.commands, check if it's already registered
     for (let i = 0; i < commands.length; i++) {
       const command = commands[i];
       await create(command);

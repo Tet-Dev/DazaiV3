@@ -19,7 +19,7 @@ export const rarityNameMap = {
   [CardRarity.MYTHIC]: 'Mythic',
   [CardRarity.EVENT_RARE]: 'Event Rare',
   [CardRarity.SECRET_RARE]: 'Secret Rare',
-};  
+};
 export const rarityEmojiMap = {
   [CardRarity.COMMON]: '⬜️',
   [CardRarity.RARE]: '🟩',
@@ -50,7 +50,7 @@ export type CardType = {
   guild?: string;
 };
 
-export type Crate = {
+export interface Crate {
   _id: string | ObjectId;
   itemID: string;
   userID: string;
@@ -60,18 +60,10 @@ export type Crate = {
   openedAt?: number;
   name: string;
   description: string;
-};
-export type UserCrate = {
-  _id: string | ObjectId;
+}
+export interface UserCrate extends Crate {
   item: CardType;
-  userID: string;
-  guildID: string;
-  createdAt: number;
-  opened?: boolean;
-  openedAt?: number;
-  name: string;
-  description: string;
-};
+}
 
 export type CrateTemplate = {
   _id: string | ObjectId;

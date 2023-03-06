@@ -45,24 +45,42 @@ export class InteractionCollector {
       }
       handler.limit--;
     }
-    !handler.doNotAcknowledge && await interaction.acknowledge();
+    !handler.doNotAcknowledge && (await interaction.acknowledge());
     handler.run(bot, interaction);
     return;
   }
   collectInteraction(
     handler: ComponentInteractionHandler,
     message: Message,
-    timeout: number,
-    
+    timeout: number
   ) {
     this.interactions.set(`${message.id} ${handler.interactionid}`, handler);
     setTimeout(() => {
       this.interactions.delete(`${message.id} ${handler.interactionid}`);
-      message.edit({
-        components: [],
-      }).catch(() => {});
+      message
+        .edit({
+          components: [],
+        })
+        .catch(() => {});
     }, timeout);
   }
+  waitForInteraction(
+    handler: Omit<ComponentInteractionHandler, 'run'>,
+    message: Message,
+    timeout: number
+  ) {
+    return new Promise<ComponentInteraction>((resolve, reject) => {
+      const fullHandler: ComponentInteractionHandler = {
+        ...handler,
+        limit: 1,
+        run: (bot, interaction) => {
+          resolve(interaction);
+        },
+      };
+      this.collectInteraction(fullHandler, message, timeout);
+    });
+  }
+
   deleteInteraction(messageID: string, interactionID: string) {
     this.interactions.delete(`${messageID} ${interactionID}`);
   }

@@ -25,18 +25,47 @@ export const play = {
     const start = Date.now();
     const player = MusicManager.getInstance().getGuildData(interaction.guildID);
     if (!player) {
-      return interaction.createMessage({
-        embeds: [
-          {
-            title: `Bot is not in a voice channel!`,
-            description: `Please use \`/connect\` to connect me to a voice channel!`,
-            color: 16728385,
-            thumbnail: {
-              url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+      // get interaction member voice channel
+      // if not in voice channel, return
+      // if in voice channel, connect to voice channel
+      const voiceChannel = interaction.member.voiceState.channelID;
+      if (!voiceChannel) {
+        // return interaction.createMessage(
+        //   'You are not in a voice channel! Please join one, our to use this command!'
+        // );
+
+        return interaction.createMessage({
+          embeds: [
+            {
+              title: `You are not in a voice channel!`,
+              description: `Please use \`/connect\` to connect me to a voice channel or join a voice channel to use this command!`,
+              color: 16728385,
+              thumbnail: {
+                url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+              },
             },
-          },
-        ],
-      });
+          ],
+        });
+      }
+      const connecter = await MusicManager.getInstance().connect(
+        interaction.guildID,
+        voiceChannel,
+        interaction.channel.id
+      );
+      if (!connecter) {
+        return interaction.createMessage({
+          embeds: [
+            {
+              title: 'Unable to connect',
+              description: 'Unable to connect to the voice channel!',
+              color: 16728385,
+              thumbnail: {
+                url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
+              },
+            },
+          ],
+        });
+      }
     }
 
     const initAck = await interaction.acknowledge(); //.createMessage('Searching for songs...');

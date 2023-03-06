@@ -91,7 +91,8 @@ export const TetLib = {
   getUserDisplayName(user: User) {
     return `${user.username}#${user.discriminator}`;
   },
-  findCommandParam: (options: Eris.InteractionDataOptions[], name: string) => {
+  findCommandParam: (options?: Eris.InteractionDataOptions[], name?: string) => {
+    if (!options || !name) return;
     return options.find((option) => option.name === name);
   },
 };
