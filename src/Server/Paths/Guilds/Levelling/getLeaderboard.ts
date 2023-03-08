@@ -41,7 +41,6 @@ export const getLeaderboard = {
           .getSelectedCard(xp.userID, guildID)
           .then((x) => (x ? x.url : null))
           .catch((e) => null);
-        console.log('leaderboard timing card', Date.now() - start);
         getCardTime += Date.now() - start;
         return {
           ...xp,
