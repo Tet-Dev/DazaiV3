@@ -94,7 +94,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   const blackout = new Image(982, 298);
 
   blackout.fill(Jimp.rgbaToInt(21, 21, 21, 180));
-  let progressBar = new Image(~~((xp / xpToNext) * 982), 8);
+  let progressBar = new Image(Math.min(~~((xp / xpToNext) * 982), 1), 8);
   progressBar.fill(Jimp.rgbaToInt(255, 255, 255, 255));
   let progressBarBg = new Image(982, 8);
   progressBarBg.fill(Jimp.rgbaToInt(0, 0, 0, 200));
