@@ -1,3 +1,5 @@
+import { EmbedField } from 'eris';
+import { rarityEmojiMap, rarityNameMap } from '../../constants/cardNames';
 import { InventoryManager } from '../Crates/InventoryManager';
 import { LevellingRewards } from './LevelRewards';
 import { RankCardManager } from './RankCardManager';
@@ -88,6 +90,15 @@ export class XPManager {
 
     return data || defaultGuildMemberXP;
   }
+  async getAllGuildMemberXP(guildID: string) {
+    const data = (await MongoDB.db('EXP')
+      .collection('userLevels')
+      .find({
+        guildID,
+      })
+      .toArray()) as unknown as GuildMemeberXP[];
+    return data;
+  }
   updateGuildMemberXP(
     guildID: string,
     userID: string,
@@ -157,16 +168,76 @@ export class XPManager {
       console.log('level up', newXP, XPForNextLevel, newLevel);
       newXP -= XPForNextLevel;
       newLevel++;
-
       XPForNextLevel = this.getRequiredXPForLevel(newLevel + 1);
     }
     const levelDiff = newLevel - xpData.level;
     if (levelDiff > 0) {
-      await LevellingRewards.getInstance().processGuildRewardsForMember(
-        guildID,
-        userID,
-        [xpData.level, newLevel]
-      );
+      const awards =
+        await LevellingRewards.getInstance().processGuildRewardsForMember(
+          guildID,
+          userID,
+          [xpData.level, newLevel]
+        );
+      const dmChannel = await bot.getDMChannel(userID);
+      const guild =
+        bot.guilds.get(guildID) || (await bot.getRESTGuild(guildID));
+      const awardFields = [] as EmbedField[];
+      if (awards?.roles.length) {
+        awardFields.push({
+          name: '__New Roles__',
+          value: `\`\`\`${awards.roles
+            .map((r) => {
+              const roleData = guild.roles.get(r[0]);
+              return roleData ? `@${roleData.name}` : 'Unknown Role';
+            })
+            .join('\n')}\`\`\``,
+        });
+      }
+      if (awards?.cards.length) {
+        awardFields.push({
+          name: '__New Rank Cards__',
+          value: `\`\`\`${awards.cards
+            .map((r) => {
+              return `- x${r[1]} 「 ${r[0].name} 」  ${
+                rarityEmojiMap[r[0].rarity]
+              } — ${rarityNameMap[r[0].rarity]}`;
+            })
+            .join('\n')}\`\`\``,
+        });
+      }
+      if (awards?.crates.length) {
+        awardFields.push({
+          name: '__New Crates__',
+          value: `\`\`\`${awards.crates
+            .map((r) => {
+              return `- x${r[1]} 「 ${r[0].name} 」`;
+            })
+            .join('\n')}\`\`\``,
+        });
+      }
+      dmChannel.createMessage({
+        embed: {
+          title: 'Level Up!',
+          description: `You have leveled up to level **__${newLevel}__** in **${
+            guild?.name
+          }**!\n
+${
+  awardFields.length > 0
+    ? 'In addition, you also have received the following rewards!'
+    : ''
+}`,
+          thumbnail: {
+            url:
+              guild?.dynamicIconURL('png', 64) ||
+              'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk',
+          },
+          fields: awardFields,
+          footer: {
+            text: `Sent from ${guild?.name}`,
+            icon_url: guild?.dynamicIconURL('png', 64) ?? undefined,
+          },
+        },
+      });
     }
     console.log('level done', newXP, XPForNextLevel);
     !dontUpdate &&
