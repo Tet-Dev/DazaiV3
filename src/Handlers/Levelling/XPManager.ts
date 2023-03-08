@@ -122,7 +122,12 @@ export class XPManager {
       }
     );
   }
-  async messageXP(guildID: string, userID: string, xpData?: GuildXPPreference) {
+  async messageXP(
+    guildID: string,
+    userID: string,
+    xpData?: GuildXPPreference,
+    xpMultiplier?: number
+  ) {
     xpData = xpData ?? (await this.getGuildXPPreference(guildID));
     const memberXP = await this.getGuildMemberXP(guildID, userID);
     if (memberXP.resetAt < Date.now()) {
@@ -132,7 +137,8 @@ export class XPManager {
     const randomXP =
       (xpData.xpRange[0] +
         ~~(Math.random() * (xpData.xpRange[1] - xpData.xpRange[0]))) *
-      xpData.diminishingReturns ** memberXP.dailyMessages; // 10-20 * 1^dailyMessages
+      xpData.diminishingReturns ** memberXP.dailyMessages *
+      (xpMultiplier ?? 1); // 10-20 * 1^dailyMessages
     memberXP.dailyMessages++;
 
     const newXP = await this.giveGuildMemberXP(
