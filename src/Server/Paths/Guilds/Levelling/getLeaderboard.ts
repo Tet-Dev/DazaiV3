@@ -1,4 +1,4 @@
-import { Constants, TextableChannel, VoiceChannel } from 'eris';
+import Eris, { Constants, TextableChannel, VoiceChannel } from 'eris';
 import { InventoryManager } from '../../../../Handlers/Crates/InventoryManager';
 import { XPManager } from '../../../../Handlers/Levelling/XPManager';
 import { MusicManager } from '../../../../Handlers/Music/MusicPlayer';
@@ -26,12 +26,27 @@ export const getLeaderboard = {
     console.log('leaderboard timing end', Date.now() - timer);
     let getUserTime = 0;
     let getCardTime = 0;
+    let usersToFetch = leaderboard.map((x) => x.userID);
+    let fetchTime = Date.now();
+    let userMap = new Map<string, Eris.Member>();
+    (
+      await (
+        bot.guilds.get(guildID) || (await bot.getRESTGuild(guildID))
+      )?.fetchMembers({
+        userIDs: usersToFetch,
+      })
+    ).map((x) => userMap.set(x.id, x));
+    console.log('member timing fetch', Date.now() - fetchTime);
+    let fallbacks = 0;
     let resultMap = await Promise.all(
       leaderboard.map(async (xp) => {
         let start = Date.now();
-        let user =
-          bot.users.get(xp.userID) ||
-          (await bot.getRESTUser(xp.userID).catch((e) => null));
+        let user = userMap.get(xp.userID) as Eris.Member | Eris.User | null;
+        if (!user) {
+          console.log('falling back for ', xp.userID, fallbacks);
+          user = await bot.getRESTUser(xp.userID).catch((e) => null);
+          fallbacks++;
+        }
         getUserTime += Date.now() - start;
         start = Date.now();
         let card = await InventoryManager.getInstance()
