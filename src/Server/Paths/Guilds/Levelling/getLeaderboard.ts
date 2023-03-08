@@ -37,18 +37,21 @@ export const getLeaderboard = {
       }
       return true;
     });
-    (
-      await (
-        bot.guilds.get(guildID) || (await bot.getRESTGuild(guildID))
-      )?.fetchMembers({
-        userIDs: usersToFetch,
-      })
-    ).map((x) => userMap.set(x.id, x));
+    if (usersToFetch.length > 0) {
+      (
+        await (
+          bot.guilds.get(guildID) || (await bot.getRESTGuild(guildID))
+        )?.fetchMembers({
+          userIDs: usersToFetch,
+        })
+      ).map((x) => userMap.set(x.id, x));
+    }
     console.log(
       'leaderboard timing fetch',
       Date.now() - fetchTime,
       `for ${usersToFetch.length} users`
     );
+
     let fallbacks = 0;
     let resultMap = await Promise.all(
       leaderboard.map(async (xp) => {
