@@ -134,11 +134,14 @@ export class XPManager {
       memberXP.resetAt = Date.now() + xpData.resetPeriod;
       memberXP.dailyMessages = 0;
     }
-    const randomXP =
-      (xpData.xpRange[0] +
-        ~~(Math.random() * (xpData.xpRange[1] - xpData.xpRange[0]))) *
-      xpData.diminishingReturns ** memberXP.dailyMessages *
-      (xpMultiplier ?? 1); // 10-20 * 1^dailyMessages
+    const randomXP = parseFloat(
+      (
+        (xpData.xpRange[0] +
+          ~~(Math.random() * (xpData.xpRange[1] - xpData.xpRange[0]))) *
+        xpData.diminishingReturns ** memberXP.dailyMessages *
+        (xpMultiplier ?? 1)
+      ).toFixed(3)
+    ); // 10-20 * 1^dailyMessages
     memberXP.dailyMessages++;
 
     const newXP = await this.giveGuildMemberXP(
