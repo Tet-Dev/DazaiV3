@@ -31,9 +31,6 @@ export const getLeaderboard = {
         let start = Date.now();
         let user =
           bot.users.get(xp.userID) ||
-          (await bot
-            .getRESTGuildMember(guildID, xp.userID)
-            .catch((e) => null)) ||
           (await bot.getRESTUser(xp.userID).catch((e) => null));
         getUserTime += Date.now() - start;
         start = Date.now();
