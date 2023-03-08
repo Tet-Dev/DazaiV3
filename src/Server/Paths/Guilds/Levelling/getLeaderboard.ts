@@ -16,14 +16,12 @@ export const getLeaderboard = {
       return res.status(400).json({ error: 'Invalid offset or limit' });
     }
     let timer = Date.now();
-    console.log('leaderboard timing start');
     const leaderboard = await XPManager.getInstance().getLeaderboard(
       guildID,
 
       Math.min(limit, 100),
       offset
     );
-    console.log('leaderboard timing end', Date.now() - timer);
     let getUserTime = 0;
     let getCardTime = 0;
     let usersToFetch = leaderboard.map((x) => x.userID);

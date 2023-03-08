@@ -88,7 +88,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   let time = Date.now();
   const imgBuffer = await nfetch(avatar).then((res) => res.buffer());
   const pfp = (await imagescript.decode(imgBuffer, true)) as imagescript.Image;
-  console.log('PFP', Date.now() - time);
+  // console.log('PFP', Date.now() - time);
   pfp.resize(224, 224);
   pfp.cropCircle(true, 0);
   const blackout = new Image(982, 298);
@@ -103,7 +103,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   blackout.roundCorners(12);
   canvas.composite(blackout, 24, 24);
   canvas.composite(pfp, 58, 58);
-  console.log('BlackoutComposit', Date.now() - time);
+  // console.log('BlackoutComposit', Date.now() - time);
   time = Date.now();
   let rankImg = await Image.renderText(
     pop,
@@ -141,7 +141,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
     `#${discriminator}`,
     Jimp.rgbaToInt(200, 200, 200, 255)
   );
-  console.log('TextRender', Date.now() - time);
+  // console.log('TextRender', Date.now() - time);
   time = Date.now();
 
   // create Data Canvas
@@ -168,11 +168,11 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   dataCanvas.composite(nameCanvas, 0, rankImg.height + lvlImg.height - 24);
   canvas.composite(dataCanvas, 316, 170 - dataCanvas.height / 2);
   canvas.composite(xpImg, 1024 - 42 - xpImg.width, 298 - xpImg.height);
-  console.log('Compositing', Date.now() - time);
+  // console.log('Compositing', Date.now() - time);
   return canvas;
 }
 async function generateRankCard(data: RankCardGenerationDataBundle) {
-  console.log('Generating rank card');
+  // console.log('Generating rank card');
   const [overlay, canvas] = await Promise.all([
     await generateOverlay(data),
     data.background
@@ -181,7 +181,7 @@ async function generateRankCard(data: RankCardGenerationDataBundle) {
         : await imagescript.decode(await getBackgroundBuffer(data.background))
       : new Image(1024, 340).fill(Jimp.rgbaToInt(40, 40, 40, 100)),
   ]);
-  console.log('Donwloaded background', data.background);
+  // console.log('Donwloaded background', data.background);
   if (data.background?.match(/\.gif$/)) {
     const gif = canvas as imagescript.GIF;
     for (let frame of gif) {
@@ -189,7 +189,7 @@ async function generateRankCard(data: RankCardGenerationDataBundle) {
     }
     let time = Date.now();
     const encoded = await gif.encode(80);
-    console.log('Encoded gif', Date.now() - time);
+    // console.log('Encoded gif', Date.now() - time);
     return {
       buffer: encoded,
       type: 'gif',

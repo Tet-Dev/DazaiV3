@@ -116,6 +116,7 @@ export const GrantEXPOnChat = {
     lastEXP.set(`${msg.author.id}-${msg.channel.id}`, Date.now());
     if (multiplier <= 0.04) {
       msg.addReaction('🚫');
+      
     }
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,

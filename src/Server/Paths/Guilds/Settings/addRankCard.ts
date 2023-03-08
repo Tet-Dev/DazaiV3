@@ -60,11 +60,6 @@ export const createRankCard = {
       });
     }
     let split = base64.indexOf('base64,');
-    console.log(
-      'Creating card',
-      base64.substring(0, 50),
-      Buffer.from(base64.substring(split + 7), 'base64').length
-    );
     const result = await createCard(
       { name, description, rarity: rarity as CardRarity },
       guildID,

@@ -42,13 +42,6 @@ export class CrateManager {
       })
       .toArray();
     if (raw) return crates;
-    console.log(
-      { crates },
-      {
-        userID,
-        guildID,
-      }
-    );
     const userCrates = await Promise.all(
       crates.map(async (crate) => ({
         ...crate,
@@ -145,7 +138,6 @@ export class CrateManager {
 
     // for every rarity, subtract the chance of that rarity from the random number
     // if the random number is less than the chance of that rarity, then that rarity is the one that is drawn
-    console.log({ item });
     const crate = {
       _id: new ObjectID(),
       name: crateTemplate.name,

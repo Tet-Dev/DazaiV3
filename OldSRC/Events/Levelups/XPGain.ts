@@ -22,7 +22,6 @@ export const XPEvent = new DiscordEvent({
       await LevellingHandler.updateUser(msg.guildID, msg.author.id, 1, 0);
       return;
     }
-    console.log(userXP.exp);
     let levelUPs = 0;
     while (userXP.exp >= Math.floor(100 * Math.pow(userXP.level, 1.5))) {
       userXP.exp -= Math.floor(100 * Math.pow(userXP.level, 1.5));

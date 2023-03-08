@@ -63,7 +63,6 @@ export const crateInv = {
   execute: async (bot, { interaction }) => {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
-    console.log(interaction.data?.options);
     const selectedUserID = (
       TetLib.findCommandParam(
         interaction.data?.options,

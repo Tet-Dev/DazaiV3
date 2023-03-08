@@ -24,7 +24,6 @@ export const getInventory = {
         if (y) cardMap.set(y._id.toString(), y);
       });
     });
-    console.log(cardIds, inventory.cards);
     let cards = await Promise.all(
       inventory.cards.map(async (x) => {
         let card = cardMap.get(x.cardID);

@@ -155,7 +155,6 @@ export const updateGuildReward = {
       guildID,
       rewardData as LevelUpRewardType
     );
-    console.log(update);
     return res.json(update);
   },
 } as RESTHandler;
