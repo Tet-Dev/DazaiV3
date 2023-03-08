@@ -179,7 +179,7 @@ async function generateRankCard(data: RankCardGenerationDataBundle) {
       ? data.background.endsWith('.gif')
         ? await imagescript.decode(await getBackgroundBuffer(data.background))
         : await imagescript.decode(await getBackgroundBuffer(data.background))
-      : new Image(1024, 340).fill(Jimp.rgbaToInt(40, 40, 40, 255)),
+      : new Image(1024, 340).fill(Jimp.rgbaToInt(40, 40, 40, 100)),
   ]);
   console.log('Donwloaded background', data.background);
   if (data.background?.match(/\.gif$/)) {
@@ -248,8 +248,8 @@ async function generateRankCard(data: RankCardGenerationDataBundle) {
   }
   (canvas as imagescript.Image).composite(overlay, 0, 0);
   return {
-    buffer: await (canvas as imagescript.Image).encodeJPEG(90),
-    type: 'jpg',
+    buffer: await (canvas as imagescript.Image).encode(3),
+    type: 'png',
   };
   // check if
 }
