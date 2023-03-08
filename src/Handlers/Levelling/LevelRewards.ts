@@ -96,7 +96,7 @@ export class LevellingRewards {
       (reward) =>
         (reward.type === 'atLevel' && reward.level === level) ||
         (reward.type === 'everyNLevels' &&
-          (level - reward.offset) % reward.everyNLevel === 0)
+          (level - reward.offset) % reward.everyNLevel === 0 && level >= reward.offset)
     ) as LevelUpAtLevelRewardType[];
   }
   async addGuildReward(
