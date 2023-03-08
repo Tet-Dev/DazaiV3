@@ -174,6 +174,17 @@ ${crate.description}
         msg,
         1000 * 120
       );
+      // check if crate is still open
+      const crate2 = await CrateManager.getInstance().getUserCrate(
+        crate._id.toString(),
+        true
+      );
+      if (crate2?.opened) {
+        await interaction.createFollowup({
+          content: `This crate has already been opened!`,
+        });
+        return;
+      }
       // mark crate as opened
       await CrateManager.getInstance().openCrate(crate._id as string);
       const followup = await interaction.createFollowup({
