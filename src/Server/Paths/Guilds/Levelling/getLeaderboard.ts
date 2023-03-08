@@ -55,8 +55,13 @@ export const getLeaderboard = {
         let start = Date.now();
         let user = userMap.get(xp.userID) as Eris.Member | Eris.User | null;
         if (!user) {
-          console.log('falling back for ', xp.userID, fallbacks);
           user = await bot.getRESTUser(xp.userID).catch((e) => null);
+          console.log(
+            'falling back for ',
+            user?.username,
+            `#${user?.discriminator}`,
+            fallbacks
+          );
           fallbacks++;
         }
         getUserTime += Date.now() - start;
