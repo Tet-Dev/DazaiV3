@@ -62,6 +62,7 @@ export const getLeaderboard = {
             `#${user?.discriminator}`,
             fallbacks
           );
+          bot.users.set(xp.userID, user as Eris.User);
           fallbacks++;
         }
         getUserTime += Date.now() - start;
