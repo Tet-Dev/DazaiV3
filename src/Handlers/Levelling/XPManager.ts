@@ -215,6 +215,15 @@ export class XPManager {
             .join('\n')}\`\`\``,
         });
       }
+      if (!awardFields.length)
+        return {
+          guildID,
+          userID,
+          level: newLevel,
+          xp: newXP,
+          dailyMessages: xpData.dailyMessages,
+          resetAt: xpData.resetAt,
+        };
       dmChannel.createMessage({
         embed: {
           title: 'Level Up!',
