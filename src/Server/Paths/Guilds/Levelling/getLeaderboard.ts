@@ -11,7 +11,7 @@ export const getLeaderboard = {
   run: async (req, res, next, user) => {
     const guildID = req.params.guildID;
     const offset = parseInt((req.query.offset as string) ?? 0);
-    const limit = parseInt((req.query.limit as string) ?? 25);
+    const limit = parseInt((req.query.limit as string) ?? 50);
     if (Number.isNaN(offset) || Number.isNaN(limit)) {
       return res.status(400).json({ error: 'Invalid offset or limit' });
     }
