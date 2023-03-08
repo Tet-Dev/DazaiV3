@@ -9,9 +9,9 @@ const determineMultiplier = (
   msg: Message<PossiblyUncachedTextableChannel>
 ) => {
   // conditions for a spam reducer:
-  // 1. the message is similar to at least 3 of the last 25 messages (similarity is determined by the levenshtein distance)
-  // 2. the message is a link, and the last 25 messages contain at least 3 links
-  // 3. if there are more than 2 large messages (messages with more than 500 characters) in the last 25 messages
+  // 1. the message is similar to at least 3 of the last 50 messages (similarity is determined by the levenshtein distance)
+  // 2. the message is a link, and the last 50 messages contain at least 3 links
+  // 3. if there are more than 2 large messages (messages with more than 500 characters) in the last 50 messages
   // 4. if the user has sent more than 3 messages in the last 5 seconds
   let multiplier = 1;
   let similarMessages = 0;
@@ -55,7 +55,7 @@ const determineMultiplier = (
     if (similarity < 0.5) similarMessages++;
   });
   if (similarMessages >= 3) {
-    multiplier *= 1 / (similarMessages / 2.2);
+    multiplier *= 1 / (similarMessages / 2.3);
     if (similarMessages >= 10) multiplier *= 0.5;
   }
   if (
@@ -105,7 +105,7 @@ export const GrantEXPOnChat = {
         );
       }
     }
-    if (lastMessages.length >= 25) lastMessages.shift();
+    if (lastMessages.length >= 50) lastMessages.shift();
     lastUserMessages.set(msg.author.id, [
       ...(lastMessages ?? []),
       msg as Message,
@@ -120,7 +120,7 @@ export const GrantEXPOnChat = {
       XPPrefs,
       multiplier
     );
-    if (multiplier < 0.02) {
+    if (multiplier < 0.04) {
       msg.addReaction('🚫');
     }
     console.log(
