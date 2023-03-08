@@ -56,7 +56,7 @@ const determineMultiplier = (
   });
   if (similarMessages >= 3) {
     multiplier *= 1 / (similarMessages / 2.3);
-    if (similarMessages >= 10) multiplier *= 0.5;
+    if (similarMessages >= 10) multiplier *= 5 / similarMessages;
   }
   if (
     links >= 3 &&
@@ -114,15 +114,16 @@ export const GrantEXPOnChat = {
     let lastEXPEvent = lastEXP.get(`${msg.author.id}-${msg.channel.id}`) ?? 0;
     if (Date.now() < lastEXPEvent + XPPrefs.cooldown) return;
     lastEXP.set(`${msg.author.id}-${msg.channel.id}`, Date.now());
+    if (multiplier <= 0.04) {
+      msg.addReaction('🚫');
+    }
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,
       msg.author.id,
       XPPrefs,
       multiplier
     );
-    if (multiplier < 0.04) {
-      msg.addReaction('🚫');
-    }
+
     console.log(
       `Granted XP to ${msg.author.username}#${msg.author.discriminator} in ${msg.guildID}`
     );
