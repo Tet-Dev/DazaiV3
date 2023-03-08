@@ -4,6 +4,7 @@ const lastEXP = new Map<string, number>();
 export const GrantEXPOnChat = {
   event: 'messageCreate',
   run: async (bot, msg) => {
+    if (env.devmode) return;
     if (!msg.guildID) return;
     if (msg.author.bot) return;
     // grant exp
