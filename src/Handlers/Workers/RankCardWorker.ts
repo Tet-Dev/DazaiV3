@@ -120,7 +120,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   let xpImg = await Image.renderText(
     pop,
     16,
-    `${xp} / ${xpToNext} XP`,
+    `${Math.floor(xp)} / ${xpToNext} XP`,
     Jimp.rgbaToInt(255, 255, 255, 255)
   );
   const layout = new imagescript.TextLayout({
