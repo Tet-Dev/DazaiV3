@@ -84,12 +84,12 @@ export const crateInv = {
     if (!user) return interaction.createMessage('User not found!');
     const start = Date.now();
     const userCrates = (await CrateManager.getInstance().getUserCrates(
-      interaction.member ? interaction.member.user.id : interaction.user?.id!,
+      user.id,
       interaction.guildID,
       false
     )) as UserCrate[];
     const globalUserCrates = (await CrateManager.getInstance().getUserCrates(
-      interaction.member ? interaction.member.user.id : interaction.user?.id!,
+      user.id,
       `@global`,
       false
     )) as UserCrate[];
