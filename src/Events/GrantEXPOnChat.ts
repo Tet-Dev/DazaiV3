@@ -97,7 +97,7 @@ export const GrantEXPOnChat = {
     // check if the user is spamming
     let multiplier = 1;
     const lastMessages = lastUserMessages.get(msg.author.id) ?? [];
-    if (lastMessages?.length >= 10) {
+    if (lastMessages?.length >= 5) {
       multiplier = determineMultiplier(lastMessages, msg);
       if (multiplier < 1) {
         console.log(
@@ -117,7 +117,8 @@ export const GrantEXPOnChat = {
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,
       msg.author.id,
-      XPPrefs
+      XPPrefs,
+      multiplier
     );
     console.log(
       `Granted XP to ${msg.author.username}#${msg.author.discriminator} in ${msg.guildID}`
