@@ -28,7 +28,15 @@ export const getLeaderboard = {
     let getCardTime = 0;
     let usersToFetch = leaderboard.map((x) => x.userID);
     let fetchTime = Date.now();
-    let userMap = new Map<string, Eris.Member>();
+    let userMap = new Map<string, Eris.Member | Eris.User>();
+    usersToFetch = usersToFetch.filter((x) => {
+      let user = bot.users.get(x);
+      if (user) {
+        userMap.set(x, user);
+        return false;
+      }
+      return true;
+    });
     (
       await (
         bot.guilds.get(guildID) || (await bot.getRESTGuild(guildID))
@@ -36,7 +44,11 @@ export const getLeaderboard = {
         userIDs: usersToFetch,
       })
     ).map((x) => userMap.set(x.id, x));
-    console.log('member timing fetch', Date.now() - fetchTime);
+    console.log(
+      'leaderboard timing fetch',
+      Date.now() - fetchTime,
+      `for ${usersToFetch.length} users`
+    );
     let fallbacks = 0;
     let resultMap = await Promise.all(
       leaderboard.map(async (xp) => {
