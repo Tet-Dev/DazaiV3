@@ -12,11 +12,8 @@ import { APIUser } from 'discord-api-types/v10';
 import { NextFunction, Request, Response } from 'express';
 import { Socket } from 'socket.io';
 
-
-
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
-
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type Command = {
   name: string;
@@ -78,3 +75,8 @@ export interface SocketHandler {
     ...args: any[]
   ) => void | Promise<void> | any | Promise<any>;
 }
+
+export type DiscordScript = (
+  bot: BotClient,
+  interaction: CommandInteraction
+) => void | Promise<void>;
