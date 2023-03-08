@@ -120,6 +120,9 @@ export const GrantEXPOnChat = {
       XPPrefs,
       multiplier
     );
+    if (multiplier < 0.02) {
+      msg.addReaction('🚫');
+    }
     console.log(
       `Granted XP to ${msg.author.username}#${msg.author.discriminator} in ${msg.guildID}`
     );
