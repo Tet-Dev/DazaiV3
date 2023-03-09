@@ -22,8 +22,8 @@ export const createRankCard = {
       description: string;
       rarity: string;
     };
-    // name < 20 , description < 200 , rarity in enum
-    if (name.length > 20 || name.length < 1) {
+    // name < 40 , description < 200 , rarity in enum
+    if (name.length > 40 || name.length < 1) {
       return res.status(400).json({ error: 'Invalid card name' });
     }
     if (description.length > 200 || description.length < 1) {
