@@ -18,8 +18,8 @@ const determineMultiplier = (
   let largeCount = 0;
   let links = 0;
   let fastMsgs = messages
-    .slice(-5)
-    .filter((m) => m.timestamp > msg.timestamp - 5000).length;
+    .slice(-10)
+    .filter((m) => m.timestamp > msg.timestamp - 10000).length;
   messages.forEach((m) => {
     if (
       m.content.match(
@@ -54,8 +54,8 @@ const determineMultiplier = (
       levidist / Math.max(m.content.length, msg.content.length);
     if (similarity < 0.5) similarMessages++;
   });
-  if (similarMessages >= 3) {
-    multiplier *= 1 / (similarMessages / 2.3);
+  if (similarMessages >= 1) {
+    multiplier *= 1 / (similarMessages / 0.8);
     if (similarMessages >= 10) multiplier *= 5 / similarMessages;
   }
   if (
@@ -114,9 +114,8 @@ export const GrantEXPOnChat = {
     let lastEXPEvent = lastEXP.get(`${msg.author.id}-${msg.channel.id}`) ?? 0;
     if (Date.now() < lastEXPEvent + XPPrefs.cooldown) return;
     lastEXP.set(`${msg.author.id}-${msg.channel.id}`, Date.now());
-    if (multiplier <= 0.04) {
-      msg.addReaction('🚫');
-      
+    if (multiplier <= 0.9) {
+      bot.addMessageReaction(msg.channel.id, msg.id, '🤨');
     }
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,
