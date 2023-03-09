@@ -96,7 +96,8 @@ export class LevellingRewards {
       (reward) =>
         (reward.type === 'atLevel' && reward.level === level) ||
         (reward.type === 'everyNLevels' &&
-          (level - reward.offset) % reward.everyNLevel === 0 && level >= reward.offset)
+          (level - reward.offset) % reward.everyNLevel === 0 &&
+          level >= reward.offset)
     ) as LevelUpAtLevelRewardType[];
   }
   async addGuildReward(
@@ -246,6 +247,7 @@ export class LevellingRewards {
       .map(([roleID, count]) => {
         return [roleID, count] as [string, number];
       });
+    console.log(cratesMap);
     const crateOperations = (await Promise.all(
       Array.from(cratesMap.entries())
         .filter(([crateID, count]) => {
@@ -291,6 +293,7 @@ export class LevellingRewards {
       }
     }
     for (const [crateTemplate, count] of crateOperations) {
+      console.log('crate', crateTemplate, count, levels, userID, guildID);
       for (let i = 0; i < count; i++) {
         const crate = await CrateManager.getInstance().generateCrate(
           crateTemplate,
