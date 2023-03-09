@@ -128,10 +128,12 @@ export const queue = {
                 type: Constants.ComponentTypes.SELECT_MENU,
                 custom_id: 'pageSelect',
                 placeholder: 'Jump to page',
-                options: embeds.map((_, index) => ({
-                  label: `Page ${index + 1}`,
-                  value: `${index + 1}`,
-                })),
+                options: embeds
+                  .map((_, index) => ({
+                    label: `Page ${index + 1}`,
+                    value: `${index + 1}`,
+                  }))
+                  .slice(0, 25),
               },
             ],
           },
@@ -177,10 +179,12 @@ export const queue = {
                   type: Constants.ComponentTypes.SELECT_MENU,
                   custom_id: 'pageSelect',
                   placeholder: 'Jump to page',
-                  options: embeds.map((_, index) => ({
-                    label: `Page ${index + 1}`,
-                    value: `${index + 1}`,
-                  })),
+                  options: embeds
+                    .map((_, index) => ({
+                      label: `Page ${index + 1}`,
+                      value: `${index + 1}`,
+                    }))
+                    .slice(0, 25),
                 },
               ],
             },
