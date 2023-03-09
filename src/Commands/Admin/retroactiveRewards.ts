@@ -111,7 +111,7 @@ export const retroRewards = {
         {
           title: `Confirm Giving Retroactive Rewards`,
           description: `Please confirm that you want to give ${
-            selectedRewardID ? `\`reward?.name\`` : 'all rewards'
+            selectedRewardID ? `\`${reward?.name}\`` : 'all rewards'
           } to ${
             selectedUserID ? userReference?.mention : 'all users'
           }. This means that ${
