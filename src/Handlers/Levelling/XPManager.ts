@@ -195,7 +195,7 @@ export class XPManager {
       console.log('level up', newXP, XPForNextLevel, newLevel);
       newXP -= XPForNextLevel;
       newLevel++;
-      XPForNextLevel = this.getRequiredXPForLevel(newLevel + 1);
+      XPForNextLevel = this.getRequiredXPForLevel(newLevel);
     }
     const levelDiff = newLevel - xpData.level;
     console.log('level diff', levelDiff);
