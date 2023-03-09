@@ -198,6 +198,12 @@ export class LevellingRewards {
         if (action.type === 'crate') {
           if (action.action === 'add') {
             if (cratesMap.has(action.crateID)) {
+              console.log(
+                'adding to crate',
+                action.crateID,
+                action.count,
+                action
+              );
               cratesMap.set(
                 action.crateID,
                 cratesMap.get(action.crateID)! + action.count
