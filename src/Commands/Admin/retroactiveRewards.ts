@@ -205,12 +205,22 @@ export const retroRewards = {
         let xp = user.xp;
         let level = user.level;
         console.log({ user: user.userID, xp, level });
+        let rwds = [] as LevelUpRewardType[];
+        for (let i = 0; i <= level; i++) {
+          rwds.push(
+            ...LevellingRewards.getInstance().parseGuildRewardsForLevel(
+              interaction.guildID,
+              i,
+              guildRewards
+            )
+          );
+        }
         const rewardProcess =
           await LevellingRewards.getInstance().processGuildRewardsForMember(
             interaction.guildID,
             user.userID,
             [0, level],
-            guildRewards
+            rwds
           );
         if (!rewardProcess) {
           await collectInter.createFollowup({
