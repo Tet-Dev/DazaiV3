@@ -158,20 +158,26 @@ export class LevellingRewards {
   async processGuildRewardsForMember(
     guildID: string,
     userID: string,
-    levels: number | [number, number]
+    levels: number | [number, number],
+    overrideRewards?: LevelUpRewardType[]
   ) {
     let rewards: LevelUpRewardType[] = [];
-    const guildRewards = await this.getGuildRewards(guildID);
-    if (Array.isArray(levels)) {
-      for (let i = levels[0]; i <= levels[1]; i++) {
-        rewards.push(
-          ...this.parseGuildRewardsForLevel(guildID, i, guildRewards)
-        );
+    if (overrideRewards) {
+      rewards = overrideRewards;
+    } else {
+      const guildRewards = await this.getGuildRewards(guildID);
+      if (Array.isArray(levels)) {
+        for (let i = levels[0]; i <= levels[1]; i++) {
+          rewards.push(
+            ...this.parseGuildRewardsForLevel(guildID, i, guildRewards)
+          );
+        }
+      }
+      if (typeof levels === 'number') {
+        rewards = this.parseGuildRewardsForLevel(guildID, levels, guildRewards);
       }
     }
-    if (typeof levels === 'number') {
-      rewards = this.parseGuildRewardsForLevel(guildID, levels, guildRewards);
-    }
+
     // figure out roles first; then cards; then crates
     const rolesMap = new Map<string, number>();
     // for every role that needs adding, add one to the entry in the map
