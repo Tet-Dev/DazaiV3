@@ -115,7 +115,7 @@ export const GrantEXPOnChat = {
     if (Date.now() < lastEXPEvent + XPPrefs.cooldown) return;
     lastEXP.set(`${msg.author.id}-${msg.channel.id}`, Date.now());
     if (multiplier <= 0.9) {
-      bot.addMessageReaction(msg.channel.id, msg.id, '🤨');
+      // bot.addMessageReaction(msg.channel.id, msg.id, '🤨');
     }
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,
