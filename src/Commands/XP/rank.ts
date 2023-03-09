@@ -27,7 +27,7 @@ export const rank = {
       ? bot.users.get(selectedUserID) || (await bot.getRESTUser(selectedUserID))
       : interaction.user || interaction.member?.user;
     if (!user) return interaction.createMessage('User not found!');
-    const ackPromise = interaction.acknowledge()
+    const ackPromise = interaction.acknowledge();
     const guildCard = await XPManager.getInstance().generateRankCard(
       interaction.guildID,
       user.id
