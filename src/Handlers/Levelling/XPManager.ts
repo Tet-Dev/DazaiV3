@@ -239,15 +239,7 @@ export class XPManager {
               .join('\n')}\`\`\``,
           });
         }
-        if (!awardFields.length)
-          return resolve({
-            guildID,
-            userID,
-            level: newLevel,
-            xp: newXP,
-            dailyMessages: xpData.dailyMessages,
-            resetAt: xpData.resetAt,
-          });
+        if (!awardFields.length) return resolve();
         dmChannel.createMessage({
           embed: {
             title: 'Level Up!',
@@ -278,15 +270,8 @@ ${
           level: newLevel,
           xp: newXP,
         }));
-      resolve({
-        guildID,
-        userID,
-        level: newLevel,
-        xp: newXP,
-        dailyMessages: xpData.dailyMessages,
-        resetAt: xpData.resetAt,
-      });
-    });
+      resolve();
+    }) as Promise<void>;
     return {
       data: {
         guildID,
