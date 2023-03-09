@@ -248,6 +248,7 @@ export class LevellingRewards {
         return [roleID, count] as [string, number];
       });
     console.log(cratesMap);
+    console.log(rewards);
     const crateOperations = (await Promise.all(
       Array.from(cratesMap.entries())
         .filter(([crateID, count]) => {
