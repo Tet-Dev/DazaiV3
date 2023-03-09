@@ -123,7 +123,12 @@ export const updateGuildReward = {
               'Invalid card ID in reward data; only server-wide cards are allowed',
           });
         }
-        if (reward.count <= 0 || reward.count > 100 || reward.count % 1 !== 0) {
+        if (
+          isNaN(reward.count) ||
+          reward.count <= 0 ||
+          reward.count > 100 ||
+          reward.count % 1 !== 0
+        ) {
           return res.status(400).json({
             error:
               'Invalid card count in reward data; must be between 1 and 100 and a whole number',
