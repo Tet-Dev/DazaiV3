@@ -142,7 +142,7 @@ export const updateGuildReward = {
       }
     }
 
-    const member =
+    const member = 
       bot.guilds.get(guildID)?.members.get(user.id) ??
       (await bot.getRESTGuildMember(guildID, user.id));
     if (!member) {

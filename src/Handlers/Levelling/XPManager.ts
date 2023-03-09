@@ -151,7 +151,7 @@ export class XPManager {
       memberXP,
       true
     );
-    await this.updateGuildMemberXP(guildID, userID, newXP);
+    await this.updateGuildMemberXP(guildID, userID, newXP.data);
     return newXP;
   }
   async giveGuildMemberXP(
@@ -160,7 +160,7 @@ export class XPManager {
     xp: number,
     userXPData?: GuildMemeberXP,
     dontUpdate?: boolean
-  ): Promise<GuildMemeberXP> {
+  ): Promise<{ data: GuildMemeberXP; rewardsPromise: Promise<void> }> {
     const xpData = userXPData ??
       (await this.getGuildMemberXP(guildID, userID)) ?? {
         guildID,
@@ -194,96 +194,109 @@ export class XPManager {
     }
     const levelDiff = newLevel - xpData.level;
     console.log('level diff', levelDiff);
-    if (levelDiff > 0) {
-      const awards =
-        await LevellingRewards.getInstance().processGuildRewardsForMember(
-          guildID,
-          userID,
-          [xpData.level, newLevel]
-        );
-      const dmChannel = await bot.getDMChannel(userID);
-      const guild =
-        bot.guilds.get(guildID) || (await bot.getRESTGuild(guildID));
-      const awardFields = [] as EmbedField[];
-      if (awards?.roles.length) {
-        awardFields.push({
-          name: '__New Roles__',
-          value: `\`\`\`${awards.roles
-            .map((r) => {
-              const roleData = guild.roles.get(r[0]);
-              return roleData ? `@${roleData.name}` : 'Unknown Role';
-            })
-            .join('\n')}\`\`\``,
-        });
-      }
-      if (awards?.cards.length) {
-        awardFields.push({
-          name: '__New Rank Cards__',
-          value: `\`\`\`${awards.cards
-            .map((r) => {
-              return `- x${r[1]} 「 ${r[0].name} 」  ${
-                rarityEmojiMap[r[0].rarity]
-              } — ${rarityNameMap[r[0].rarity]}`;
-            })
-            .join('\n')}\`\`\``,
-        });
-      }
-      if (awards?.crates.length) {
-        awardFields.push({
-          name: '__New Crates__',
-          value: `\`\`\`${awards.crates
-            .map((r) => {
-              return `- x${r[1]} 「 ${r[0].name} 」`;
-            })
-            .join('\n')}\`\`\``,
-        });
-      }
-      if (!awardFields.length)
-        return {
-          guildID,
-          userID,
-          level: newLevel,
-          xp: newXP,
-          dailyMessages: xpData.dailyMessages,
-          resetAt: xpData.resetAt,
-        };
-      dmChannel.createMessage({
-        embed: {
-          title: 'Level Up!',
-          description: `You have leveled up to level **__${newLevel}__** in **${
-            guild?.name
-          }**!\n
+    const rewardsPromise = new Promise(async (resolve) => {
+      if (levelDiff > 0) {
+        const awards =
+          await LevellingRewards.getInstance().processGuildRewardsForMember(
+            guildID,
+            userID,
+            [xpData.level, newLevel]
+          );
+        const dmChannel = await bot.getDMChannel(userID);
+        const guild =
+          bot.guilds.get(guildID) || (await bot.getRESTGuild(guildID));
+        const awardFields = [] as EmbedField[];
+        if (awards?.roles.length) {
+          awardFields.push({
+            name: '__New Roles__',
+            value: `\`\`\`${awards.roles
+              .map((r) => {
+                const roleData = guild.roles.get(r[0]);
+                return roleData ? `@${roleData.name}` : 'Unknown Role';
+              })
+              .join('\n')}\`\`\``,
+          });
+        }
+        if (awards?.cards.length) {
+          awardFields.push({
+            name: '__New Rank Cards__',
+            value: `\`\`\`${awards.cards
+              .map((r) => {
+                return `- x${r[1]} 「 ${r[0].name} 」  ${
+                  rarityEmojiMap[r[0].rarity]
+                } — ${rarityNameMap[r[0].rarity]}`;
+              })
+              .join('\n')}\`\`\``,
+          });
+        }
+        if (awards?.crates.length) {
+          awardFields.push({
+            name: '__New Crates__',
+            value: `\`\`\`${awards.crates
+              .map((r) => {
+                return `- x${r[1]} 「 ${r[0].name} 」`;
+              })
+              .join('\n')}\`\`\``,
+          });
+        }
+        if (!awardFields.length)
+          return resolve({
+            guildID,
+            userID,
+            level: newLevel,
+            xp: newXP,
+            dailyMessages: xpData.dailyMessages,
+            resetAt: xpData.resetAt,
+          });
+        dmChannel.createMessage({
+          embed: {
+            title: 'Level Up!',
+            description: `You have leveled up to level **__${newLevel}__** in **${
+              guild?.name
+            }**!\n
 ${
   awardFields.length > 0
     ? 'In addition, you also have received the following rewards!'
     : ''
 }`,
-          thumbnail: {
-            url:
-              guild?.dynamicIconURL('png', 64) ||
-              'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk',
+            thumbnail: {
+              url:
+                guild?.dynamicIconURL('png', 64) ||
+                'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk',
+            },
+            fields: awardFields,
+            footer: {
+              text: `Sent from ${guild?.name}`,
+              icon_url: guild?.dynamicIconURL('png', 64) ?? undefined,
+            },
           },
-          fields: awardFields,
-          footer: {
-            text: `Sent from ${guild?.name}`,
-            icon_url: guild?.dynamicIconURL('png', 64) ?? undefined,
-          },
-        },
-      });
-    }
-    console.log('level done', newXP, XPForNextLevel);
-    !dontUpdate &&
-      (await this.updateGuildMemberXP(guildID, userID, {
+        });
+      }
+      console.log('level done', newXP, XPForNextLevel);
+      !dontUpdate &&
+        (await this.updateGuildMemberXP(guildID, userID, {
+          level: newLevel,
+          xp: newXP,
+        }));
+      resolve({
+        guildID,
+        userID,
         level: newLevel,
         xp: newXP,
-      }));
+        dailyMessages: xpData.dailyMessages,
+        resetAt: xpData.resetAt,
+      });
+    });
     return {
-      guildID,
-      userID,
-      level: newLevel,
-      xp: newXP,
-      dailyMessages: xpData.dailyMessages,
-      resetAt: xpData.resetAt,
+      data: {
+        guildID,
+        userID,
+        level: newLevel,
+        xp: newXP,
+        dailyMessages: xpData.dailyMessages,
+        resetAt: xpData.resetAt,
+      },
+      rewardsPromise,
     };
     // each level
   }
