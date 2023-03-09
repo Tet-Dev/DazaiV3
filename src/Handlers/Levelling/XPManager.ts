@@ -193,6 +193,7 @@ export class XPManager {
       XPForNextLevel = this.getRequiredXPForLevel(newLevel + 1);
     }
     const levelDiff = newLevel - xpData.level;
+    console.log('level diff', levelDiff);
     if (levelDiff > 0) {
       const awards =
         await LevellingRewards.getInstance().processGuildRewardsForMember(
