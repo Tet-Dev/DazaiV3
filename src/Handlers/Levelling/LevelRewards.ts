@@ -177,7 +177,13 @@ export class LevellingRewards {
         rewards = this.parseGuildRewardsForLevel(guildID, levels, guildRewards);
       }
     }
-    console.log({ userID, levels });
+    console.log({
+      userID,
+      levels,
+      rwds: {
+        rewards,
+      },
+    });
     // figure out roles first; then cards; then crates
     const rolesMap = new Map<string, number>();
     // for every role that needs adding, add one to the entry in the map
