@@ -204,12 +204,6 @@ export class LevellingRewards {
         if (action.type === 'crate') {
           if (action.action === 'add') {
             if (cratesMap.has(action.crateID)) {
-              console.log(
-                'adding to crate',
-                action.crateID,
-                action.count,
-                action
-              );
               cratesMap.set(
                 action.crateID,
                 cratesMap.get(action.crateID)! + action.count
@@ -259,8 +253,6 @@ export class LevellingRewards {
       .map(([roleID, count]) => {
         return [roleID, count] as [string, number];
       });
-    console.log(cratesMap);
-    console.log(rewards);
     const crateOperations = (await Promise.all(
       Array.from(cratesMap.entries())
         .filter(([crateID, count]) => {
@@ -306,7 +298,6 @@ export class LevellingRewards {
       }
     }
     for (const [crateTemplate, count] of crateOperations) {
-      console.log('crate', crateTemplate, count, levels, userID, guildID);
       for (let i = 0; i < count; i++) {
         const crate = await CrateManager.getInstance().generateCrate(
           crateTemplate,
