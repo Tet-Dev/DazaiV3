@@ -116,9 +116,12 @@ export class InventoryManager {
   ) {
     const inventory = await this.getUserInventory(userID, guildID);
     if (!inventory) return;
+    const findCard = inventory.cards.findIndex((card) => card.cardID === cardID);
+    if (findCard === -1) return;
+    inventory.cards.splice(findCard, 1);
     const newInventory = {
       ...inventory,
-      cards: inventory.cards.filter((card) => card.cardID !== cardID),
+      cards: inventory.cards,
     };
     await this.updateInventory(userID, guildID, newInventory);
     return newInventory;

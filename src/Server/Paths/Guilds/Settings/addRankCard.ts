@@ -28,6 +28,12 @@ export const createRankCard = {
     if (!Object.values(CardRarity).includes(rarity as CardRarity)) {
       return res.status(400).json({ error: 'Invalid card rarity' });
     }
+    if (
+      sellPrice &&
+      (isNaN(parseInt(`${sellPrice}`)) || parseInt(`${sellPrice}`) < 0)
+    ) {
+      return res.status(400).json({ error: 'Invalid sell price' });
+    }
     // check user persm
     const member =
       bot.guilds.get(guildID)?.members.get(user.id) ??
@@ -62,7 +68,7 @@ export const createRankCard = {
     }
     let split = base64.indexOf('base64,');
     const result = await createCard(
-      { name, description, rarity: rarity as CardRarity, sellPrice },
+      { name, description, rarity: rarity as CardRarity, sellPrice: parseInt(`${sellPrice}`) || 0 },
       guildID,
       //   base64 to buffer
       Buffer.from(base64.substring(split + 7), 'base64')

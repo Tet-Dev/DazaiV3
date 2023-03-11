@@ -40,6 +40,12 @@ export const createRankCard = {
     if (card.guild !== guildID) {
       return res.status(400).json({ error: 'Card does not belong to guild' });
     }
+    if (
+      sellPrice &&
+      (isNaN(parseInt(`${sellPrice}`)) || parseInt(`${sellPrice}`) < 0)
+    ) {
+      return res.status(400).json({ error: 'Invalid sell price' });
+    }
     const member =
       bot.guilds.get(guildID)?.members.get(user.id) ??
       (await bot.getRESTGuildMember(guildID, user.id));
@@ -58,6 +64,7 @@ export const createRankCard = {
       name,
       description,
       rarity: rarity as CardRarity,
+      sellPrice,
     });
     return res.json({ success: true });
   },
