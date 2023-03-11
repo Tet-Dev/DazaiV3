@@ -48,6 +48,7 @@ export type CardType = {
   url: string;
   rarity: CardRarity;
   guild?: string;
+  sellPrice?: number;
 };
 
 export interface Crate {

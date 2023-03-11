@@ -14,10 +14,11 @@ export const createRankCard = {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const { name, description, rarity, base64 } = req.body as {
+    const { name, description, rarity, base64, sellPrice } = req.body as {
       name: string;
       description: string;
       rarity: string;
+      sellPrice: number;
       base64: string;
     };
     if (!name || !description || !rarity || !base64) {
@@ -61,7 +62,7 @@ export const createRankCard = {
     }
     let split = base64.indexOf('base64,');
     const result = await createCard(
-      { name, description, rarity: rarity as CardRarity },
+      { name, description, rarity: rarity as CardRarity, sellPrice },
       guildID,
       //   base64 to buffer
       Buffer.from(base64.substring(split + 7), 'base64')

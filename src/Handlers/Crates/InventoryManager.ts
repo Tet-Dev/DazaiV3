@@ -10,12 +10,14 @@ type DefaultInventoryType = {
     cardID: string;
     id: string;
   }[];
+  money?: number;
 };
 const defaultInventory = (userID: string, guildID: string) =>
   ({
     userID,
     guildID,
     cards: [],
+    money: 0,
   } as DefaultInventoryType);
 export class InventoryManager {
   static instance: InventoryManager;
@@ -68,6 +70,28 @@ export class InventoryManager {
         upsert: true,
       }
     );
+  }
+  async addMoneyToInventory(userID: string, guildID: string, amount: number) {
+    const inventory = await this.getUserInventory(userID, guildID);
+    if (!inventory) return;
+    const newInventory = {
+      ...inventory,
+      money: (inventory.money ?? 0) + amount,
+    };
+    await this.updateInventory(userID, guildID, newInventory);
+    return newInventory;
+  }
+  async removeMoneyFromInventory(
+    userID: string,
+    guildID: string,
+    amount: number
+  ) {
+    const inventory = await this.getUserInventory(userID, guildID);
+    if (!inventory) return;
+    const newInventory = {
+      ...inventory,
+      money: (inventory.money ?? 0) - amount,
+    };
   }
   async addCardToInventory(userID: string, guildID: string, cardID: string) {
     const inventory = await this.getUserInventory(userID, guildID);
@@ -133,7 +157,7 @@ export class InventoryManager {
       .findOne({
         'cards.id': itemID,
       })) as DefaultInventoryType;
-    if (!inventory) return null
+    if (!inventory) return null;
     const cardID = inventory?.cards.find((card) => card.id === itemID)?.cardID;
     const cardData = cardID && (await getCard(cardID));
     return {

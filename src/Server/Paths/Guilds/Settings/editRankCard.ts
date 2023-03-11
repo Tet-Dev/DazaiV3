@@ -17,10 +17,11 @@ export const createRankCard = {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const { name, description, rarity } = req.body as {
+    const { name, description, rarity, sellPrice } = req.body as {
       name: string;
       description: string;
       rarity: string;
+      sellPrice?: number;
     };
     // name < 40 , description < 200 , rarity in enum
     if (name.length > 40 || name.length < 1) {

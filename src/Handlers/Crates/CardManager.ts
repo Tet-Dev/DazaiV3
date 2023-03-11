@@ -73,6 +73,7 @@ export const createCard = async (
       description: card.description,
       url: `https://assets.dazai.app/${fileLoc}`,
       rarity: card.rarity,
+      sellPrice: card.sellPrice,
     });
   return {
     cardID,
