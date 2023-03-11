@@ -109,14 +109,14 @@ export class InventoryManager {
     await this.updateInventory(userID, guildID, newInventory);
     return newInventory;
   }
-  async removeCardFromInventory(
+  async removeItemFromInventory(
     userID: string,
     guildID: string,
-    cardID: string
+    itemID: string
   ) {
     const inventory = await this.getUserInventory(userID, guildID);
     if (!inventory) return;
-    const findCard = inventory.cards.findIndex((card) => card.cardID === cardID);
+    const findCard = inventory.cards.findIndex((item) => item.id === itemID);
     if (findCard === -1) return;
     inventory.cards.splice(findCard, 1);
     const newInventory = {

@@ -4,7 +4,7 @@ import { InventoryManager } from '../../../../Handlers/Crates/InventoryManager';
 import { RESTMethods, RESTHandler } from '../../../../types/misc';
 
 export const getInventory = {
-  method: RESTMethods.GET,
+  method: RESTMethods.POST,
   path: '/guilds/:guildID/inventory/sell/:cardID',
   sendUser: true,
   run: async (req, res, next, user) => {
@@ -18,13 +18,13 @@ export const getInventory = {
     const globalInventory =
       await InventoryManager.getInstance().getUserInventory(user.id, '@global');
     inventory.cards = inventory.cards.concat(globalInventory.cards);
-    const sellCard = inventory.cards.find((x) => x.cardID === cardID);
+    const sellCard = inventory.cards.find((x) => x.id === cardID);
 
     if (!sellCard) return res.status(404).json({ error: 'Card not found' });
     const card = await getCard(sellCard?.cardID);
     if (!card?.sellPrice || card.sellPrice <= 0)
       return res.status(400).json({ error: 'Card cannot be sold' });
-    await InventoryManager.getInstance().removeCardFromInventory(
+    await InventoryManager.getInstance().removeItemFromInventory(
       user.id,
       guildID,
       cardID
@@ -34,9 +34,15 @@ export const getInventory = {
       guildID,
       card.sellPrice
     );
+    const newInv = await InventoryManager.getInstance().getUserInventory(
+      user.id,
+      guildID
+    );
+
     return res.json({
       success: true,
       money: card.sellPrice,
+      inventory: newInv,
     });
   },
 } as RESTHandler;
