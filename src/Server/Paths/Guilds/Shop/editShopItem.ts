@@ -77,7 +77,7 @@ export const editShopItem = {
       return res.status(400).json({ error: 'Invalid card ID' });
 
     const guildShopItem = await ShopManager.getInstance().updateShopItem(
-      guildID,
+      itemID,
       {
         name,
         description,
