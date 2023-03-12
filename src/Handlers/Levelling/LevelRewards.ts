@@ -167,7 +167,7 @@ export class LevellingRewards {
     } else {
       const guildRewards = await this.getGuildRewards(guildID);
       if (Array.isArray(levels)) {
-        for (let i = levels[0]; i <= levels[1]; i++) {
+        for (let i = levels[0]+1; i <= levels[1]; i++) {
           rewards.push(
             ...this.parseGuildRewardsForLevel(guildID, i, guildRewards)
           );
