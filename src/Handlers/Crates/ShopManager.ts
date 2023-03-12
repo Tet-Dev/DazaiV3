@@ -71,14 +71,14 @@ export class ShopManager {
 
   async getShopItem(itemID: string) {
     return (await MongoDB.db('Guilds')
-      .collection('shopData')
+      .collection('shopItems')
       .findOne({
         _id: new ObjectId(itemID),
       })) as ShopItem;
   }
   async getShopItems(guildID: string) {
     return (await MongoDB.db('Guilds')
-      .collection('shopData')
+      .collection('shopItems')
       .find({
         guildID,
       })
@@ -88,7 +88,7 @@ export class ShopManager {
     const item = await this.getShopItem(itemID);
     if (!item) return;
     await MongoDB.db('Guilds')
-      .collection('shopData')
+      .collection('shopItems')
       .updateOne(
         {
           _id: new ObjectId(itemID),
@@ -105,7 +105,7 @@ export class ShopManager {
   async createShopItem(guildID: string, data: Partial<ShopItem>) {
     delete data._id;
     const item = await MongoDB.db('Guilds')
-      .collection('shopData')
+      .collection('shopItems')
       .insertOne({
         guildID,
         ...data,
@@ -118,7 +118,7 @@ export class ShopManager {
   }
   async deleteShopItem(itemID: string) {
     return await MongoDB.db('Guilds')
-      .collection('shopData')
+      .collection('shopItems')
       .deleteOne({
         _id: new ObjectId(itemID),
       });
