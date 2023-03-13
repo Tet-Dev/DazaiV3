@@ -61,9 +61,9 @@ export const createRankCard = {
     // });
     // return;
     const currentCardCount = await getGuildCards(guildID);
-    if (currentCardCount.length >= 25) {
+    if (currentCardCount.length >= 250) {
       return res.status(400).json({
-        error: 'Cannot create more than 25 cards per guild',
+        error: 'Cannot create more than 250 cards per guild',
       });
     }
     let split = base64.indexOf('base64,');
