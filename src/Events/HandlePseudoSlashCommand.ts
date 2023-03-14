@@ -76,17 +76,20 @@ export const HandlePseudoSlashCommands = {
       else if (arg.type === Constants.ApplicationCommandOptionTypes.USER)
         parsedArgs.push({
           name: argName,
-          value: argValue,
+          // get user id from <@595719716560175149> or <@!595719716560175149> or 595719716560175149
+          value: (argValue.match(/<@!?(\d+)>/) || [])[1] || argValue,
         } as InteractionDataOptionsUser);
       else if (arg.type === Constants.ApplicationCommandOptionTypes.CHANNEL)
         parsedArgs.push({
           name: argName,
-          value: argValue,
+          // get channel id from <#595719716560175149> or 595719716560175149
+          value: (argValue.match(/<#(\d+)>/) || [])[1] || argValue,
         } as InteractionDataOptionsChannel);
       else if (arg.type === Constants.ApplicationCommandOptionTypes.ROLE)
         parsedArgs.push({
           name: argName,
-          value: argValue,
+          // get role id from <@&595719716560175149> or 595719716560175149
+          value: (argValue.match(/<@&(\d+)>/) || [])[1] || argValue,
         } as InteractionDataOptionsRole);
       else if (arg.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE)
         parsedArgs.push({
