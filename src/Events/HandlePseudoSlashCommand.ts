@@ -20,6 +20,8 @@ import {
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { SlashCommandHandler } from '../Handlers/SlashCommandHandler';
 import { EventHandler } from '../types/misc';
+const commandMapCooldowns = new Map<string, number>();
+
 export const HandlePseudoSlashCommands = {
   event: 'messageCreate',
   run: async (bot, msg) => {
@@ -30,7 +32,19 @@ export const HandlePseudoSlashCommands = {
     if (!commandName) return;
     const command = SlashCommandHandler.getInstance().getCommand(commandName);
     if (!command) return;
+    // can only run 5 commands every 8 seconds
+    const lastCommand = commandMapCooldowns.get(msg.author.id);
     const channel = bot.getChannel(msg.channel.id) as TextChannel;
+    if (lastCommand && lastCommand >= 8) {
+      channel.createMessage(
+        `<@!${msg.author.id}> You are sending too many commands. Please wait a few seconds before sending another command.`
+      );
+      return;
+    }
+    commandMapCooldowns.set(msg.author.id, (lastCommand ?? 0) + 1);
+    setTimeout(() => {
+      commandMapCooldowns.set(msg.author.id, (lastCommand ?? 0) - 1);
+    }, 8000);
     const guild = msg.guildID ? bot.guilds.get(msg.guildID) : undefined;
     const member = guild ? guild.members.get(msg.author.id) : undefined;
     const cmdArgs = command.args;
