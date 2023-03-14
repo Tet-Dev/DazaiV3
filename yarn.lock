@@ -11236,7 +11236,7 @@ uuid@^9.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
   integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
-uwuifier@^4.0.4:
+uwuifier@^4.0.5:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/uwuifier/-/uwuifier-4.0.5.tgz#c8f89dc9a13b5df2958677f83f6074d715c50093"
   integrity sha512-aY94c/5dRXEpJb12H/8DeLbCFfkIjqkLLJz0Ogj46WXsVkvq+CYUmCxs3S4sJGtb78cI8x/PQN6ZXe4QApcIYw==

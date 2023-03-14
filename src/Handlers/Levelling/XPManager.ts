@@ -33,6 +33,7 @@ export type GuildMemeberXP = {
   xp: number;
   dailyMessages: number;
   resetAt: number;
+  kitten?: number; // 0 = no kitten, 1 = kitten, 2 = forced kitten
 };
 const defaultGuildMemberXP: GuildMemeberXP = {
   guildID: '',
