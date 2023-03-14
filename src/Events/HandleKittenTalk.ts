@@ -97,14 +97,32 @@ export const KittenifyMessages = {
     }
     console.log(`Took ${Date.now() - perf}ms to uwuify`);
     perf = Date.now();
-    await bot.executeWebhook(webhook.id, webhook.token!, {
+    const hookMsg = await bot.executeWebhook(webhook.id, webhook.token!, {
       content,
       username: msg.author.username,
       avatarURL: msg.author.avatar?.startsWith('a_')
         ? msg.author.dynamicAvatarURL('gif')
         : msg.author.dynamicAvatarURL('png'),
       embeds: msg.embeds,
+      allowedMentions: {
+        everyone: false,
+        repliedUser: true,
+        roles: false,
+        users: false,
+      },
+      wait: true,
     });
+    hookMsg.edit({
+      content,
+      embeds: msg.embeds,
+      allowedMentions: {
+        everyone: true,
+        repliedUser: true,
+        roles: true,
+        users: true,
+      },
+    });
+    
     console.log(`Took ${Date.now() - perf}ms to send webhook`);
     perf = Date.now();
     // get channel bot webhooks
