@@ -53,17 +53,39 @@ export const HandlePseudoSlashCommands = {
     ).length;
     const maxArgs = cmdArgs.length;
     if (args.length < minArgs || args.length > maxArgs) {
-      channel.createMessage(
-        `Invalid number of arguments. Proper usage: \`\`\`${prefix}${commandName} ${cmdArgs
-          .map((arg) =>
-            (arg as ApplicationCommandOptionsWithValue).required
-              ? `<${arg.name}>`
-              : `[${arg.name}]`
-          )
-          .join(' ')}\`\`\`
-          Required parameters are surrounded by \`<>\`
-          Optional parameters are surrounded by \`[]\``
-      );
+      channel.createMessage({
+        embed: {
+          title: `Invalid Parameters for \`${commandName}\``,
+          description: `\`\`\`/${commandName} ${cmdArgs
+            .map((arg) =>
+              (arg as ApplicationCommandOptionsWithValue).required
+                ? `<${arg.name}>`
+                : `[${arg.name}]`
+            )
+            .join(' ')}\`\`\`\n${
+            command.description
+          }\nRequired parameters are surrounded by \`<>\`
+              Optional parameters are surrounded by \`[]\`\n**__Parameters__**`,
+          color: 16734296,
+          fields: cmdArgs.map((arg) => ({
+            name: `\`${arg.name}\``,
+            value: `${arg.description} (${
+              (arg as ApplicationCommandOptionsWithValue).required
+                ? 'required'
+                : 'optional'
+            })`,
+            inline: true,
+          })),
+
+          // [
+          //   {
+          //     name: '`song`',
+          //     value:
+          //       'The name of the song/the URL of the song/playlist URL (Spotify + Youtube)',
+          //   },
+          // ]
+        },
+      });
       return;
     }
     // InteractionDataOptionsString | InteractionDataOptionsInteger | InteractionDataOptionsBoolean | InteractionDataOptionsUser | InteractionDataOptionsChannel | InteractionDataOptionsRole | InteractionDataOptionsMentionable | InteractionDataOptionsNumber
