@@ -1,4 +1,5 @@
 import {
+  EmbedOptions,
   Message,
   PossiblyUncachedTextableChannel,
   Textable,
@@ -97,13 +98,26 @@ export const KittenifyMessages = {
     }
     console.log(`Took ${Date.now() - perf}ms to uwuify`);
     perf = Date.now();
+    const embeds = [...msg.embeds] as EmbedOptions[];
+    if (msg.referencedMessage) {
+      embeds.push({
+        author: {
+          name: `${msg.referencedMessage?.author.username}#${msg.referencedMessage.author.discriminator}`,
+          icon_url: msg.referencedMessage?.author.avatar?.startsWith('a_')
+            ? msg.referencedMessage?.author.dynamicAvatarURL('gif')
+            : msg.referencedMessage?.author.dynamicAvatarURL('png'),
+        },
+        description: `
+        ${msg.referencedMessage.content} [[Jump]](${msg.referencedMessage.jumpLink})`,
+      });
+    }
     const hookMsg = await bot.executeWebhook(webhook.id, webhook.token!, {
       content,
       username: msg.author.username,
       avatarURL: msg.author.avatar?.startsWith('a_')
         ? msg.author.dynamicAvatarURL('gif')
         : msg.author.dynamicAvatarURL('png'),
-      embeds: msg.embeds,
+      embeds: embeds,
       allowedMentions: {
         everyone: false,
         repliedUser: true,
@@ -112,9 +126,11 @@ export const KittenifyMessages = {
       },
       wait: true,
     });
-    hookMsg.edit({
+    // only edit if there was a ping
+    
+    hookMsg.editWebhook(webhook.token!, {
       content,
-      embeds: msg.embeds,
+      embeds,
       allowedMentions: {
         everyone: true,
         repliedUser: true,
@@ -122,7 +138,7 @@ export const KittenifyMessages = {
         users: true,
       },
     });
-    
+
     console.log(`Took ${Date.now() - perf}ms to send webhook`);
     perf = Date.now();
     // get channel bot webhooks
