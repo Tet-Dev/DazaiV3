@@ -54,54 +54,58 @@ export const HandlePseudoSlashCommands = {
     }
     // InteractionDataOptionsString | InteractionDataOptionsInteger | InteractionDataOptionsBoolean | InteractionDataOptionsUser | InteractionDataOptionsChannel | InteractionDataOptionsRole | InteractionDataOptionsMentionable | InteractionDataOptionsNumber
     let parsedArgs = [] as InteractionDataOptions[];
-    for (let i = 0; i < cmdArgs.length; i++) {
-      const arg = cmdArgs[i];
-      const argName = arg.name;
-      const argValue = args[i];
-      if (arg.type === Constants.ApplicationCommandOptionTypes.STRING)
-        parsedArgs.push({
-          name: argName,
-          value: argValue,
-        } as InteractionDataOptionsString);
-      else if (arg.type === Constants.ApplicationCommandOptionTypes.INTEGER)
-        parsedArgs.push({
-          name: argName,
-          value: parseInt(argValue),
-        } as InteractionDataOptionsInteger);
-      else if (arg.type === Constants.ApplicationCommandOptionTypes.BOOLEAN)
-        parsedArgs.push({
-          name: argName,
-          value: argValue.toLowerCase() === 'true',
-        } as InteractionDataOptionsBoolean);
-      else if (arg.type === Constants.ApplicationCommandOptionTypes.USER)
-        parsedArgs.push({
-          name: argName,
-          // get user id from <@595719716560175149> or <@!595719716560175149> or 595719716560175149
-          value: (argValue.match(/<@!?(\d+)>/) || [])[1] || argValue,
-        } as InteractionDataOptionsUser);
-      else if (arg.type === Constants.ApplicationCommandOptionTypes.CHANNEL)
-        parsedArgs.push({
-          name: argName,
-          // get channel id from <#595719716560175149> or 595719716560175149
-          value: (argValue.match(/<#(\d+)>/) || [])[1] || argValue,
-        } as InteractionDataOptionsChannel);
-      else if (arg.type === Constants.ApplicationCommandOptionTypes.ROLE)
-        parsedArgs.push({
-          name: argName,
-          // get role id from <@&595719716560175149> or 595719716560175149
-          value: (argValue.match(/<@&(\d+)>/) || [])[1] || argValue,
-        } as InteractionDataOptionsRole);
-      else if (arg.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE)
-        parsedArgs.push({
-          name: argName,
-          value: argValue,
-        } as InteractionDataOptionsMentionable);
-      else if (arg.type === Constants.ApplicationCommandOptionTypes.NUMBER)
-        parsedArgs.push({
-          name: argName,
-          value: parseFloat(argValue),
-        } as InteractionDataOptionsNumber);
-    }
+    if (args.length && cmdArgs.length)
+      for (let i = 0; i < cmdArgs.length; i++) {
+        const arg = cmdArgs[i];
+        const argName = arg.name;
+        const argValue = args[i];
+        if (!argValue) continue;
+        if (arg.type === Constants.ApplicationCommandOptionTypes.STRING)
+          parsedArgs.push({
+            name: argName,
+            value: argValue,
+          } as InteractionDataOptionsString);
+        else if (arg.type === Constants.ApplicationCommandOptionTypes.INTEGER)
+          parsedArgs.push({
+            name: argName,
+            value: parseInt(argValue),
+          } as InteractionDataOptionsInteger);
+        else if (arg.type === Constants.ApplicationCommandOptionTypes.BOOLEAN)
+          parsedArgs.push({
+            name: argName,
+            value: argValue.toLowerCase() === 'true',
+          } as InteractionDataOptionsBoolean);
+        else if (arg.type === Constants.ApplicationCommandOptionTypes.USER)
+          parsedArgs.push({
+            name: argName,
+            // get user id from <@595719716560175149> or <@!595719716560175149> or 595719716560175149
+            value: (argValue.match(/<@!?(\d+)>/) || [])[1] || argValue,
+          } as InteractionDataOptionsUser);
+        else if (arg.type === Constants.ApplicationCommandOptionTypes.CHANNEL)
+          parsedArgs.push({
+            name: argName,
+            // get channel id from <#595719716560175149> or 595719716560175149
+            value: (argValue.match(/<#(\d+)>/) || [])[1] || argValue,
+          } as InteractionDataOptionsChannel);
+        else if (arg.type === Constants.ApplicationCommandOptionTypes.ROLE)
+          parsedArgs.push({
+            name: argName,
+            // get role id from <@&595719716560175149> or 595719716560175149
+            value: (argValue.match(/<@&(\d+)>/) || [])[1] || argValue,
+          } as InteractionDataOptionsRole);
+        else if (
+          arg.type === Constants.ApplicationCommandOptionTypes.MENTIONABLE
+        )
+          parsedArgs.push({
+            name: argName,
+            value: argValue,
+          } as InteractionDataOptionsMentionable);
+        else if (arg.type === Constants.ApplicationCommandOptionTypes.NUMBER)
+          parsedArgs.push({
+            name: argName,
+            value: parseFloat(argValue),
+          } as InteractionDataOptionsNumber);
+      }
     command.execute(bot, {
       interaction: {
         type: 2,
