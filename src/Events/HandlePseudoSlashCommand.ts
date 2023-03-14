@@ -134,12 +134,8 @@ export const HandlePseudoSlashCommands = {
         acknowledge: async (_: any) => {
           channel.sendTyping();
         },
-        createFollowup: async (content: MessageContent, file?: FileContent) => {
-          console.log({ channel });
-          const newmsg = channel.createMessage(content, file);
-          console.log(newmsg);
-          return newmsg;
-        },
+        createFollowup: async (content: MessageContent, file?: FileContent) =>
+          channel.createMessage(content, file),
         createMessage: async (
           content: MessageContent,
           file?: FileContent | FileContent[]
