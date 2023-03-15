@@ -40,7 +40,9 @@ const getChannelWebhooks = (channel: TextChannel) =>
 export const KittenifyMessages = {
   event: 'messageCreate',
   run: async (bot, msg) => {
+    if (env.devmode) return;
     if (!msg.guildID) return;
+
     let perf = Date.now();
     if (!kittenCacheMap.get(`${msg.guildID}-${msg.author.id}`)) {
       const userxpdata = await XPManager.getInstance().getGuildMemberXP(
@@ -48,7 +50,8 @@ export const KittenifyMessages = {
         msg.author.id
       );
       const isKitten = !!userxpdata?.kitten ?? false;
-      if (!isKitten) return;
+      if (!isKitten)
+        return kittenCacheMap.set(`${msg.guildID}-${msg.author.id}`, false);
       kittenCacheMap.set(`${msg.guildID}-${msg.author.id}`, true);
     }
     if (msg.components?.length) return;
@@ -127,7 +130,7 @@ export const KittenifyMessages = {
       wait: true,
     });
     // only edit if there was a ping
-    
+
     hookMsg.editWebhook(webhook.token!, {
       content,
       embeds,
@@ -141,6 +144,14 @@ export const KittenifyMessages = {
 
     console.log(`Took ${Date.now() - perf}ms to send webhook`);
     perf = Date.now();
+    const userxpdata = await XPManager.getInstance().getGuildMemberXP(
+      msg.guildID,
+      msg.author.id
+    );
+    const isKitten = !!userxpdata?.kitten ?? false;
+    if (!isKitten)
+      return kittenCacheMap.set(`${msg.guildID}-${msg.author.id}`, false);
+    kittenCacheMap.set(`${msg.guildID}-${msg.author.id}`, true);
     // get channel bot webhooks
   },
 } as EventHandler<'messageCreate'>;
