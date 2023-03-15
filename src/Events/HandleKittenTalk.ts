@@ -10,12 +10,16 @@ import {
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { EventHandler } from '../types/misc';
 import Uwuifier from 'uwuifier';
+import translate from 'google-translate-api';
 const uwuifier = new Uwuifier();
 // seeded random number generator
 const random = (seed: number) => {
   var x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
 };
+function isASCII(str: string, extended: boolean) {
+  return (extended ? /^[\x00-\xFF]*$/ : /^[\x00-\x7F]*$/).test(str);
+}
 export const kittenCacheMap = new Map<string, boolean>();
 const channelWebhookCache = new Map<string, Webhook[]>();
 const getChannelWebhooks = (channel: TextChannel) =>
@@ -76,7 +80,17 @@ export const KittenifyMessages = {
             webhooks.length
         )
       ];
-    const content = uwuifier.uwuifySentence(msg.content).substring(0, 2000);
+    const content = isASCII(msg.content, true)
+      ? uwuifier.uwuifySentence(msg.content).substring(0, 2000)
+      : uwuifier
+          .uwuifySentence(
+            (
+              await translate(msg.content, {
+                to: 'en',
+              })
+            ).text
+          )
+          .substring(0, 2000);
     // uwuify every embed
     for (const embed of msg.embeds) {
       if (embed.title)
@@ -115,6 +129,7 @@ export const KittenifyMessages = {
         ${msg.referencedMessage.content} [[Jump]](${msg.referencedMessage.jumpLink})`,
       });
     }
+
     const hookMsg = await bot.executeWebhook(webhook.id, webhook.token!, {
       content,
       username: msg.author.username,
