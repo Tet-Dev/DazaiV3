@@ -40,6 +40,7 @@ const getChannelWebhooks = (channel: TextChannel) =>
 export const KittenifyMessages = {
   event: 'messageCreate',
   run: async (bot, msg) => {
+    //@ts-ignore
     if (env.devmode) return;
     if (!msg.guildID) return;
 
