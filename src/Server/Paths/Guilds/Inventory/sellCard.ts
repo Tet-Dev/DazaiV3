@@ -24,6 +24,9 @@ export const getInventory = {
     const card = await getCard(sellCard?.cardID);
     if (!card?.sellPrice || card.sellPrice <= 0)
       return res.status(400).json({ error: 'Card cannot be sold' });
+    if (inventory.selectedCard === cardID) {
+      await InventoryManager.getInstance().selectCard(user.id, guildID, null);
+    }
     await InventoryManager.getInstance().removeItemFromInventory(
       user.id,
       guildID,
