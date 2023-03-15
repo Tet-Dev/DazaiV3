@@ -10,7 +10,7 @@ import {
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { EventHandler } from '../types/misc';
 import Uwuifier from 'uwuifier';
-import translate from 'google-translate-api';
+import translate from 'google-translate-api-x';
 const uwuifier = new Uwuifier();
 // seeded random number generator
 const random = (seed: number) => {
@@ -45,7 +45,7 @@ export const KittenifyMessages = {
   event: 'messageCreate',
   run: async (bot, msg) => {
     //@ts-ignore
-    if (env.devmode) return;
+    // if (env.devmode) return;
     if (!msg.guildID) return;
 
     let perf = Date.now();
@@ -86,6 +86,7 @@ export const KittenifyMessages = {
           .uwuifySentence(
             (
               await translate(msg.content, {
+                from: 'auto',
                 to: 'en',
               })
             ).text
