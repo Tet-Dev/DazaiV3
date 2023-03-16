@@ -87,7 +87,7 @@ async function generateSlander(title: string, slanderGIF: string) {
   }
 
   const gif = new imagescript.GIF(frameArr, -1);
-  return await gif.encode(50);
+  return await gif.encode(95);
 
   // const canvas = new Image(slander.width, slander.height + canvasText.height);
   // canvas.composite(canvasText, 0, 0);
