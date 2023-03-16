@@ -97,7 +97,7 @@ export const uwuSpeak = {
     );
     if (slanderData) {
       // if its > 8mb, upload to imgbb
-      if (slanderData.buffer.length > 8 * 1024 * 1024) {
+      if (slanderData.buffer.byteLength > 8 * 1024 * 1024) {
         // upload to imgbb and send via url-encoded
         const data = await nfetch(
           `https://api.imgbb.com/1/upload?key=a30605f1da7b089b528b79988fdf09ba`,

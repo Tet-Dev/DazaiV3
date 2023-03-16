@@ -19,7 +19,7 @@ export const uwuSpeak = {
   ],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
   execute: async (bot, { interaction }) => {
-   
+    if (env.devmode) return;
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
     const selectedUserID = (
