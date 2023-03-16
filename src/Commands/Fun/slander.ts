@@ -109,9 +109,9 @@ export const slander = {
       });
     }
     slanderCooldowns.set(
-        (interaction.member.user || interaction.user).id,
-        Date.now() + 1000 * 30
-        );
+      (interaction.member.user || interaction.user).id,
+      Date.now() + 1000 * 30
+    );
 
     await interaction.acknowledge();
     const slanderData = await SlanderManager.getInstance().slander(
@@ -120,7 +120,7 @@ export const slander = {
     );
     if (slanderData) {
       // if its > 8mb, upload to imgbb
-      if (slanderData.buffer.byteLength > 8 * 1024 * 1024) {
+      if (slanderData.buffer.byteLength > 8) {
         // upload to imgbb and send via url-encoded
         const data = await nfetch(
           `https://api.imgbb.com/1/upload?key=a30605f1da7b089b528b79988fdf09ba`,
@@ -138,16 +138,16 @@ export const slander = {
           return x.json();
         });
         console.log(data);
-        return interaction.createFollowup({
-          embeds: [
-            {
-              color: 16728385,
-              image: {
-                url: data.data.url,
-              },
-            },
-          ],
-        });
+        return interaction.createFollowup(data.data.url);
+        // return interaction.createFollowup({
+        //   embeds: [
+        //     {
+        //       image: {
+        //         url: data.data.url,
+        //       },
+        //     },
+        //   ],
+        // });
       } else {
         return interaction.createFollowup(
           {
