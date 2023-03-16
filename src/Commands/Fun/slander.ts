@@ -12,7 +12,8 @@ import {
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import TetLib from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
-export const uwuSpeak = {
+const slanderCooldowns = new Map<string, number>();
+export const slander = {
   name: 'slander',
   description: 'Slander someone/something',
   args: [
@@ -90,6 +91,28 @@ export const uwuSpeak = {
           },
         ],
       });
+    // check cooldown
+    const cooldown = slanderCooldowns.get(
+      (interaction.member.user || interaction.user).id
+    );
+    if (cooldown && cooldown < Date.now()) {
+      return interaction.createMessage({
+        embeds: [
+          {
+            title: `Slow down!`,
+            description: `Please wait <t:${Math.floor(
+              cooldown / 1000
+            )}:R> before using this command again!`,
+            color: 16728385,
+          },
+        ],
+      });
+    }
+    slanderCooldowns.set(
+        (interaction.member.user || interaction.user).id,
+        Date.now() + 1000 * 30
+        );
+
     await interaction.acknowledge();
     const slanderData = await SlanderManager.getInstance().slander(
       text,
@@ -147,4 +170,4 @@ export const uwuSpeak = {
   },
 } as Command;
 
-export default uwuSpeak;
+export default slander;
