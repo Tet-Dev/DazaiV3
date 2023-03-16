@@ -35,6 +35,7 @@ const options: Eris.CommandClientOptions & Eris.ClientOptions = {
   name: 'Dazai',
 };
 globalThis.env = env;
+process.env = Object.assign(process.env, env);
 globalThis.bot = new CommandClient(env.token, options);
 declare global {
   var bot: BotClient;
