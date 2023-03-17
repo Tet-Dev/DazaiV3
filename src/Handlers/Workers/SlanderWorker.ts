@@ -2,11 +2,15 @@ import * as imagescript from 'imagescript';
 //  '../../types/external/ImageScript';
 import nfetch from '../FixedNodeFetch';
 import Jimp from 'jimp';
-import { readFileSync, writeFileSync } from 'fs';
-import { readFile } from 'fs/promises';
+import { createWriteStream, read, readFileSync, writeFileSync } from 'fs';
+import { readFile, unlink, writeFile } from 'fs/promises';
 import { slanderGIFMap } from '../Fun/Slander/SlanderManager';
 const { Image } = imagescript;
 const inter900 = readFileSync('assets/fonts/inter/Inter-Black.ttf');
+import Ffmpeg from 'fluent-ffmpeg';
+import { Readable, Stream } from 'stream';
+import TetLib from '../TetLib';
+import * as intoStream from 'into-stream';
 // const inter400Print = Image.cacheFont(20, inter400).then((font: any) => {
 //   console.log('Cached inter400');
 //   return font;
@@ -38,17 +42,28 @@ const dazaiPFPPromise = new Promise(async (res) => {
 async function getSlanderGIFBuffer(slanderGIF: string) {
   if (slanderGIFMap[slanderGIF as keyof typeof slanderGIFMap]) {
     slanderGIF = slanderGIFMap[slanderGIF as keyof typeof slanderGIFMap];
-    return imagescript.decode(await readFile(slanderGIF), false);
+    return await readFile(slanderGIF);
   }
   if (slanderGIF.match(/https?:\/\/.+/)) {
     // if it's a link, download it
     const imgBuffer = await nfetch(slanderGIF).then((res) => res.buffer());
-    return imagescript.decode(imgBuffer, false);
+    return imgBuffer;
   }
+}
+async function getSlanderGIF(
+  slanderGIF: string | Buffer,
+  firstFrameOnly: boolean = false
+) {
+  if (slanderGIF instanceof Buffer) {
+    return imagescript.decode(slanderGIF, firstFrameOnly);
+  }
+  const buffer = await getSlanderGIFBuffer(slanderGIF);
+  return imagescript.decode(buffer!, firstFrameOnly);
 }
 
 async function generateSlander(title: string, slanderGIF: string) {
-  const slander = (await getSlanderGIFBuffer(slanderGIF)) as imagescript.GIF;
+  const slanderBuffer = (await getSlanderGIFBuffer(slanderGIF))!;
+  const slander = (await getSlanderGIF(slanderBuffer, true)) as imagescript.GIF;
   if (!slander) return;
   const layout = new imagescript.TextLayout({
     maxWidth: slander.width * 0.9,
@@ -72,22 +87,56 @@ async function generateSlander(title: string, slanderGIF: string) {
   const daz = await dazaiPFPPromise;
   const daz2 = daz.clone();
   daz2.resize(-1, slander.height * 0.15, Image.RESIZE_NEAREST_NEIGHBOR);
-  let frameArr = [] as imagescript.Frame[];
-  for (let i = 0; i < slander.length; i++) {
-    const frame = new imagescript.Frame(
-      slander.width,
-      slander.height + canvasText.height,
-      slander[i].duration
-    );
+  const textFileName = `temp/${TetLib.genID(32)}.png`;
+  const slanderGIFFileName = `temp/${TetLib.genID(32)}.gif`;
+  await writeFile(slanderGIFFileName, slanderBuffer);
+  await canvasText.encode(4).then((res) => {
+    writeFile(textFileName, res);
+  });
 
-    frame.composite(canvasText, 0, 0);
-    frame.composite(slander[i], 0, canvasText.height);
-    frame.composite(daz2, 0, frame.height - daz2.height);
-    frameArr.push(frame);
-  }
+  // start an ffmpeg process
+  // ffmpeg -i explain.gif -i text_image.png -filter_complex "[1:v][0:v]scale2ref=iw:oh+ih[txt][gif];[txt][gif]vstack" -codec:a copy output.gif
+  // const readable = intoStream.default(slanderBuffer);
+  const ffmpeg = Ffmpeg(textFileName);
+  // console.log('ffmpeg created', { readable, ffmpeg, slanderBuffer });
+  const outputFile = `temp/${TetLib.genID(32)}.gif`;
+  ffmpeg.input(slanderGIFFileName);
+  console.log('starting ffmpeg');
+  return new Promise((res) => {
+    ffmpeg
+      .complexFilter(['vstack=inputs=2'])
+      .outputOptions(['-codec:a copy'])
+      .outputFormat('gif')
+      .on('error', (err) => {
+        console.log(err);
+      })
+      .on('end', async () => {
+        console.log('ffmpeg done');
+        res(new Uint8Array(await readFile(outputFile)));
+        unlink(textFileName);
+        unlink(slanderGIFFileName);
+        unlink(outputFile);
 
-  const gif = new imagescript.GIF(frameArr, -1);
-  return await gif.encode(95);
+      })
+      .save(outputFile);
+  });
+
+  // let frameArr = [] as imagescript.Frame[];
+  // for (let i = 0; i < slander.length; i++) {
+  //   const frame = new imagescript.Frame(
+  //     slander.width,
+  //     slander.height + canvasText.height,
+  //     slander[i].duration
+  //   );
+
+  //   frame.composite(canvasText, 0, 0);
+  //   frame.composite(slander[i], 0, canvasText.height);
+  //   frame.composite(daz2, 0, frame.height - daz2.height);
+  //   frameArr.push(frame);
+  // }
+
+  // const gif = new imagescript.GIF(frameArr, -1);
+  // return await gif.encode(95);
 
   // const canvas = new Image(slander.width, slander.height + canvasText.height);
   // canvas.composite(canvasText, 0, 0);

@@ -95,13 +95,13 @@ export const slander = {
     const cooldown = slanderCooldowns.get(
       (interaction.member.user || interaction.user).id
     );
-    if (cooldown && cooldown < Date.now()) {
+    if (cooldown && Date.now() - cooldown <= 0) {
       return interaction.createMessage({
         embeds: [
           {
             title: `Slow down!`,
             description: `Please wait <t:${Math.floor(
-              cooldown / 1000
+              -1 * (Date.now() - cooldown)
             )}:R> before using this command again!`,
             color: 16728385,
           },
@@ -109,15 +109,17 @@ export const slander = {
       });
     }
     slanderCooldowns.set(
-        (interaction.member.user || interaction.user).id,
-        Date.now() + 1000 * 30
-        );
+      (interaction.member.user || interaction.user).id,
+      Date.now() + 1000 * 30
+    );
 
     await interaction.acknowledge();
+    let timeStart = Date.now();
     const slanderData = await SlanderManager.getInstance().slander(
       text,
       slanderType
     );
+    console.log(`Slander took ${Date.now() - timeStart}ms`);
     if (slanderData) {
       // if its > 8mb, upload to imgbb
       if (slanderData.buffer.byteLength > 8 * 1024 * 1024) {
