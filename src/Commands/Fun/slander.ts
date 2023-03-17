@@ -101,7 +101,7 @@ export const slander = {
           {
             title: `Slow down!`,
             description: `Please wait <t:${Math.floor(
-              -1 * (Date.now() - cooldown)
+              cooldown / 1000
             )}:R> before using this command again!`,
             color: 16728385,
           },
