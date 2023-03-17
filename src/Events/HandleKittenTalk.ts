@@ -60,7 +60,9 @@ export const KittenifyMessages = {
       kittenCacheMap.set(`${msg.guildID}-${msg.author.id}`, true);
     }
     if (msg.components?.length) return;
+    if (msg.attachments.length) return;
     console.log(`Took ${Date.now() - perf} to check kitten status`);
+
     msg.delete();
 
     const channel = (msg.channel as TextableChannel).client
