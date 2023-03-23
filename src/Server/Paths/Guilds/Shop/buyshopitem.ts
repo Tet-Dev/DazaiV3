@@ -12,6 +12,8 @@ export const buyShopItem = {
   sendUser: true,
   run: async (req, res, next, user) => {
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
+    if (shopLock.has(user.id))
+      return res.status(400).json({ error: 'You are already buying an item!' });
     const guildID = req.params.guildID;
     const itemID = req.params.itemID;
     if (!itemID) return res.status(400).json({ error: 'Invalid item ID' });
@@ -27,8 +29,7 @@ export const buyShopItem = {
       guild.members.get(user.id) ?? (await guild.getRESTMember(user.id));
     if (!member)
       return res.status(400).json({ error: 'Not a member of this guild' });
-    if (shopLock.has(user.id))
-      return res.status(400).json({ error: 'You are already buying an item!' });
+
     shopLock.set(user.id, true);
     setTimeout(() => {
       shopLock.delete(user.id);
