@@ -163,12 +163,20 @@ export const GrantEXPOnChat = {
       // bot.addMessageReaction(msg.channel.id, msg.id, '🤨');
     }
     if (env.devmode) return;
+    console.log(
+      `Granting xp to ${msg.author.username}#${msg.author.discriminator}`
+    );
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,
       msg.author.id,
       XPPrefs,
       multiplier
     );
+    if (newXP) {
+      console.log(
+        `Granted ${newXP} xp to ${msg.author.username}#${msg.author.discriminator}`
+      );
+    }
 
     // if (lastEXPEvent
   },
