@@ -107,7 +107,7 @@ export const GrantEXPOnChat = {
         );
       }
     }
-    if (lastMessages.length >= 50) lastMessages.shift();
+    if (lastMessages.length >= 100) lastMessages.shift();
     lastUserMessages.set(msg.author.id, [
       ...(lastMessages ?? []),
       msg as Message,
