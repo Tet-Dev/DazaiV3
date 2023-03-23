@@ -139,12 +139,17 @@ export const GrantEXPOnChat = {
         else {
           multiplier *= 1 / ((userMsgs - lastMessagesInChannel.length / 3) * 2);
         }
+        console.log(`
+        ${msg.author.username}#${msg.author.discriminator} in ${
+          msg.member?.guild.name
+        } is Stale (multiplier = ${~~(multiplier * 10000) / 100}%
+        )`);
       }
       if (multiplier < 1) {
         console.log(
           `Reduced XP for ${msg.author.username}#${
             msg.author.discriminator
-          } in ${msg.member?.guild.name} to ${~~(multiplier * 10000) / 100}`
+          } in ${msg.member?.guild.name} to ${~~(multiplier * 10000) / 100}%`
         );
       }
     }
