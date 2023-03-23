@@ -144,12 +144,6 @@ export class XPManager {
       ).toFixed(3)
     ); // 10-20 * 1^dailyMessages
     memberXP.dailyMessages++;
-    console.log(
-      'Daily messages',
-      memberXP.dailyMessages,
-      `Curved`,
-      xpData.diminishingReturns ** memberXP.dailyMessages
-    );
     const newXP = await this.giveGuildMemberXP(
       guildID,
       userID,
@@ -157,6 +151,7 @@ export class XPManager {
       memberXP,
       true
     );
+    console.log('Giving XP', randomXP, 'to', userID, 'newXP', newXP.data);
     await this.updateGuildMemberXP(guildID, userID, newXP.data);
     return newXP;
   }

@@ -5,7 +5,7 @@ import {
   ShopManager,
 } from '../../../../Handlers/Crates/ShopManager';
 import { RESTHandler, RESTMethods } from '../../../../types/misc';
-
+const shopLock = new Map<string, boolean>();
 export const buyShopItem = {
   method: RESTMethods.POST,
   path: '/guilds/:guildID/shop/items/:itemID/buy',
@@ -27,11 +27,19 @@ export const buyShopItem = {
       guild.members.get(user.id) ?? (await guild.getRESTMember(user.id));
     if (!member)
       return res.status(400).json({ error: 'Not a member of this guild' });
+    if (shopLock.has(user.id))
+      return res.status(400).json({ error: 'You are already buying an item!' });
+    shopLock.set(user.id, true);
+    setTimeout(() => {
+      shopLock.delete(user.id);
+    }, 10000);
     const buy = await ShopManager.getInstance().purchaseItem(
       user.id,
       guildID,
       itemID
     );
+    shopLock.delete(user.id);
+
     if (typeof buy === 'string') return res.status(400).json({ error: buy });
     return res.json(buy);
   },

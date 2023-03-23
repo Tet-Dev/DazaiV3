@@ -101,7 +101,9 @@ export const GrantEXPOnChat = {
       multiplier = determineMultiplier(lastMessages, msg);
       if (multiplier < 1) {
         console.log(
-          `Reduced XP for ${msg.author.username}#${msg.author.discriminator} in ${msg.guildID} by ${multiplier}`
+          `Reduced XP for ${msg.author.username}#${
+            msg.author.discriminator
+          } in ${msg.member?.guild.name} to ${~~(multiplier * 10000) / 100}`
         );
       }
     }
