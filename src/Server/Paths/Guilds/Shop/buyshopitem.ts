@@ -42,6 +42,7 @@ export const buyShopItem = {
     shopLock.delete(user.id);
 
     if (typeof buy === 'string') return res.status(400).json({ error: buy });
+
     return res.json(buy);
   },
 } as RESTHandler;

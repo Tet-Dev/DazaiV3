@@ -1,12 +1,25 @@
-import { Message, PossiblyUncachedTextableChannel } from 'eris';
+import {
+  Collection,
+  GuildTextableChannel,
+  Message,
+  PossiblyUncachedTextableChannel,
+} from 'eris';
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { EventHandler } from '../types/misc';
 import levenshtein from 'fast-levenshtein';
 const lastEXP = new Map<string, number>();
 const lastUserMessages = new Map<string, Message[]>();
+const getLastMessagesInCollection = (
+  messages: Collection<Message>,
+  amount: number
+) => {
+  const allMsgs = Array.from(messages.values());
+  return allMsgs.slice(0, amount);
+};
 const determineMultiplier = (
   messages: Message[],
-  msg: Message<PossiblyUncachedTextableChannel>
+  msg: Message<PossiblyUncachedTextableChannel>,
+  staleNess: number = 0
 ) => {
   // conditions for a spam reducer:
   // 1. the message is similar to at least 3 of the last 50 messages (similarity is determined by the levenshtein distance)
@@ -81,7 +94,7 @@ export const GrantEXPOnChat = {
   event: 'messageCreate',
   run: async (bot, msg) => {
     //@ts-ignore
-    if (env.devmode) return;
+
     if (!msg.guildID) return;
     if (msg.author.bot) return;
     // grant exp
@@ -97,7 +110,35 @@ export const GrantEXPOnChat = {
     // check if the user is spamming
     let multiplier = 1;
     const lastMessages = lastUserMessages.get(msg.author.id) ?? [];
+    // check if the user is the only one talking in the channel
+
     if (lastMessages?.length >= 5) {
+      // check if 2-3 people are talking in the channel
+      const msgChannel = (await ((
+        bot.getChannel(msg.channel.id) as GuildTextableChannel
+      ).messages
+        ? bot.getChannel(msg.channel.id)
+        : bot.getRESTChannel(msg.channel.id))) as GuildTextableChannel;
+
+      const lastMessagesInChannel = getLastMessagesInCollection(
+        msgChannel.messages,
+        25
+      );
+      // calculate the amount of messages sent by the user in the last 25 messages
+      const userMsgs = lastMessagesInChannel.filter(
+        (m) => m.author.id === msg.author.id
+      ).length;
+      // if the user has sent more than 1/3 of the messages in the last 25 messages, start spam reduction. User should not be able to gain any xp if they send more than 4/6-5/6 of the messages in the last 25 messages (multiplier = 0). if they send more than 5/6 of the messages, the multiplier will be -0.1
+      if (userMsgs >= (lastMessagesInChannel.length * 1) / 3) {
+        if (userMsgs >= (lastMessagesInChannel.length * 5) / 6)
+          multiplier = -0.2;
+        else if (userMsgs >= (lastMessagesInChannel.length * 4) / 6)
+          multiplier = 0;
+        else {
+          multiplier = 1 / ((userMsgs - lastMessagesInChannel.length / 3) * 2);
+        }
+      }
+
       multiplier = determineMultiplier(lastMessages, msg);
       if (multiplier < 1) {
         console.log(
@@ -119,6 +160,7 @@ export const GrantEXPOnChat = {
     if (multiplier <= 0.9) {
       // bot.addMessageReaction(msg.channel.id, msg.id, '🤨');
     }
+    if (env.devmode) return;
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,
       msg.author.id,
