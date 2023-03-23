@@ -138,6 +138,14 @@ export class SlashCommandHandler {
     if (interaction instanceof CommandInteraction) {
       const command = this.getCommand(interaction.data.name);
       if (!command) return;
+      console.log('executing command', {
+        command: interaction.data.name,
+        args: interaction.data.options,
+        user:
+          interaction.member?.user.username +
+          '#' +
+          interaction.member?.user.discriminator,
+      });
       command.execute(bot, {
         interaction,
         // args: interaction.data.options.map(option => option.value),
