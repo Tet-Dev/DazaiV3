@@ -131,6 +131,14 @@ export class XPManager {
   ) {
     xpData = xpData ?? (await this.getGuildXPPreference(guildID));
     const memberXP = await this.getGuildMemberXP(guildID, userID);
+    console.log(
+      'messageXP',
+      guildID,
+      userID,
+      { xpData, memberXP },
+      xpMultiplier
+    );
+
     if (memberXP.resetAt < Date.now()) {
       memberXP.resetAt = Date.now() + xpData.resetPeriod;
       memberXP.dailyMessages = 0;
@@ -143,6 +151,7 @@ export class XPManager {
         (xpMultiplier ?? 1)
       ).toFixed(3)
     ); // 10-20 * 1^dailyMessages
+    console.log('randomXP', randomXP);
     memberXP.dailyMessages++;
     const newXP = await this.giveGuildMemberXP(
       guildID,
@@ -187,6 +196,7 @@ export class XPManager {
       newXP -= XPForNextLevel;
       newLevel++;
       XPForNextLevel = this.getRequiredXPForLevel(newLevel);
+      console.log('level up', newLevel, XPForNextLevel);
     }
     const levelDiff = newLevel - xpData.level;
     console.log('level diff', levelDiff);
