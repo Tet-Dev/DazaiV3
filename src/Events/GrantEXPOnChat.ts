@@ -120,10 +120,17 @@ export const GrantEXPOnChat = {
         ? bot.getChannel(msg.channel.id)
         : bot.getRESTChannel(msg.channel.id))) as GuildTextableChannel;
 
-      const lastMessagesInChannel = getLastMessagesInCollection(
+      let lastMessagesInChannel = getLastMessagesInCollection(
         msgChannel.messages,
         25
       );
+      if (lastMessagesInChannel.length < 25) {
+        lastMessagesInChannel = await msgChannel.getMessages({
+          around: msg.id,
+          limit: 25,
+        });
+      }
+
       // calculate the amount of messages sent by the user in the last 25 messages
       const userMsgs = lastMessagesInChannel.filter(
         (m) => m.author.id === msg.author.id
@@ -144,6 +151,10 @@ export const GrantEXPOnChat = {
           msg.member?.guild.name
         } is Stale (multiplier = ${~~(multiplier * 10000) / 100}%
         )`);
+      } else {
+        console.log(
+          `stale multiplier = ${userMsgs} / ${lastMessagesInChannel.length}`
+        );
       }
       if (multiplier < 1) {
         console.log(

@@ -142,6 +142,13 @@ export const HandlePseudoSlashCommands = {
             value: parseFloat(argValue),
           } as InteractionDataOptionsNumber);
       }
+    console.log('executing ps command', {
+      commandName,
+      parsedArgs,
+      args,
+      cmdArgs,
+      user: msg.author.username + '#' + msg.author.discriminator,
+    });
     command.execute(bot, {
       interaction: {
         type: 2,
