@@ -151,7 +151,16 @@ export class XPManager {
       memberXP,
       true
     );
-    console.log('Giving XP', randomXP, 'to', userID, 'newXP', newXP.data);
+    console.log(
+      'Giving XP',
+      randomXP,
+      'to',
+      userID,
+      'newXP',
+      newXP.data.xp,
+      'newLevel',
+      newXP.data.level
+    );
     await this.updateGuildMemberXP(guildID, userID, newXP.data);
     return newXP;
   }
@@ -174,21 +183,7 @@ export class XPManager {
     let newXP = xpData.xp + xp;
     let newLevel = xpData.level;
     let XPForNextLevel = this.getRequiredXPForLevel(xpData.level + 1);
-    console.log(
-      'Giving XP to',
-      userID,
-      'of',
-      xp,
-      'newXP',
-      newXP,
-      'newLevel',
-      newLevel,
-      'XPForNextLevel',
-      XPForNextLevel,
-      ''
-    );
     while (newXP >= XPForNextLevel) {
-      console.log('level up', newXP, XPForNextLevel, newLevel);
       newXP -= XPForNextLevel;
       newLevel++;
       XPForNextLevel = this.getRequiredXPForLevel(newLevel);
@@ -265,7 +260,6 @@ ${
           },
         });
       }
-      console.log('level done', newXP, XPForNextLevel);
       !dontUpdate &&
         (await this.updateGuildMemberXP(guildID, userID, {
           level: newLevel,

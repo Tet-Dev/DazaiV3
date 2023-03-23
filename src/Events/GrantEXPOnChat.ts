@@ -126,9 +126,6 @@ export const GrantEXPOnChat = {
       multiplier
     );
 
-    console.log(
-      `Granted XP to ${msg.author.username}#${msg.author.discriminator} in ${msg.guildID}`
-    );
     // if (lastEXPEvent
   },
 } as EventHandler<'messageCreate'>;
