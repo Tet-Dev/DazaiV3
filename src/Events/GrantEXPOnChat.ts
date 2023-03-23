@@ -129,17 +129,17 @@ export const GrantEXPOnChat = {
         (m) => m.author.id === msg.author.id
       ).length;
       // if the user has sent more than 1/3 of the messages in the last 25 messages, start spam reduction. User should not be able to gain any xp if they send more than 4/6-5/6 of the messages in the last 25 messages (multiplier = 0). if they send more than 5/6 of the messages, the multiplier will be -0.1
-      if (userMsgs >= (lastMessagesInChannel.length * 1) / 3) {
-        if (userMsgs >= (lastMessagesInChannel.length * 5) / 6)
-          multiplier = -0.2;
-        else if (userMsgs >= (lastMessagesInChannel.length * 4) / 6)
-          multiplier = 0;
-        else {
-          multiplier = 1 / ((userMsgs - lastMessagesInChannel.length / 3) * 2);
-        }
-      }
 
       multiplier = determineMultiplier(lastMessages, msg);
+      if (userMsgs >= (lastMessagesInChannel.length * 1) / 3) {
+        if (userMsgs >= (lastMessagesInChannel.length * 5) / 6)
+          multiplier *= -0.5;
+        else if (userMsgs >= (lastMessagesInChannel.length * 4) / 6)
+          multiplier *= 0;
+        else {
+          multiplier *= 1 / ((userMsgs - lastMessagesInChannel.length / 3) * 2);
+        }
+      }
       if (multiplier < 1) {
         console.log(
           `Reduced XP for ${msg.author.username}#${
