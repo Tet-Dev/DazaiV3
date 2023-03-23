@@ -45,7 +45,7 @@ export const KittenifyMessages = {
   event: 'messageCreate',
   run: async (bot, msg) => {
     //@ts-ignore
-    // if (env.devmode) return;
+    if (env.devmode) return;
     if (!msg.guildID) return;
 
     let perf = Date.now();

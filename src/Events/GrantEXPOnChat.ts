@@ -154,10 +154,7 @@ export const GrantEXPOnChat = {
       }
     }
     if (lastMessages.length >= 100) lastMessages.shift();
-    lastUserMessages.set(msg.author.id, [
-      ...(lastMessages ?? []),
-      msg as Message,
-    ]);
+    lastMessages.push(msg as Message);
 
     let lastEXPEvent = lastEXP.get(`${msg.author.id}-${msg.channel.id}`) ?? 0;
     if (Date.now() < lastEXPEvent + XPPrefs.cooldown) return;
