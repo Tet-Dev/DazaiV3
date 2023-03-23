@@ -55,8 +55,8 @@ const determineMultiplier = (
     if (similarity < 0.5) similarMessages++;
   });
   if (similarMessages >= 1) {
-    multiplier *= 1 / (similarMessages / 0.8);
-    if (similarMessages >= 10) multiplier *= 5 / similarMessages;
+    multiplier *= 1 / (similarMessages * 1.4);
+    if (similarMessages >= 10) multiplier *= 4 / similarMessages;
   }
   if (
     links >= 3 &&
@@ -73,7 +73,7 @@ const determineMultiplier = (
   }
   if (fastMsgs >= 3) {
     multiplier *= 0.75;
-    if (fastMsgs >= 5) multiplier *= 0.8;
+    if (fastMsgs >= 5) multiplier *= 0.4;
   }
   return multiplier;
 };
