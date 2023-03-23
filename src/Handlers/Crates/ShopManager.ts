@@ -1,3 +1,4 @@
+import { TextChannel } from 'eris';
 import { ObjectId } from 'mongodb';
 import { CrateManager } from './CrateManager';
 import { InventoryManager } from './InventoryManager';
@@ -140,6 +141,27 @@ export class ShopManager {
     await Promise.all(
       item.items.map((i) => this.processItemPurchase(userID, guildID, i))
     );
+    const txt = (await bot.getChannel(`1088348179667374080`)) as TextChannel;
+    await txt.createMessage({
+      embed: {
+        title: 'Shop Purchase',
+        description: `Server: \`${
+          bot.guilds.get(guildID)?.name ?? `Unknown Guild (${guildID})`
+        }\`\nShop Offer: \`${item.name}\`\nOffer Price: \`${
+          item.price
+        }$\`\nBalance pre-transaction: \`${
+          inventory.money
+        }\`\nBalance post transaction: \`${inventory.money - item.price}\``,
+        color: 5814783,
+        author: {
+          name: `${bot.users.get(userID)?.username}#${
+            bot.users.get(userID)?.discriminator
+          } (${userID})`,
+          icon_url: bot.users.get(userID)?.avatarURL,
+        },
+      },
+    });
+
     return {
       success: true,
       message: 'Successfully purchased item',
