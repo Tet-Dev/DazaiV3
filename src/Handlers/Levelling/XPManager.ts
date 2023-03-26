@@ -22,7 +22,7 @@ const defaultXPPreference: GuildXPPreference = {
   channelIDs: [],
   blacklist: [],
   xpRange: [10, 20],
-  diminishingReturns: 1,
+  diminishingReturns: 0.9999,
   cooldown: 5, //1000 * 30,
   resetPeriod: 1000 * 60 * 60 * 24, // 24 hours
 };
