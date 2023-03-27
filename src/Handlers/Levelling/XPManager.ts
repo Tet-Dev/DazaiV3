@@ -143,6 +143,7 @@ export class XPManager {
       memberXP.resetAt = Date.now() + xpData.resetPeriod;
       memberXP.dailyMessages = 0;
     }
+
     const randomXP = parseFloat(
       (
         (xpData.xpRange[0] +
@@ -192,11 +193,13 @@ export class XPManager {
     let newXP = xpData.xp + xp;
     let newLevel = xpData.level;
     let XPForNextLevel = this.getRequiredXPForLevel(xpData.level + 1);
-    while (newXP >= XPForNextLevel) {
+    let maxLevelDiff = 0;
+    while (newXP >= XPForNextLevel && maxLevelDiff < 250) {
       newXP -= XPForNextLevel;
       newLevel++;
+      maxLevelDiff++;
       XPForNextLevel = this.getRequiredXPForLevel(newLevel);
-      console.log('level up', newLevel, XPForNextLevel);
+      console.log('level up', newLevel, XPForNextLevel, newXP);
     }
     const levelDiff = newLevel - xpData.level;
     console.log('level diff', levelDiff);
