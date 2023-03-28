@@ -6,13 +6,15 @@ import util from 'util';
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import TetLib from '../../Handlers/TetLib';
 import { migrateXP } from '../../Scripts/migrateXP';
+import { sellAllButOneScript } from '../../Scripts/sellAllButOne';
 const scriptMap = {
   migratexp: migrateXP,
+  sellall: sellAllButOneScript,
 };
 export const retroRewards = {
   name: 'scriptrun',
   description:
-    'Runs a specific script. Only run this command if you know what you\'re doing/are told to!',
+    "Runs a specific script. Only run this command if you know what you're doing/are told to!",
   args: [
     {
       name: 'script',
@@ -38,7 +40,7 @@ export const retroRewards = {
         ],
       });
     }
-    if (!scriptMap[script.value as keyof typeof scriptMap]) {
+    if (!scriptMap[script.value.toLowerCase() as keyof typeof scriptMap]) {
       return interaction.createMessage({
         embeds: [
           {
@@ -49,7 +51,10 @@ export const retroRewards = {
         ],
       });
     }
-    scriptMap[script.value as keyof typeof scriptMap](bot, interaction);
+    scriptMap[script.value.toLowerCase() as keyof typeof scriptMap](
+      bot,
+      interaction
+    );
 
     // const start = Date.now();
     // console.log('here');

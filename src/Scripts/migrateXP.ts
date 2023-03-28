@@ -14,6 +14,16 @@ export const migrateXP: DiscordScript = async (bot, interaction) => {
       ],
     });
   }
+  if (!interaction.member?.permissions.has('administrator')) {
+    return interaction.createMessage({
+      embeds: [
+        {
+          title: `Cannot run script`,
+          description: `You must be an administrator to run this script!`,
+        },
+      ],
+    });
+  }
   console.log('acking...');
   await interaction.acknowledge();
   const start = Date.now();

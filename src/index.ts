@@ -1,5 +1,5 @@
 import { join } from 'path';
-import Eris, { CommandClient } from 'eris';
+import Eris, { CommandClient, Message } from 'eris';
 // import * as DatabaseHandler from './Handlers/DatabaseHandler';
 // import SQLHandler from './Handlers/SQLHandler';
 import * as fs from 'fs/promises';

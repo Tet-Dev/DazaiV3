@@ -42,10 +42,18 @@ export class CrateManager {
       })
       .toArray();
     if (raw) return crates;
+    const cardSet = new Set() as Set<string>;
+    crates.forEach((crate) => cardSet.add(crate.itemID));
+    const cardMap = new Map() as Map<string, CardType>;
+    await Promise.all(
+      Array.from(cardSet).map(async (cardID) => await getCard(cardID))
+    ).then((cards) =>
+      cards.forEach((card) => card && cardMap.set(card?._id.toString(), card))
+    );
     const userCrates = await Promise.all(
       crates.map(async (crate) => ({
         ...crate,
-        item: await getCard(crate.itemID),
+        item: cardMap.get(crate.itemID),
       }))
     );
     return userCrates as UserCrate[];
@@ -58,6 +66,18 @@ export class CrateManager {
       });
     return crate as CrateTemplate | null;
   }
+  async getCrateItems(crateTemplate: CrateTemplate) {
+    const items = [] as CardType[];
+    for (let i = 0; i < crateTemplate.items.length; i++) {
+      const item = await getCard(crateTemplate.items[i]);
+      if (item) items.push(item);
+    }
+    const itemMap = new Map() as Map<string, CardType>;
+    items.forEach((item) => itemMap.set(item._id.toString(), item));
+
+    return itemMap;
+  }
+
   async getGuildCrateTemplates(guildID: string) {
     const crates = await MongoDB.db('Crates')
       .collection('crateTemplates')
@@ -110,7 +130,9 @@ export class CrateManager {
   async generateCrate(
     crateTemplate: CrateTemplate,
     guildID: string,
-    userID: string
+    userID: string,
+    crateItemCache?: Map<string, CardType>,
+    addLater?: boolean
   ) {
     let rarity = Math.random();
     let drawnRarity = null as null | CardRarity;
@@ -127,7 +149,13 @@ export class CrateManager {
       }
     }
     const itemMap = (
-      await Promise.all(crateTemplate.items.map(getCard))
+      await Promise.all(
+        crateTemplate.items.map((c) => {
+          if (crateItemCache && crateItemCache.has(c))
+            return crateItemCache.get(c);
+          return getCard(c);
+        })
+      )
     ).filter((x) => x) as CardType[];
 
     const itemsWithRarity = itemMap.filter(
@@ -147,9 +175,10 @@ export class CrateManager {
       createdAt: Date.now(),
       itemID: item._id.toString() as string,
     } as Crate;
-    await MongoDB.db('Crates')
-      .collection('userCrates')
-      .insertOne(crate as Crate & { _id: ObjectID });
+    if (!addLater)
+      await MongoDB.db('Crates')
+        .collection('userCrates')
+        .insertOne(crate as Crate & { _id: ObjectID });
     return crate;
   }
   async openCrate(crateID: string) {
@@ -174,5 +203,16 @@ export class CrateManager {
       crate.itemID
     );
     return crate;
+  }
+  async addCrates(crates: Crate[]) {
+    await MongoDB.db('Crates')
+      .collection('userCrates')
+      .insertMany(
+        crates.map((crate) => ({
+          ...crate,
+          _id:
+            typeof crate._id === 'string' ? new ObjectID(crate._id) : crate._id,
+        }))
+      );
   }
 }

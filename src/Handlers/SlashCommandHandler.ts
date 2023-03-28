@@ -1,6 +1,10 @@
 import Eris, { CommandInteraction, Interaction } from 'eris';
 import { Command } from '../types/misc';
-
+const guildsWithSlashCommands = [
+  '1061108960268124210',
+  '739559911033405592',
+  '1089977920023449783',
+];
 export class SlashCommandHandler {
   static instance: SlashCommandHandler;
   static getInstance(): SlashCommandHandler {
@@ -16,24 +20,17 @@ export class SlashCommandHandler {
     bot.on('interactionCreate', this.handleInteraction.bind(this));
   }
   async createDevCommand(command: Command) {
-    await bot
-      .createGuildCommand('1061108960268124210', {
-        ...command,
-        options: command.args,
-      })
-      .catch((e) => {
-        console.error(e);
-        console.log(command);
-      });
-    await bot
-      .createGuildCommand('739559911033405592', {
-        ...command,
-        options: command.args,
-      })
-      .catch((e) => {
-        console.error(e);
-        console.log(command);
-      });
+    for (const guild of guildsWithSlashCommands) {
+      await bot
+        .createGuildCommand(guild, {
+          ...command,
+          options: command.args,
+        })
+        .catch((e) => {
+          console.error(e);
+          console.log(command);
+        });
+    }
   }
   createCommand(command: Command) {
     return bot.createCommand({
@@ -100,7 +97,7 @@ export class SlashCommandHandler {
   async onReady() {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
     const cmds = await (this.devMode
-      ? bot.getGuildCommands('1061108960268124210')
+      ? bot.getGuildCommands('1089977920023449783')
       : bot.getCommands());
     const cmdArr = Array.from(this.commands.values());
     const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));

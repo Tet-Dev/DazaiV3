@@ -1,5 +1,6 @@
 import { TextChannel } from 'eris';
 import { ObjectId } from 'mongodb';
+import { Crate } from '../../constants/cardNames';
 import { CrateManager } from './CrateManager';
 import { InventoryManager } from './InventoryManager';
 
@@ -174,7 +175,7 @@ export class ShopManager {
         guildID
       );
     }
-    
+
     return {
       success: true,
       message: 'Successfully purchased item',
@@ -199,14 +200,23 @@ export class ShopManager {
         const crateData = await CrateManager.getInstance().getCrateTemplate(
           item.itemID
         );
-        if (!crateData) return 'Could not find crate';
-        for (let i = 0; i < (item.count || 1); i++)
-          await CrateManager.getInstance().generateCrate(
-            crateData,
-            guildID,
-            userID
-          );
+        const items = await CrateManager.getInstance().getCrateItems(
+          crateData!
+        );
 
+        if (!crateData) return 'Could not find crate';
+        const cratesToAdd = [] as Crate[];
+        for (let i = 0; i < (item.count || 1); i++)
+          cratesToAdd.push(
+            await CrateManager.getInstance().generateCrate(
+              crateData,
+              guildID,
+              userID,
+              items
+            )
+          );
+        await InventoryManager.getInstance().addCratesToInventory(
+          
         break;
       }
       case 'role': {
