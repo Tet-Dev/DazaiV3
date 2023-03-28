@@ -68,7 +68,7 @@ export const sellAllButOneScript: DiscordScript = async (bot, interaction) => {
         ? item.id === keepItemsMap.get(item.cardID)
         : true
     ),
-    money: totalValue,
+    money: totalValue + (inventory.money || 0),
   };
   // calculate total value of items to sell
 
