@@ -164,6 +164,7 @@ export const GrantEXPOnChat = {
         );
       }
     }
+    // multiplier =10;
     if (lastMessages.length >= 100) lastMessages.shift();
     lastMessages.push(msg as Message);
     if (!lastUserMessages.has(msg.author.id)) {
@@ -180,6 +181,10 @@ export const GrantEXPOnChat = {
     console.log(
       `Granting xp to ${msg.author.username}#${msg.author.discriminator}`
     );
+    // multiplier max = 10, min = -5
+    if (multiplier > 10) multiplier = 10;
+    if (multiplier < -5) multiplier = -5;
+
     const newXP = await XPManager.getInstance().messageXP(
       msg.guildID,
       msg.author.id,

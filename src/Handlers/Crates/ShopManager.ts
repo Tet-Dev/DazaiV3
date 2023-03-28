@@ -161,7 +161,20 @@ export class ShopManager {
         },
       },
     });
-
+    let newMoney = await InventoryManager.getInstance().getUserInventory(
+      userID,
+      guildID
+    );
+    while (newMoney.money && newMoney.money > inventory.money) {
+      await InventoryManager.getInstance().updateInventory(userID, guildID, {
+        money: newMoney.money - item.price,
+      });
+      newMoney = await InventoryManager.getInstance().getUserInventory(
+        userID,
+        guildID
+      );
+    }
+    
     return {
       success: true,
       message: 'Successfully purchased item',
