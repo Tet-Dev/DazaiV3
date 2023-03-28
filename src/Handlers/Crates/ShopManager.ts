@@ -212,11 +212,11 @@ export class ShopManager {
               crateData,
               guildID,
               userID,
-              items
+              items,
+              true
             )
           );
-        await InventoryManager.getInstance().addCratesToInventory(
-          
+        await CrateManager.getInstance().addCrates(cratesToAdd);
         break;
       }
       case 'role': {
