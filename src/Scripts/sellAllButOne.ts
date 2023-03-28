@@ -56,6 +56,10 @@ export const sellAllButOneScript: DiscordScript = async (bot, interaction) => {
   const itemsToSell = sellableItems.filter(
     (item) => item.id !== keepItemsMap.get(item.cardID)
   );
+  const totalValue = itemsToSell.reduce(
+    (acc, item) => acc + guildCardsMap.get(item.cardID!)?.sellPrice! || 0,
+    0
+  );
   // create an inventory after the sell, keeping all value entries from keepItemsMap
   const inventoryAfterSell = {
     ...inventory,
@@ -64,12 +68,10 @@ export const sellAllButOneScript: DiscordScript = async (bot, interaction) => {
         ? item.id === keepItemsMap.get(item.cardID)
         : true
     ),
+    money: totalValue,
   };
   // calculate total value of items to sell
-  const totalValue = itemsToSell.reduce(
-    (acc, item) => acc + guildCardsMap.get(item.cardID!)?.sellPrice! || 0,
-    0
-  );
+
   // update inventory
   if (
     (interaction.member?.id || interaction.user?.id) === '595719716560175149'
