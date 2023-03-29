@@ -202,6 +202,7 @@ export class CrateManager {
       crate.guildID || `@global`,
       crate.itemID
     );
+    
     return crate;
   }
   async addCrates(crates: Crate[]) {

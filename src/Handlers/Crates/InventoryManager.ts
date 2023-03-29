@@ -107,6 +107,11 @@ export class InventoryManager {
       ],
     };
     await this.updateInventory(userID, guildID, newInventory);
+    let newInv = await this.getUserInventory(userID, guildID);
+    // wait until the inventory is updated
+    while (newInv.cards.length !== newInventory.cards.length) {
+      newInv = await this.getUserInventory(userID, guildID);
+    }
     return newInventory;
   }
   async removeItemFromInventory(
