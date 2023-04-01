@@ -6,7 +6,7 @@ import {
   CardRarity,
   CardType,
 } from '../../constants/cardNames';
-import { getCard } from './CardManager';
+import { getCard, getCards } from './CardManager';
 import { InventoryManager } from './InventoryManager';
 
 export class CrateManager {
@@ -45,10 +45,8 @@ export class CrateManager {
     const cardSet = new Set() as Set<string>;
     crates.forEach((crate) => cardSet.add(crate.itemID));
     const cardMap = new Map() as Map<string, CardType>;
-    await Promise.all(
-      Array.from(cardSet).map(async (cardID) => await getCard(cardID))
-    ).then((cards) =>
-      cards.forEach((card) => card && cardMap.set(card?._id.toString(), card))
+    await getCards(Array.from(cardSet)).then((cards) =>
+      cards.forEach((card) => cardMap.set(card._id.toString(), card))
     );
     const userCrates = await Promise.all(
       crates.map(async (crate) => ({
@@ -67,11 +65,7 @@ export class CrateManager {
     return crate as CrateTemplate | null;
   }
   async getCrateItems(crateTemplate: CrateTemplate) {
-    const items = [] as CardType[];
-    for (let i = 0; i < crateTemplate.items.length; i++) {
-      const item = await getCard(crateTemplate.items[i]);
-      if (item) items.push(item);
-    }
+    const items = await getCards(crateTemplate.items);
     const itemMap = new Map() as Map<string, CardType>;
     items.forEach((item) => itemMap.set(item._id.toString(), item));
 
@@ -184,6 +178,7 @@ export class CrateManager {
   async openCrate(crateID: string) {
     const crate = (await this.getUserCrate(crateID, true)) as Crate | null;
     if (!crate) return null;
+
     await MongoDB.db('Crates')
       .collection('userCrates')
       .updateOne(
@@ -202,7 +197,7 @@ export class CrateManager {
       crate.guildID || `@global`,
       crate.itemID
     );
-    
+
     return crate;
   }
   async addCrates(crates: Crate[]) {

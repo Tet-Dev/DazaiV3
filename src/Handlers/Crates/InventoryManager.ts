@@ -10,7 +10,13 @@ type DefaultInventoryType = {
     cardID: string;
     id: string;
   }[];
+
   money?: number;
+  viewingPerson?: {
+    name: string;
+    username: string;
+    avartarURL: string;
+  };
 };
 const defaultInventory = (userID: string, guildID: string) =>
   ({

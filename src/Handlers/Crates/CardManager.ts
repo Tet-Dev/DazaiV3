@@ -18,6 +18,12 @@ export const getCard = (cardID: string) =>
   MongoDB.db('Guilds')
     .collection('customCards')
     .findOne({ _id: new ObjectID(cardID) }) as Promise<CardType | null>;
+export const getCards = (guildID: string[]) =>
+  MongoDB.db('Guilds')
+    .collection('customCards')
+    .find({ _id: { $in: guildID.map((id) => new ObjectID(id)) } })
+    .toArray() as Promise<CardType[]>;
+
 export const getGuildCards = async (guildID: string) =>
   MongoDB.db('Guilds')
     .collection('customCards')
