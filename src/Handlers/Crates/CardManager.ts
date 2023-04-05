@@ -33,7 +33,7 @@ export const scrubSecretRare = (card: CardType) =>
   ({
     ...card,
     name: `Unknown Secret Rare`,
-    description: `Unknown Secret Rare`,
+    description: `Data unknown; You have not unlocked this secret rare card yet.`,
     url: `https://assets.dazai.app/cards/secret_rare_card.png`,
     sellPrice: 0,
   } as CardType);
