@@ -16,7 +16,7 @@ export const ping = {
   ],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
   execute: async (bot, { interaction }) => {
-    if ((interaction.user || interaction.member)?.id !== '295391243318591490') {
+    if ((interaction.user || interaction.member)?.id !== env.adminID) {
       return;
     }
     await interaction.acknowledge();

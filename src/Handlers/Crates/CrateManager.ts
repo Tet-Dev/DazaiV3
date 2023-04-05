@@ -33,12 +33,18 @@ export class CrateManager {
       } as UserCrate | null);
     return userCrate;
   }
-  async getUserCrates(userID: string, guildID?: string, raw?: boolean) {
+  async getUserCrates(
+    userID: string,
+    guildID?: string,
+    raw?: boolean,
+    unopened: boolean = false
+  ) {
     const crates = await MongoDB.db('Crates')
       .collection('userCrates')
       .find({
         userID,
         ...(guildID && { guildID }),
+        ...(unopened && { opened: { $exists: false } }),
       })
       .toArray();
     if (raw) return crates;
@@ -156,7 +162,8 @@ export class CrateManager {
       (item) => item.rarity === drawnRarity
     );
     const item =
-      itemsWithRarity[Math.floor(Math.random() * itemsWithRarity.length)];
+      itemsWithRarity[Math.floor(Math.random() * itemsWithRarity.length)] ??
+      itemMap[0];
 
     // for every rarity, subtract the chance of that rarity from the random number
     // if the random number is less than the chance of that rarity, then that rarity is the one that is drawn

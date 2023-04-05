@@ -66,7 +66,7 @@ export const ping = {
       },
       {
         name: 'Developer',
-        value: `<@!295391243318591490>`,
+        value: `<@!${env.adminID}>`,
       },
     ] as Eris.EmbedField[];
     const msg = await interaction.createMessage({

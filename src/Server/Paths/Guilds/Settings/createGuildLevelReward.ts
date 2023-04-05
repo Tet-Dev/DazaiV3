@@ -141,20 +141,26 @@ export const updateGuildReward = {
         return res.status(400).json({ error: 'Invalid reward action' });
       }
     }
-
-    const member = 
-      bot.guilds.get(guildID)?.members.get(user.id) ??
-      (await bot.getRESTGuildMember(guildID, user.id));
-    if (!member) {
-      return res.status(400).json({ error: 'Not a member of this guild' });
-    }
-    const perms =
-      member.permissions.has('administrator') ||
-      member.permissions.has('manageGuild');
-    if (!perms) {
-      return res
-        .status(400)
-        .json({ error: 'Missing permissions, need manage guild or admin' });
+    if (guildID === '@global') {
+      if (user.id !== env.adminID) {
+        return res.status(400).json({ error: 'Unauthorized' });
+      }
+    } else {
+      // check user persm
+      const member =
+        bot.guilds.get(guildID)?.members.get(user.id) ??
+        (await bot.getRESTGuildMember(guildID, user.id));
+      if (!member) {
+        return res.status(400).json({ error: 'Not a member of this guild' });
+      }
+      const perms =
+        member.permissions.has('administrator') ||
+        member.permissions.has('manageGuild');
+      if (!perms) {
+        return res
+          .status(400)
+          .json({ error: 'Missing permissions, need manage guild or admin' });
+      }
     }
     const update = await LevellingRewards.getInstance().addGuildReward(
       guildID,

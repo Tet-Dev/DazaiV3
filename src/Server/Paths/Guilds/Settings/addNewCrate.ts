@@ -82,21 +82,26 @@ export const createGuildCrate = {
     if (Object.values(dropRates).reduce((a, b) => a + b, 0) !== 100) {
       return res.status(400).json({ error: 'Drop rates must add up to 100' });
     }
-
-    // check user persm
-    const member =
-      bot.guilds.get(guildID)?.members.get(user.id) ??
-      (await bot.getRESTGuildMember(guildID, user.id));
-    if (!member) {
-      return res.status(400).json({ error: 'Not a member of this guild' });
-    }
-    const perms =
-      member.permissions.has('administrator') ||
-      member.permissions.has('manageGuild');
-    if (!perms) {
-      return res
-        .status(400)
-        .json({ error: 'Missing permissions, need manage guild or admin' });
+    if (guildID === '@global') {
+      if (user.id !== env.adminID) {
+        return res.status(400).json({ error: 'Unauthorized' });
+      }
+    } else {
+      // check user persm
+      const member =
+        bot.guilds.get(guildID)?.members.get(user.id) ??
+        (await bot.getRESTGuildMember(guildID, user.id));
+      if (!member) {
+        return res.status(400).json({ error: 'Not a member of this guild' });
+      }
+      const perms =
+        member.permissions.has('administrator') ||
+        member.permissions.has('manageGuild');
+      if (!perms) {
+        return res
+          .status(400)
+          .json({ error: 'Missing permissions, need manage guild or admin' });
+      }
     }
     const currentCrateCount =
       await CrateManager.getInstance().getGuildCrateTemplates(guildID);

@@ -7,9 +7,11 @@ import { XPManager } from '../../Handlers/Levelling/XPManager';
 import TetLib from '../../Handlers/TetLib';
 import { migrateXP } from '../../Scripts/migrateXP';
 import { sellAllButOneScript } from '../../Scripts/sellAllButOne';
+import { giveCrates } from '../../Scripts/giveGlobalCrate';
 const scriptMap = {
   migratexp: migrateXP,
   sellall: sellAllButOneScript,
+  ownercrategive: giveCrates,
 };
 export const retroRewards = {
   name: 'scriptrun',

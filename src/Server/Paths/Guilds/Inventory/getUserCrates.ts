@@ -13,7 +13,9 @@ export const getUserCrates = {
     const guildID = req.params.guildID;
     const crates = await CrateManager.getInstance().getUserCrates(
       user.id,
-      guildID
+      guildID,
+      false,
+      true
     );
     return res.json(crates);
   },

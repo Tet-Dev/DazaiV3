@@ -11,7 +11,12 @@ export const getUserCrates = {
   run: async (req, res, next, user) => {
     const { userID } = req.params;
     if (!userID) return res.status(400).json({ error: 'Bad Request' });
-    const crates = await CrateManager.getInstance().getUserCrates(userID);
+    const crates = await CrateManager.getInstance().getUserCrates(
+      userID,
+      undefined,
+      false,
+      true
+    );
     return res.json(crates);
   },
 } as RESTHandler;
