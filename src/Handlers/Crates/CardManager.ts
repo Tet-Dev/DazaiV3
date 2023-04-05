@@ -29,6 +29,15 @@ export const getGuildCards = async (guildID: string) =>
     .collection('customCards')
     .find({ guild: guildID })
     .toArray() as Promise<CardType[]>;
+export const scrubSecretRare = (card: CardType) =>
+  ({
+    ...card,
+    name: `Unknown Secret Rare`,
+    description: `Unknown Secret Rare`,
+    url: `https://assets.dazai.app/cards/secret_rare_card.png`,
+    sellPrice: 0,
+  } as CardType);
+
 export const getGlobalCards = async () =>
   MongoDB.db('Guilds')
     .collection('customCards')
