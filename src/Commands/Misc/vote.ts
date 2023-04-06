@@ -50,7 +50,7 @@ export const inventory = {
     const votingData = await UserDataManager.getInstance().getUserData(user.id);
     const embed = {
       title: `Voting Info for ${interaction.member?.nick || user.username}`,
-      description: `You currently have voted **${votingData?.currentStreak}** times in a row (${votingData?.highestStreak} highest streak) ), and have voted a total of **${votingData?.votes}** times!`,
+      description: `You currently have voted **${votingData?.currentStreak}** times in a row (highest streak: **${votingData?.highestStreak} Votes**), and have voted a total of **${votingData?.votes}** times!`,
       fields: [
         {
           name: 'Last Vote',
