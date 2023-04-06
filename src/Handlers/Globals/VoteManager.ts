@@ -213,7 +213,7 @@ Let's see if you can beat your highest streak! 💪`,
       await LevellingRewards.getInstance().processGuildRewardsForMember(
         `@global`,
         userID,
-        userData.votes
+        userData.currentStreak
       );
     // we get the user's dm channel
     const dm = await bot.getDMChannel(userID);
@@ -244,7 +244,7 @@ Let's see if you can beat your highest streak! 💪`,
     }
     awardFields.push({
       name: 'Voting Streak',
-      value: `You have voted for me **${userData.votes} times** in a row! Keep it up! 🔥`,
+      value: `You have voted for me **${userData.currentStreak} times** in a row! Keep it up! 🔥`,
       inline: true,
     });
     awardFields.push({
