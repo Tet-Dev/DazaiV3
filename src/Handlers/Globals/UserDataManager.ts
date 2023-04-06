@@ -22,6 +22,7 @@ export type UserData = {
   premiumUntil: number;
   remindVote: boolean;
   disableLevelUpMessages: boolean;
+  warned?: boolean;
 };
 export type UserDataWithUser = UserData & {
   user: {

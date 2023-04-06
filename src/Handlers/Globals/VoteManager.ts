@@ -32,13 +32,17 @@ export class VoteManager {
       .collection('userData')
       .find({
         lastVote: {
-          $gt: Date.now() - 24 * 60 * 60 * 1000,
-          $lt: Date.now() - 12 * 60 * 60 * 1000,
+          $lt: Date.now() - 24 * 60 * 60 * 1000,
+          $gt: Date.now() - 48 * 60 * 60 * 1000,
         },
         remindVote: true,
       })
       .toArray()) as UserData[];
     // we put the passive reminders in the reminderMap
+    console.log(
+      `Warning ${warningUsers.length} users of voting`,
+      warningUsers.map((u) => u.userID)
+    );
     for (const user of users) {
       this.reminderMap.set(
         user.userID,
@@ -54,7 +58,7 @@ export class VoteManager {
         user.userID,
         setTimeout(
           (() => this.warningReminder(user.userID)).bind(this),
-          user.lastVote + 24 * 60 * 60 * 1000 - Date.now()
+          Math.max(user.lastVote + 24 * 60 * 60 * 1000 - Date.now(), 0)
         )
       );
     }
@@ -84,13 +88,17 @@ export class VoteManager {
     await dm.createMessage({
       embed: {
         title: 'Vote Reminder!',
-        description: `Hey there <@!3>!
+        description: `Hey there <@!${userID}>!
 
-I wanted to remind you to keep your current vote streak going. You currently have voted {x} times in a row! Keep it going! 🔥
+I wanted to remind you to keep your current vote streak going. You currently have voted **${currentStreak} times** in a row! Keep it going! 🔥
 
 To help me continue providing the best experience for you please take a moment to vote for me by clicking the link below. By voting, you'll not only receive rewards but also help me reach more people and improve my features! Thank you for your continued support! 🌟
 
-Let's see if you can beat your highest streak! 💪`,
+Let's see if you can ${
+          currentStreak === highestStreak
+            ? `keep your current streak going`
+            : `beat your highest streak of **${highestStreak} votes**`
+        }! 💪`,
         color: 16090623,
         footer: {
           text: "Don't want to recieve automatic voting notifications? Go to the global dashboard and turn off Vote Reminders",
@@ -120,7 +128,7 @@ Let's see if you can beat your highest streak! 💪`,
     const userData = await UserDataManager.getInstance().getUserData(userID);
     if (!userData) return;
     // we check if the user wants to be reminded
-    if (!userData.remindVote) return;
+    if (!userData.remindVote || userData.warned) return;
     // we get the user's last vote
     const lastVote = userData.lastVote;
     // we get the user's current streak
@@ -133,18 +141,25 @@ Let's see if you can beat your highest streak! 💪`,
     if (lastVote > Date.now() - 24 * 60 * 60 * 1000) return;
     // we get the user's dm channel
     const dm = await bot.getDMChannel(userID);
+    await UserDataManager.getInstance().updateUserData(userID, {
+      warned: true,
+    });
     // we send the user a gentle reminder
     await dm.createMessage({
       embed: {
         title: 'Vote Reminder!',
         description: `
-Hey there <@!3>!
+Hey there <@!${userID}>!
 
-It looks like you missed a day of voting, but don't worry, we all get busy sometimes! I wanted to remind you to get back on track and vote for me today. You currently have voted {x} times in a row! Keep it going! 🔥
+It looks like you missed a day of voting, but don't worry, we all get busy sometimes! I wanted to remind you to get back on track and vote for me today. You currently have voted **${currentStreak} times** in a row! Keep it going! 🔥
 
 To help me continue providing the best experience for you please take a moment to vote for me by clicking the link below. By voting, you'll not only receive rewards but also help me reach more people and improve my features! Thank you for your continued support! 🌟
 
-Let's see if you can beat your highest streak! 💪`,
+Let's see if you can ${
+          currentStreak === highestStreak
+            ? `keep your current streak going`
+            : `beat your highest streak of **${highestStreak} votes**`
+        }! 💪`,
         color: 16090623,
         footer: {
           text: "Don't want to recieve automatic voting notifications? Go to the global dashboard and turn off Vote Reminders",
@@ -198,6 +213,7 @@ Let's see if you can beat your highest streak! 💪`,
       currentStreak: userData.currentStreak,
       highestStreak: userData.highestStreak,
       lastVote: userData.lastVote,
+      warned: false,
     });
     // we add the user to the reminder map
     this.reminderMap.set(

@@ -9,6 +9,7 @@ import { SlashCommandHandler } from './Handlers/SlashCommandHandler';
 import { MusicManager } from './Handlers/Music/MusicPlayer';
 import { MongoClient } from 'mongodb';
 import server from './Server/server';
+// import { VoteManager } from './Handlers/Globals/VoteManager';
 // import MusicHandler from './Handlers/Music/MusicMain';
 // import RankCardDrawer from './Handlers/Levelling/RankCardDrawer';
 const options: Eris.CommandClientOptions & Eris.ClientOptions = {
@@ -99,6 +100,8 @@ const recursivelyAddEvents = async (dir: string) => {
 // }
 globalThis.MongoDB = new MongoClient(env.MongoURL);
 MongoDB.connect();
+// on mongo connect
+
 bot.connect();
 console.log('Connecting...');
 // DatabaseHandler.init();
@@ -106,6 +109,9 @@ bot.once('ready', () => {
   console.log('Ready!');
   server();
   MusicManager.getInstance().musicManager.init(bot.user.id);
+  import(`./Handlers/Globals/VoteManager`).then((vm) => {
+    vm.VoteManager.getInstance();
+  });
   recursivelyAddEvents(join(__dirname, 'Events')).then();
 });
 
