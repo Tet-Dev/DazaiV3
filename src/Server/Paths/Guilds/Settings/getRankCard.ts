@@ -10,7 +10,7 @@ import { RESTHandler, RESTMethods } from '../../../../types/misc';
 export const getRankCard = {
   method: RESTMethods.GET,
   path: '/guilds/:guildID/settings/cards/:cardID',
-  sendUser: false,
+  sendUser: true,
   run: async (req, res, next, user) => {
     const { guildID, cardID } = req.params;
     const cardData = await getCard(cardID);

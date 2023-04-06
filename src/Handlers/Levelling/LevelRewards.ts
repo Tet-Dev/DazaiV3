@@ -167,7 +167,7 @@ export class LevellingRewards {
     } else {
       const guildRewards = await this.getGuildRewards(guildID);
       if (Array.isArray(levels)) {
-        for (let i = levels[0]+1; i <= levels[1]; i++) {
+        for (let i = levels[0] + 1; i <= levels[1]; i++) {
           rewards.push(
             ...this.parseGuildRewardsForLevel(guildID, i, guildRewards)
           );
@@ -288,19 +288,20 @@ export class LevellingRewards {
         })
         .filter((card) => card !== null)
     )) as [CardType, number][];
+    if (guildID !== `@global`) {
+      const member =
+        bot.guilds.get(guildID)?.members.get(userID) ??
+        (await bot.getRESTGuildMember(guildID, userID));
+      if (!member) {
+        return null;
+      }
 
-    const member =
-      bot.guilds.get(guildID)?.members.get(userID) ??
-      (await bot.getRESTGuildMember(guildID, userID));
-    if (!member) {
-      return null;
-    }
-
-    for (const [roleID, count] of roleOperations) {
-      if (count > 0) {
-        await member.addRole(roleID, 'Level up reward');
-      } else {
-        await member.removeRole(roleID, 'Level up reward');
+      for (const [roleID, count] of roleOperations) {
+        if (count > 0) {
+          await member.addRole(roleID, 'Level up reward');
+        } else {
+          await member.removeRole(roleID, 'Level up reward');
+        }
       }
     }
     for (const [crateTemplate, count] of crateOperations) {
