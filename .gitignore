@@ -5,3 +5,4 @@ dist
 src/env.ts
 env.js
 cachedstate
+log.txt
