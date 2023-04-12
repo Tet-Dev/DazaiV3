@@ -5,24 +5,15 @@ import {
   EmbedField,
   EmbedOptions,
   InteractionDataOptionsBoolean,
-  InteractionDataOptionsNumber,
   InteractionDataOptionsUser,
-  Member,
 } from 'eris';
-import {
-  CardRarity,
-  CardType,
-  Crate,
-  rarityEmojiMap,
-  UserCrate,
-} from '../../constants/cardNames';
-import { getCard } from '../../Handlers/Crates/CardManager';
+import { UserCrate } from '../../constants/cardNames';
 import { CrateManager } from '../../Handlers/Crates/CrateManager';
-import { InventoryManager } from '../../Handlers/Crates/InventoryManager';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
-import { MusicManager } from '../../Handlers/Music/MusicPlayer';
 import { TetLib } from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
+
+// Returns an embed field containing crate information
 const parseCrateItem = (crate: UserCrate) => {
   return {
     name: `__📦 ${crate.name}__`,
@@ -42,6 +33,8 @@ Crate Item: **${crate.opened ? crate.item?.name : '[???]'}** ${
 `,
   } as EmbedField;
 };
+
+// Chat command to view a user's crate inventory
 export const crateInv = {
   name: 'crates',
   description: 'Views what crates you, or someone else, own',
@@ -61,8 +54,11 @@ export const crateInv = {
   ],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
   execute: async (bot, { interaction }) => {
+    // Check if the command was invoked in a guild channel
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
+
+    // Get the ID of the user whose crate inventory is being viewed
     const selectedUserID = (
       TetLib.findCommandParam(
         interaction.data?.options,
@@ -70,6 +66,7 @@ export const crateInv = {
       ) as InteractionDataOptionsUser
     )?.value;
 
+    // Determine whether to show opened crates
     const showOpened = (
       TetLib.findCommandParam(
         interaction.data?.options,
@@ -77,11 +74,13 @@ export const crateInv = {
       ) as InteractionDataOptionsBoolean
     )?.value;
 
+    // Get the user object
     const user = selectedUserID
       ? bot.users.get(selectedUserID) || (await bot.getRESTUser(selectedUserID))
       : interaction.user || interaction.member?.user;
     if (!user) return interaction.createMessage('User not found!');
-    const start = Date.now();
+
+    // Get the user's crates (both guild-specific and global)
     const userCrates = (await CrateManager.getInstance().getUserCrates(
       user.id,
       interaction.guildID,
@@ -92,14 +91,17 @@ export const crateInv = {
       `@global`,
       false
     )) as UserCrate[];
+
+    // Filter the user's crates based on whether to show opened crates or not, and sort by date received
     const userCratesData = [...userCrates, ...globalUserCrates]
       .filter((x) => showOpened || !x.opened)
       .sort((a, b) => {
-        // sort all unopened crates to the top, then sort by date received
-        if (a.opened && !b.opened) return 1;
-        if (!a.opened && b.opened) return -1;
-        return b.createdAt - a.createdAt;
+        if (a.opened && !b.opened) return 1; // Sort all opened crates to the bottom
+        if (!a.opened && b.opened) return -1; // Sort all unopened crates to the top
+        return b.createdAt - a.createdAt; // Sort by date received
       });
+
+    // If the user doesn't have any unopened crates and opened crates are not being shown, return an error message
     if (!userCratesData?.filter((x) => !x.opened)?.length && !showOpened)
       return await interaction.createMessage({
         embeds: [
@@ -120,6 +122,7 @@ export const crateInv = {
         ],
       });
 
+    // Create embeds to display the user's crates (in groups of 5 per page)
     const embeds = [] as EmbedOptions[];
     const pages = Math.ceil(userCratesData.length / 5);
     let page = 1;
@@ -141,6 +144,7 @@ export const crateInv = {
       embeds.push(embed);
     }
 
+    // Send the first page of the crate inventory embed, along with navigation buttons
     const msg = await interaction.createFollowup({
       embeds: [embeds[page - 1]],
       components: [
@@ -201,6 +205,8 @@ export const crateInv = {
         },
       ],
     });
+
+    // Function to edit the current page of the crate inventory embed and update the navigation buttons
     const editPage = async (pg: number, interaction: ComponentInteraction) => {
       page = pg;
       await msg.edit({
@@ -267,6 +273,7 @@ export const crateInv = {
       await interaction.acknowledge();
     };
 
+    // Collect interactions for the navigation buttons
     InteractionCollector.getInstance().collectInteraction(
       {
         interactionid: 'pageSelect',
@@ -274,7 +281,6 @@ export const crateInv = {
           let pg = ~~(interaction.data as ComponentInteractionSelectMenuData)
             .values[0];
           await editPage(pg, interaction);
-          // interaction.acknowledge()
         },
         limit: 100000,
         whitelistUsers: [(interaction.user || interaction.member?.user!).id],
@@ -288,7 +294,6 @@ export const crateInv = {
         interactionid: 'pageLeft',
         run: async (bot, interaction) => {
           await editPage(page - 1, interaction);
-          // interaction.acknowledge()
         },
         doNotAcknowledge: true,
         whitelistUsers: [(interaction.user || interaction.member?.user!).id],
@@ -301,7 +306,6 @@ export const crateInv = {
         interactionid: 'pageRight',
         run: async (bot, interaction) => {
           await editPage(page + 1, interaction);
-          // interaction.acknowledge()
         },
         doNotAcknowledge: true,
         whitelistUsers: [(interaction.user || interaction.member?.user!).id],

@@ -1706,7 +1706,7 @@
   resolved "https://registry.yarnpkg.com/@discordjs/collection/-/collection-1.2.0.tgz#5cad4bb47521c6f0abd175bf55c84528d1ac94f7"
   integrity sha512-VvrrtGb7vbfPHzbhGq9qZB5o8FOB+kfazrxdt0OtxzSkoBuw9dURMkCwWizZ00+rDpiK2HmLHBZX+y6JsG9khw==
 
-"@discordjs/node-pre-gyp@^0.4.0":
+"@discordjs/node-pre-gyp@^0.4.5":
   version "0.4.5"
   resolved "https://registry.yarnpkg.com/@discordjs/node-pre-gyp/-/node-pre-gyp-0.4.5.tgz#b33e38cedd821268c75923641783c68fcd1b55ae"
   integrity sha512-YJOVVZ545x24mHzANfYoy0BJX5PDyeZlpiJjDkUBM/V/Ao7TFX9lcUvCN4nr0tbr5ubeaXxtEBILUrHtTphVeQ==
@@ -1721,13 +1721,13 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@discordjs/opus@^0.5.0":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@discordjs/opus/-/opus-0.5.3.tgz#7294f539da0b37bf13b072e51acb47ffca748471"
-  integrity sha512-IQhCwCy2WKXLe+qkOkwO1Wjgk20uqeAbqM62tCbzIqbTsXX4YAge8Me9RFnI77Lx+UTkgm4rSVM3VPVdS/GsUw==
+"@discordjs/opus@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@discordjs/opus/-/opus-0.9.0.tgz#bbd9f78bd6bc399885bcb48645c6d2b1f0efa0c5"
+  integrity sha512-NEE76A96FtQ5YuoAVlOlB3ryMPrkXbUCTQICHGKb8ShtjXyubGicjRMouHtP1RpuDdm16cDa+oI3aAMo1zQRUQ==
   dependencies:
-    "@discordjs/node-pre-gyp" "^0.4.0"
-    node-addon-api "^3.2.1"
+    "@discordjs/node-pre-gyp" "^0.4.5"
+    node-addon-api "^5.0.0"
 
 "@eslint/eslintrc@^1.4.0":
   version "1.4.0"
@@ -8242,10 +8242,10 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-node-addon-api@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
-  integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
+node-addon-api@^5.0.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-5.1.0.tgz#49da1ca055e109a23d537e9de43c09cca21eb762"
+  integrity sha512-eh0GgfEkpnoWDq+VY8OyvYhFEzBk6jIYbRKdIlyTiAXIVJ8PyBaKb0rp7oDtoddbdoHWhq8wwr+XZ81F1rpNdA==
 
 node-fetch@^2.6.0, node-fetch@^2.6.7:
   version "2.6.7"

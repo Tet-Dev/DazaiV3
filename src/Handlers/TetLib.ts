@@ -1,4 +1,5 @@
-import Eris, { Member, User } from 'eris';
+import Eris, { Member, Message, User } from 'eris';
+import { ReducedMessage } from './Fun/MessageReader/SniperManager';
 export const TetLib = {
   sleep: (delay: number) =>
     new Promise((resolve) => setTimeout(resolve, delay)),
@@ -91,9 +92,46 @@ export const TetLib = {
   getUserDisplayName(user: User) {
     return `${user.username}#${user.discriminator}`;
   },
-  findCommandParam: (options?: Eris.InteractionDataOptions[], name?: string) => {
+  findCommandParam: (
+    options?: Eris.InteractionDataOptions[],
+    name?: string
+  ) => {
     if (!options || !name) return;
     return options.find((option) => option.name === name);
   },
+  /**
+   * Reduces a message to a simple object that can be easily stringified
+   * @param message {Message} Message to reduce
+   */
+  reduceMessage: (message: Message) => {
+    const memObj = {
+      id: message.id,
+      content: message.content,
+      embeds: message.embeds,
+      author: {
+        id: message.author.id,
+        username: message.author.username,
+        discriminator: message.author.discriminator,
+        avatar: message.author.avatarURL,
+      },
+      timestamp: message.timestamp,
+      editedTimestamp: message.editedTimestamp,
+      channelID: message.channel.id,
+    } as ReducedMessage;
+    if (message.member) {
+      return {
+        ...memObj,
+        author: {
+          ...memObj.author,
+          member: {
+            nick: message.member.nick,
+            guildID: message.member.guild.id,
+          },
+        },
+      } as ReducedMessage;
+    }
+    return memObj as ReducedMessage;
+  },
 };
 export default TetLib;
+// create a type based on reduceMessage

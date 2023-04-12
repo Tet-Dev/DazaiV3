@@ -21,6 +21,7 @@ function isASCII(str: string, extended: boolean) {
   return (extended ? /^[\x00-\xFF]*$/ : /^[\x00-\x7F]*$/).test(str);
 }
 export const kittenCacheMap = new Map<string, boolean>();
+export const kittenedMessageIDs = new Set<string>();
 const channelWebhookCache = new Map<string, Webhook[]>();
 const getChannelWebhooks = (channel: TextChannel) =>
   new Promise(async (res, rej) => {
@@ -62,7 +63,10 @@ export const KittenifyMessages = {
     if (msg.components?.length) return;
     if (msg.attachments.length) return;
     console.log(`Took ${Date.now() - perf} to check kitten status`);
-
+    kittenedMessageIDs.add(msg.id);
+    setTimeout(() => {
+      kittenedMessageIDs.delete(msg.id);
+    }, 10000);
     msg.delete();
 
     const channel = (msg.channel as TextableChannel).client

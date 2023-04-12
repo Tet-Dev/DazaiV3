@@ -1,40 +1,48 @@
-import {
-  ComponentInteractionSelectMenuData,
-  Constants,
-  InteractionDataOptionsUser,
-} from 'eris';
+import { Constants, InteractionDataOptionsUser } from 'eris';
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import TetLib from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
+
+// This object represents a command to make a user a Discord kitten.
 export const uwuSpeak = {
-  name: 'kitten',
-  description: 'Become a discord kitten',
+  name: 'kitten', // The name of the command
+  description: 'Become a discord kitten', // A brief description of the command
   args: [
     {
-      name: 'user',
-      description: '(Admin) force someone else into being a discord kitten',
-      type: Constants.ApplicationCommandOptionTypes.USER,
-      required: false,
+      name: 'user', // The name of the argument
+      description: '(Admin) force someone else into being a discord kitten', // A brief description of the argument
+      type: Constants.ApplicationCommandOptionTypes.USER, // The type of the argument
+      required: false, // Whether the argument is required or optional
     },
   ],
-  type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+  type: Constants.ApplicationCommandTypes.CHAT_INPUT, // The type of the command
   execute: async (bot, { interaction }) => {
+    // Check if the command was used in a guild
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
+
+    // Find the selected user ID from the command options
     const selectedUserID = (
       TetLib.findCommandParam(
         interaction.data.options,
         'user'
       ) as InteractionDataOptionsUser
     )?.value;
+
+    // Get the user object for the selected user ID or use the author of the interaction if no user is selected
     const user = selectedUserID
       ? bot.users.get(selectedUserID) || (await bot.getRESTUser(selectedUserID))
       : interaction.user || interaction.member?.user;
+
+    // If the user is not found, send an error message
     if (!user) return interaction.createMessage('User not found!');
+
+    // Check if the command user has permission to make another user a Discord kitten
     if (
       !interaction.member?.permissions.has('administrator') &&
       selectedUserID
     ) {
+      // Send an error message if the command user doesn't have permission
       return interaction.createMessage({
         embeds: [
           {
@@ -45,11 +53,16 @@ export const uwuSpeak = {
         ],
       });
     }
+
+    // Get the XP data for the user
     const memData = await XPManager.getInstance().getGuildMemberXP(
       interaction.guildID,
       user.id
     );
+
+    // If the user is already a Discord kitten, change their status to non-kitten
     if (memData.kitten) {
+      // If the user is a kitten but not a forced kitten, send an error message if the command user doesn't have permission
       if (
         memData.kitten === 2 &&
         !interaction.member?.permissions.has('administrator')
@@ -66,6 +79,8 @@ export const uwuSpeak = {
           ],
         });
       }
+
+      // Update the user's XP data to remove their kitten status
       await XPManager.getInstance().updateGuildMemberXP(
         interaction.guildID,
         user.id,
@@ -73,6 +88,9 @@ export const uwuSpeak = {
           kitten: 0,
         }
       );
+
+      // Send a success message to
+
       return interaction.createMessage({
         embeds: [
           {
@@ -87,6 +105,8 @@ export const uwuSpeak = {
         ],
       });
     }
+
+    // If the user is not a Discord kitten, make them a kitten
     await XPManager.getInstance().updateGuildMemberXP(
       interaction.guildID,
       user.id,
@@ -97,6 +117,8 @@ export const uwuSpeak = {
             : 1,
       }
     );
+
+    // Send a success message
     return interaction.createMessage({
       embeds: [
         {

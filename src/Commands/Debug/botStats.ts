@@ -1,26 +1,39 @@
+/**
+ * Command to get bot statistics.
+ *
+ * @type {Command}
+ */
 import Eris, { Constants } from 'eris';
 import { Command } from '../../types/misc';
-import { InteractionCollector } from '../../Handlers/InteractionCollector';
 import { MusicManager } from '../../Handlers/Music/MusicPlayer';
-export const ping = {
+
+export const botstats = {
   name: 'botstats',
   description: 'Gets Bot Statistics',
   args: [],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+
+  /**
+   * Executes the botstats command.
+   * @param {Eris.Client} bot The Eris client.
+   * @param {Eris.CommandInteractionOption} interaction The interaction object.
+   * @returns {Promise<void>}
+   */
   execute: async (bot, { interaction }) => {
-    if (!interaction.guildID)
+    if (!interaction.guildID) {
+      // If the command is used in a DM or Group DM, return an error message.
       return interaction.createMessage(
         'This command can only be used in a server!'
       );
-    // const start = Date.now();
-    // await interaction.createMessage('Pinging...');
-    // const end = Date.now();
-    // let clicks = 0;
-    // check the shard id of the bot
+    }
+
+    // Get the guild object.
     const guild =
       bot.guilds.get(interaction.guildID) ??
       (await bot.getRESTGuild(interaction.guildID));
+    // Get the shard ID.
     const shard = guild.shard;
+    // Create an array of fields to display in the embed.
     const fields = [
       {
         name: 'Message Latency',
@@ -69,6 +82,8 @@ export const ping = {
         value: `<@!${env.adminID}>`,
       },
     ] as Eris.EmbedField[];
+
+    // Send the embed message.
     const msg = await interaction.createMessage({
       embeds: [
         {
@@ -80,42 +95,10 @@ export const ping = {
           },
         },
       ],
-      // components: [
-      //   {
-      //     type: Constants.ComponentTypes.ACTION_ROW,
-      //     components: [
-      //       {
-      //         type: Constants.ComponentTypes.BUTTON,
-      //         label: 'Try again',
-      //         style: Constants.ButtonStyles.PRIMARY,
-      //         emoji: {
-      //           name: '🔁',
-      //           // id: '787190767105867776',
-      //           animated: true,
-      //         },
-      //         custom_id: 'tryagain',
-      //       },
-      //     ],
-      //   },
-      // ],
     });
-    // InteractionCollector.getInstance().collectInteraction(
-    //   {
-    //     interactionid: 'tryagain',
-    //     run: async (bot, interaction) => {
-    //       // clicks++;
-    //       await msg.edit(
-    //         `Interaction took ${Date.now() - interaction.createdAt}ms`
-    //       );
-    //     },
-    //     limit: 5,
-    //   },
-    //   msg,
-    //   1000*20
-    // );
-    // (bot as  ErisComponents.Client);
+
     return;
   },
 } as Command;
 
-export default ping;
+export default botstats;

@@ -1,0 +1,34 @@
+DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [10062]: Unknown interactionDiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [10062]: Unknown interactionDiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.DiscordRESTError [40060]: Interaction has already been acknowledged.TSError: ⨯ Unable to compile TypeScript:
+[96msrc/Commands/Misc/snipe.ts[0m:[93m55[0m:[93m35[0m - [91merror[0m[90m TS2339: [0mProperty 'content' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m55[0m       description: `${lastMessage.content}\n\n[[Jump]](https://discord.com/channels/${interaction.guildID}/${interaction.channel.id}/${lastMessage.id})`,
+[7m  [0m [91m                                  ~~~~~~~[0m
+[96msrc/Commands/Misc/snipe.ts[0m:[93m55[0m:[93m148[0m - [91merror[0m[90m TS2339: [0mProperty 'id' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m55[0m       description: `${lastMessage.content}\n\n[[Jump]](https://discord.com/channels/${interaction.guildID}/${interaction.channel.id}/${lastMessage.id})`,
+[7m  [0m [91m                                                                                                                                                   ~~[0m
+[96msrc/Commands/Misc/snipe.ts[0m:[93m59[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'author' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m59[0m           lastMessage.author.member?.nick || lastMessage.author.username
+[7m  [0m [91m                      ~~~~~~[0m
+[96msrc/Commands/Misc/snipe.ts[0m:[93m59[0m:[93m58[0m - [91merror[0m[90m TS2339: [0mProperty 'author' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m59[0m           lastMessage.author.member?.nick || lastMessage.author.username
+[7m  [0m [91m                                                         ~~~~~~[0m
+[96msrc/Commands/Misc/snipe.ts[0m:[93m60[0m:[93m25[0m - [91merror[0m[90m TS2339: [0mProperty 'author' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m60[0m         }#${lastMessage.author.discriminator}`,
+[7m  [0m [91m                        ~~~~~~[0m
+[96msrc/Commands/Misc/snipe.ts[0m:[93m61[0m:[93m31[0m - [91merror[0m[90m TS2339: [0mProperty 'author' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m61[0m         icon_url: lastMessage.author.avatar,
+[7m  [0m [91m                              ~~~~~~[0m
+[96msrc/Commands/Misc/snipe.ts[0m:[93m66[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'author' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m66[0m           value: `<@!${lastMessage.author.id}>`,
+[7m  [0m [91m                                   ~~~~~~[0m
+[96msrc/Commands/Misc/snipe.ts[0m:[93m73[0m:[93m42[0m - [91merror[0m[90m TS2339: [0mProperty 'timestamp' does not exist on type 'Promise<ReducedMessage | null>'.
+
+[7m73[0m       timestamp: `${new Date(lastMessage.timestamp).toISOString()}`,
+[7m  [0m [91m                                         ~~~~~~~~~[0m
+DiscordHTTPError: 401 Unauthorized on POST /api/v9/channels/798446171294924831/messagesDiscordHTTPError: 401 Unauthorized on POST /api/v9/channels/798446171294924831/messagesDiscordHTTPError: 401 Unauthorized on POST /api/v9/channels/798446171294924831/messagesDiscordHTTPError: 401 Unauthorized on POST /api/v9/channels/798446171294924831/messages

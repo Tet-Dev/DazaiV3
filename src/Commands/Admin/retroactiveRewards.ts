@@ -5,14 +5,16 @@ import {
 } from 'eris';
 import { Command } from '../../types/misc';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
-import { InventoryManager } from '../../Handlers/Crates/InventoryManager';
-import util from 'util';
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import TetLib from '../../Handlers/TetLib';
 import {
   LevellingRewards,
   LevelUpRewardType,
 } from '../../Handlers/Levelling/LevelRewards';
+
+/**
+ * Retroactive rewards command information
+ */
 export const retroRewards = {
   name: 'retroactiverewards',
   description: 'Admin Only. Retroactively give levelling rewards to users.',
@@ -35,6 +37,8 @@ export const retroRewards = {
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
   execute: async (bot, { interaction }) => {
     console.log('Retroactive rewards command used');
+
+    // Check if command was executed in a server
     if (!interaction.guildID) {
       return interaction.createMessage({
         embeds: [
@@ -46,6 +50,8 @@ export const retroRewards = {
         ],
       });
     }
+
+    // Check if user has administrator permissions
     if (!interaction.member?.permissions.has('administrator')) {
       return interaction.createMessage({
         embeds: [
@@ -57,10 +63,13 @@ export const retroRewards = {
         ],
       });
     }
+
     console.log('acking...');
     await interaction.acknowledge();
+
     const start = Date.now();
 
+    // Get selected user ID and reward ID from command options
     const selectedUserID = (
       TetLib.findCommandParam(
         interaction.data?.options,
@@ -73,9 +82,13 @@ export const retroRewards = {
         'reward_id'
       ) as InteractionDataOptionsString
     )?.value;
+
+    // Get reward information based on selected reward ID
     let reward = selectedRewardID
       ? await LevellingRewards.getInstance().getGuildReward(selectedRewardID)
       : null;
+
+    // If reward ID is selected but not found, return error message
     if (!reward && selectedRewardID) {
       await interaction.createFollowup({
         embeds: [
@@ -88,10 +101,14 @@ export const retroRewards = {
       });
       return;
     }
+
+    // Get user information based on selected user ID
     let userReference = selectedUserID
       ? bot.guilds.get(interaction.guildID)?.members.get(selectedUserID) ||
         (await bot.getRESTGuildMember(interaction.guildID, selectedUserID))
       : null;
+
+    // If user ID is selected but not found, return error message
     if (!userReference && selectedUserID) {
       await interaction.createFollowup({
         embeds: [
@@ -106,6 +123,8 @@ export const retroRewards = {
     }
 
     console.log('here');
+
+    // Create a message for confirming reward giving action
     const msg = await interaction.createFollowup({
       embeds: [
         {
@@ -138,6 +157,8 @@ export const retroRewards = {
         },
       ],
     });
+
+    // Wait for confirmation from user
     const collectInter =
       await InteractionCollector.getInstance().waitForInteraction(
         {
@@ -148,6 +169,8 @@ export const retroRewards = {
         msg,
         30000
       );
+
+    // Create a message for acknowledging reward giving process
     await collectInter.createFollowup({
       embeds: [
         {
@@ -157,8 +180,9 @@ export const retroRewards = {
         },
       ],
     });
+
+    // If all rewards are selected, give retroactive rewards to all users in the server
     if (!selectedRewardID) {
-      // get all users in guild in xp
       const allXPUsers = selectedUserID
         ? [
             await XPManager.getInstance().getGuildMemberXP(
@@ -174,12 +198,16 @@ export const retroRewards = {
         let level = user.level;
         console.log({ user: user.userID, xp, level });
         console.log({ user: user.userID, xp, level });
+
+        // Calculate XP and level based on retroactive rewards
         while (level > 0) {
           const xpNeeded = XPManager.getInstance().getRequiredXPForLevel(level);
           console.log({ user: user.userID, xp, level, xpNeeded });
           xp += xpNeeded;
           level--;
         }
+
+        // Update user's XP and level information in the database
         await XPManager.getInstance().updateGuildMemberXP(
           interaction.guildID,
           user.userID,
@@ -190,6 +218,7 @@ export const retroRewards = {
         );
       }
     } else {
+      // If a specific reward is selected, give retroactive rewards to all users in the server based on their level
       const allXPUsers = selectedUserID
         ? [
             await XPManager.getInstance().getGuildMemberXP(
@@ -215,6 +244,8 @@ export const retroRewards = {
             )
           );
         }
+
+        // Process retroactive rewards for a specific user
         const rewardProcess =
           await LevellingRewards.getInstance().processGuildRewardsForMember(
             interaction.guildID,
@@ -236,6 +267,8 @@ export const retroRewards = {
         }
       }
     }
+
+    // Create a message for acknowledging that retroactive rewards have been given
     await collectInter.createFollowup({
       embeds: [
         {

@@ -1,29 +1,17 @@
+// Import necessary dependencies and types
 import { ComponentType, ButtonStyle } from 'discord-api-types/v10';
-import {
-  ComponentInteraction,
-  ComponentInteractionSelectMenuData,
-  Constants,
-  EmbedOptions,
-  InteractionDataOptionsNumber,
-  InteractionDataOptionsString,
-  InteractionDataOptionsUser,
-  Member,
-} from 'eris';
-import {
-  Crate,
-  rarityColorMap,
-  rarityNameMap,
-  UserCrate,
-} from '../../constants/cardNames';
+import { Constants, EmbedOptions, InteractionDataOptionsString } from 'eris';
+import { rarityNameMap, UserCrate } from '../../constants/cardNames';
 import { CrateManager } from '../../Handlers/Crates/CrateManager';
-import { InventoryManager } from '../../Handlers/Crates/InventoryManager';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
-import { MusicManager } from '../../Handlers/Music/MusicPlayer';
 import TetLib from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
+
+// Define the crateView command
 export const crateView = {
   name: 'crate',
   description: 'View or open a crate!',
+  // Define the arguments for the command
   args: [
     {
       name: 'crate_id',
@@ -32,20 +20,24 @@ export const crateView = {
       required: true,
     },
   ],
+  // Define the type of command
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+  // Define the function to execute when the command is called
   execute: async (bot, { interaction }) => {
+    // Extract the crate ID from the interaction data
     const crateID = (
       TetLib.findCommandParam(
         interaction.data.options,
         'crate_id'
       ) as InteractionDataOptionsString
     ).value;
+    // If no crate ID was provided, send an error message
     if (!crateID)
       return interaction.createMessage({
         embeds: [
           {
             title: `Cannot view crate`,
-            description: `Please provide an crate ID!`,
+            description: `Please provide a crate ID!`,
             color: 16728385,
             thumbnail: {
               url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
@@ -53,9 +45,11 @@ export const crateView = {
           },
         ],
       });
+    // Get the UserCrate object for the specified crate ID
     const crate = (await CrateManager.getInstance().getUserCrate(
       crateID
     )) as UserCrate;
+    // If the crate doesn't exist, send an error message
     if (!crate)
       return interaction.createMessage({
         embeds: [
@@ -70,11 +64,13 @@ export const crateView = {
         ],
       });
 
+    // Get the guild and user associated with the crate
     const guild =
       (crate.guildID !== `@global` && bot.guilds.get(crate.guildID)) ??
       (await bot.getRESTGuild(crate.guildID));
     const user =
       bot.users.get(crate.userID) ?? (await bot.getRESTUser(crate.userID));
+    // If the guild doesn't exist, send an error message
     if (!guild && crate.guildID !== `@global`)
       return interaction.createMessage({
         embeds: [
@@ -88,8 +84,8 @@ export const crateView = {
           },
         ],
       });
-    // if (crate.opened) {
 
+    // If the crate has already been opened, show the crate details
     if (crate.opened) {
       await interaction.createMessage({
         embeds: [
@@ -110,8 +106,8 @@ ${crate.description}
               url:
                 crate.guildID && guild
                   ? guild.dynamicIconURL('png', 64) ??
-                    'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk'
-                  : 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk',
+                    'https://cdn.discordapp.com/attachments/757863990129852509/1094019901624172674/wanDazai.jpg'
+                  : 'https://cdn.discordapp.com/attachments/757863990129852509/1094019901624172674/wanDazai.jpg',
             },
             footer: {
               text: `Crate owned by ${user.username}#${user.discriminator} (${user.id}) | ID: ${crate._id}`,
@@ -121,6 +117,7 @@ ${crate.description}
         ],
       });
     } else {
+      // If the crate hasn't been opened yet, show the unopened crate details
       const embed: EmbedOptions = {
         title: `${crate.name} (Unopened)`,
         description: `
@@ -135,8 +132,8 @@ ${crate.description}
           url:
             crate.guildID && guild
               ? guild.dynamicIconURL('png', 64) ??
-                'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk'
-              : 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk',
+                'https://cdn.discordapp.com/attachments/757863990129852509/1094019901624172674/wanDazai.jpg'
+              : 'https://cdn.discordapp.com/attachments/757863990129852509/1094019901624172674/wanDazai.jpg',
         },
         footer: {
           text: `Crate owned by ${user.username}#${user.discriminator} (${user.id}) | ID: ${crate._id}`,
@@ -144,6 +141,7 @@ ${crate.description}
         },
       };
       await interaction.acknowledge();
+      // If the crate belongs to the user who called the command, show the "Open Crate" button
       const msg = await interaction.createFollowup({
         embeds: [embed],
         components:
@@ -164,8 +162,10 @@ ${crate.description}
               ]
             : [],
       });
+      // If the crate doesn't belong to the user who called the command, stop here
       if (crate.userID !== (interaction.user || interaction.member?.user)?.id)
         return;
+      // Wait for the user to click the "Open Crate" button
       await InteractionCollector.getInstance().waitForInteraction(
         {
           interactionid: 'open_crate',
@@ -174,18 +174,19 @@ ${crate.description}
         msg,
         1000 * 120
       );
-      // check if crate is still open
+      // Check if the crate has been opened by another user in the meantime
       const crate2 = await CrateManager.getInstance().getUserCrate(
         crate._id.toString(),
         true
       );
       if (crate2?.opened) {
+        // If the crate has been opened, show an error message
         await interaction.createFollowup({
           content: `This crate has already been opened!`,
         });
         return;
       }
-      // mark crate as opened
+      // Mark the crate as opened and send the item details
       await CrateManager.getInstance().openCrate(crate._id as string);
       const followup = await interaction.createFollowup({
         content: `🎉🎉🎉 Congratulations! 🎉🎉🎉`,
@@ -209,7 +210,7 @@ ${crate.item?.description}
       });
     }
 
-    // }
+    // End of execute function
   },
 } as Command;
 

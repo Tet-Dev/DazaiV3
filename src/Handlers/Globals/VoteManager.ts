@@ -279,7 +279,7 @@ ${
     : ''
 }`,
         thumbnail: {
-          url: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/15e13870-8518-4f22-92c4-faa2555110e4/dej1xz0-79ff858a-d77f-439d-9cab-76e25ba7f8e9.png/v1/fill/w_1280,h_1280,q_80,strp/wan__dazai_by_gummysnail_dej1xz0-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzE1ZTEzODcwLTg1MTgtNGYyMi05MmM0LWZhYTI1NTUxMTBlNFwvZGVqMXh6MC03OWZmODU4YS1kNzdmLTQzOWQtOWNhYi03NmUyNWJhN2Y4ZTkucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.ObDVGDRlq0hjQNhpECT930IVlNlYMtZ7Vffe4zwXdvk',
+          url: 'https://cdn.discordapp.com/attachments/757863990129852509/1094019901624172674/wanDazai.jpg',
         },
         fields: awardFields,
         // footer: {

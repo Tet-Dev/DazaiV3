@@ -9,6 +9,8 @@ import { SlashCommandHandler } from './Handlers/SlashCommandHandler';
 import { MusicManager } from './Handlers/Music/MusicPlayer';
 import { MongoClient } from 'mongodb';
 import server from './Server/server';
+import { writeFileSync } from 'fs';
+import process from 'node:process';
 // import { VoteManager } from './Handlers/Globals/VoteManager';
 // import MusicHandler from './Handlers/Music/MusicMain';
 // import RankCardDrawer from './Handlers/Levelling/RankCardDrawer';
@@ -112,6 +114,9 @@ bot.once('ready', () => {
   import(`./Handlers/Globals/VoteManager`).then((vm) => {
     vm.VoteManager.getInstance();
   });
+  import('./Handlers/Fun/MessageReader/SniperManager').then((sm) => {
+    sm.SniperManager.getInstance();
+  });
   recursivelyAddEvents(join(__dirname, 'Events')).then();
 });
 
@@ -125,4 +130,9 @@ process.on('unhandledRejection', (err) => {
     '798446171294924831',
     `An error occured: \`\`\`${err}\`\`\``
   );
+  // if logs folder doesn't exist, create it
+  fs.appendFile(`log.txt`, `${err}`, {
+    mode: 0o777,
+  });
 });
+console.log('Done!');

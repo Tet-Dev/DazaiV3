@@ -17,6 +17,7 @@ export class SlashCommandHandler {
   private constructor() {
     if (bot.ready) this.onReady();
     else bot.on('ready', this.onReady.bind(this));
+    console.log('slash command handler ready');
     bot.on('interactionCreate', this.handleInteraction.bind(this));
   }
   async createDevCommand(command: Command) {

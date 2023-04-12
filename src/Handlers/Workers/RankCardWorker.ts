@@ -168,6 +168,7 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   dataCanvas.composite(nameCanvas, 0, rankImg.height + lvlImg.height - 24);
   canvas.composite(dataCanvas, 316, 170 - dataCanvas.height / 2);
   canvas.composite(xpImg, 1024 - 42 - xpImg.width, 298 - xpImg.height);
+  // writeFileSync('test.png', await canvas.encode(0));
   // console.log('Compositing', Date.now() - time);
   return canvas;
 }
