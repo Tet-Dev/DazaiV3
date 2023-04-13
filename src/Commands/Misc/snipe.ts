@@ -78,7 +78,7 @@ export const snipe = {
       },
     };
     return await interaction.createMessage({
-      embeds: [embed],
+      embeds: [embed, ...(lastMessage.embeds || [])],
     });
   },
 } as Command;
