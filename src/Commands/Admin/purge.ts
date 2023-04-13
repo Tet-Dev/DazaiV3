@@ -1,6 +1,7 @@
-import Eris, { Constants, InteractionDataOptionsNumber } from 'eris';
+import Eris, { Constants, Embed, InteractionDataOptionsNumber } from 'eris';
 import { Command } from '../../types/misc';
 import TetLib from '../../Handlers/TetLib';
+import { AuditLogManager } from '../../Handlers/Auditor/AuditLogManager';
 
 /**
  * Retroactive rewards command information
@@ -69,7 +70,24 @@ export const purge = {
         return false;
       },
     });
-
+    if (
+      await AuditLogManager.getInstance().shouldLogAction(
+        interaction.guildID,
+        'logMessageBulkDeletes'
+      )
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          interaction.guildID,
+          interaction.member?.id || interaction.user?.id!
+        );
+      auditLogEmbed.title = `Message Purge`;
+      auditLogEmbed.description = `Deleted ${messages} messages in <#${channel.id}>`;
+      await AuditLogManager.getInstance().logAuditMessage(
+        interaction.guildID,
+        auditLogEmbed as Embed
+      );
+    }
     // Create a message for acknowledging reward giving process
     await interaction.channel.createMessage({
       embeds: [

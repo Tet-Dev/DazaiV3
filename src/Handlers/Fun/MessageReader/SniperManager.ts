@@ -3,6 +3,7 @@ import { accessSync, lstatSync, mkdirSync, writeFileSync } from 'fs';
 import { access, lstat, readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import TetLib from '../../TetLib';
+import { AuditLogManager } from '../../Auditor/AuditLogManager';
 
 interface CachedMessageMap {
   version: number;
@@ -141,17 +142,63 @@ export class SniperManager {
       cache,
       join('./', 'cachedstate', 'cachedMessages.json')
     );
-    process.exit(0)
+    process.exit(0);
     return;
   }
   async logSnipedMessage(message: Message) {
+    if (!message.guildID) return;
     const channelID = message.channel.id;
     const messages = this.messageMap.get(channelID) || [];
     const reducedMessage = TetLib.reduceMessage(message);
     messages.push(reducedMessage);
     this.messageMap.set(channelID, messages);
+    if (
+      (await AuditLogManager.getInstance().shouldLogAction(
+        message.guildID,
+        'logMessageDeletes'
+      )) &&
+      message.author.id !== bot.user.id
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          message.guildID,
+          message.member || message.author.id
+        );
+      auditLogEmbed.title = 'Message Deleted';
+      auditLogEmbed.description = `${message.content}`;
+      auditLogEmbed.fields = [
+        {
+          name: 'Author',
+          value: `${message.author.username}#${message.author.discriminator}`,
+          inline: true,
+        },
+        {
+          name: 'Channel',
+          value: `<#${message.channel.id}>`,
+          inline: true,
+        },
+        {
+          name: 'Message ID',
+          value: `${message.id}`,
+          inline: true,
+        },
+      ];
+      await AuditLogManager.getInstance().logAuditMessage(
+        message.guildID,
+        auditLogEmbed
+      );
+      if (message.embeds.length) {
+        for (let i = 0; i < message.embeds.length; i++) {
+          await AuditLogManager.getInstance().logAuditMessage(
+            message.guildID,
+            message.embeds[i]
+          );
+        }
+      }
+    }
   }
   async logEditedMessage(message: Message) {
+    if (!message.guildID) return;
     const channelID = message.channel.id;
     const messages = this.editMap.get(channelID) || [];
     const reducedMessage = TetLib.reduceMessage(message);
@@ -159,6 +206,42 @@ export class SniperManager {
     console.log('Logging edited message', reducedMessage);
     this.editMap.set(channelID, messages);
     console.log('Logged edited message', this.editMap.get(channelID));
+    if (
+      (await AuditLogManager.getInstance().shouldLogAction(
+        message.guildID,
+        'logMessageEdits'
+      )) &&
+      message.author.id !== bot.user.id
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          message.guildID,
+          message.member || message.author.id
+        );
+      auditLogEmbed.title = 'Message Edited';
+      auditLogEmbed.description = `${message.content}`;
+      auditLogEmbed.fields = [
+        {
+          name: 'Author',
+          value: `${message.author.username}#${message.author.discriminator}`,
+          inline: true,
+        },
+        {
+          name: 'Channel',
+          value: `<#${message.channel.id}>`,
+          inline: true,
+        },
+        {
+          name: 'Original Message',
+          value: `[[Jump to original message]](${message.jumpLink}) ${message.jumpLink}`,
+          inline: true,
+        },
+      ];
+      await AuditLogManager.getInstance().logAuditMessage(
+        message.guildID,
+        auditLogEmbed
+      );
+    }
   }
   async getSnipedMessages(channelID: string) {
     const messages = this.messageMap.get(channelID) || [];

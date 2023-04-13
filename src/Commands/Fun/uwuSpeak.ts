@@ -1,8 +1,9 @@
-import { Constants, InteractionDataOptionsUser } from 'eris';
+import { Constants, Embed, InteractionDataOptionsUser } from 'eris';
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import TetLib from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
 import { kittenCacheMap } from '../../Events/HandleKittenTalk';
+import { AuditLogManager } from '../../Handlers/Auditor/AuditLogManager';
 
 // This object represents a command to make a user a Discord kitten.
 export const uwuSpeak = {
@@ -92,7 +93,29 @@ export const uwuSpeak = {
       kittenCacheMap.delete(`${interaction.guildID}-${user.id}`);
 
       // Send a success message to
-
+      if (
+        selectedUserID &&
+        (await AuditLogManager.getInstance().shouldLogAction(
+          interaction.guildID,
+          'logImpactfulCommands'
+        ))
+      ) {
+        const auditLogEmbed =
+          await AuditLogManager.getInstance().generateAuditLogEmbed(
+            interaction.guildID,
+            interaction.member.id || interaction.user?.id!
+          );
+        auditLogEmbed.title = `Kitten status removed`;
+        auditLogEmbed.description = `**User:** ${user.username}#${
+          user.discriminator
+        } (${user.id})\n**Moderator:** ${
+          interaction.member?.nick || interaction.member?.username
+        }#${interaction.member?.discriminator} (<@${interaction.member?.id}>)`;
+        await AuditLogManager.getInstance().logAuditMessage(
+          interaction.guildID,
+          auditLogEmbed as Embed
+        );
+      }
       return interaction.createMessage({
         embeds: [
           {
@@ -120,6 +143,29 @@ export const uwuSpeak = {
       }
     );
     kittenCacheMap.set(`${interaction.guildID}-${user.id}`, true);
+    if (
+      selectedUserID &&
+      (await AuditLogManager.getInstance().shouldLogAction(
+        interaction.guildID,
+        'logImpactfulCommands'
+      ))
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          interaction.guildID,
+          interaction.member.id || interaction.user?.id!
+        );
+      auditLogEmbed.title = `Kitten status added`;
+      auditLogEmbed.description = `**User:** ${user.username}#${
+        user.discriminator
+      } (${user.id})\n**Moderator:** ${
+        interaction.member?.nick || interaction.member?.username
+      }#${interaction.member?.discriminator} (<@${interaction.member?.id}>)`;
+      await AuditLogManager.getInstance().logAuditMessage(
+        interaction.guildID,
+        auditLogEmbed as Embed
+      );
+    }
     // Send a success message
     return interaction.createMessage({
       embeds: [

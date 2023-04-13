@@ -1,5 +1,6 @@
 import {
   Constants,
+  Embed,
   InteractionDataOptionsString,
   InteractionDataOptionsUser,
 } from 'eris';
@@ -11,6 +12,7 @@ import {
   LevellingRewards,
   LevelUpRewardType,
 } from '../../Handlers/Levelling/LevelRewards';
+import { AuditLogManager } from '../../Handlers/Auditor/AuditLogManager';
 
 /**
  * Retroactive rewards command information
@@ -180,9 +182,29 @@ export const retroRewards = {
         },
       ],
     });
-
-    // If all rewards are selected, give retroactive rewards to all users in the server
+    if (
+      await AuditLogManager.getInstance().shouldLogAction(
+        interaction.guildID,
+        'logImpactfulCommands'
+      )
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          interaction.guildID,
+          interaction.member.id || interaction.user?.id!
+        );
+      auditLogEmbed.title = `Retroactive Rewards Given`;
+      auditLogEmbed.description = `
+Reward ID: ${selectedRewardID || 'All Rewards'}
+User Affected: ${`<@${selectedUserID}>` || 'All Users'}
+`;
+      await AuditLogManager.getInstance().logAuditMessage(
+        interaction.guildID,
+        auditLogEmbed as Embed
+      );
+    }
     if (!selectedRewardID) {
+      // If all rewards are selected, give retroactive rewards to all users in the server
       const allXPUsers = selectedUserID
         ? [
             await XPManager.getInstance().getGuildMemberXP(
