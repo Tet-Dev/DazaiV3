@@ -89,7 +89,7 @@ export const uwuSpeak = {
           kitten: 0,
         }
       );
-      kittenCacheMap.delete(user.id);
+      kittenCacheMap.delete(`${interaction.guildID}-${user.id}`);
 
       // Send a success message to
 
@@ -119,7 +119,7 @@ export const uwuSpeak = {
             : 1,
       }
     );
-    kittenCacheMap.set(user.id, true);
+    kittenCacheMap.set(`${interaction.guildID}-${user.id}`, true);
     // Send a success message
     return interaction.createMessage({
       embeds: [

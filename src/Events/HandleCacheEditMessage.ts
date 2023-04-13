@@ -8,7 +8,6 @@ export const HandleCacheEditMessage = {
   run: async (bot, msg, oldMsg) => {
     if (msg.guildID === undefined) return;
     if (kittenedMessageIDs.has(msg.id)) return;
-    console.log("Edited message: ", msg.content, "Old message: ", oldMsg?.content);
     SniperManager.getInstance().logEditedMessage({
       ...msg,
       content: oldMsg?.content || `Old message content not avalible.`,

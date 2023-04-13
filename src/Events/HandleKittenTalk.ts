@@ -62,7 +62,6 @@ export const KittenifyMessages = {
     }
     if (msg.components?.length) return;
     if (msg.attachments.length) return;
-    console.log(`Took ${Date.now() - perf} to check kitten status`);
     kittenedMessageIDs.add(msg.id);
     setTimeout(() => {
       kittenedMessageIDs.delete(msg.id);
@@ -74,10 +73,8 @@ export const KittenifyMessages = {
       : ((await bot.getRESTChannel(msg.channel.id)) as TextableChannel);
     if (channel.type !== 0) return;
     const textChannel = channel as TextChannel;
-    console.log(`Took ${Date.now() - perf}ms to get channel`);
     perf = Date.now();
     const webhooks = await getChannelWebhooks(channel);
-    console.log(`Took ${Date.now() - perf}ms to get webhooks`);
     perf = Date.now();
     const webhook =
       webhooks[
@@ -123,7 +120,6 @@ export const KittenifyMessages = {
           .uwuifySentence(embed.footer.text)
           .substring(0, 2048);
     }
-    console.log(`Took ${Date.now() - perf}ms to uwuify`);
     perf = Date.now();
     const embeds = [...msg.embeds] as EmbedOptions[];
     if (msg.referencedMessage) {
