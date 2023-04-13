@@ -157,7 +157,7 @@ export class SniperManager {
         message.guildID,
         'logMessageDeletes'
       )) &&
-      message.author.id !== bot.user.id
+      message?.author?.id !== bot.user.id
     ) {
       const auditLogEmbed =
         await AuditLogManager.getInstance().generateAuditLogEmbed(
@@ -211,7 +211,7 @@ export class SniperManager {
         message.guildID,
         'logMessageEdits'
       )) &&
-      message.author.id !== bot.user.id
+      message?.author?.id !== bot.user.id
     ) {
       const auditLogEmbed =
         await AuditLogManager.getInstance().generateAuditLogEmbed(
