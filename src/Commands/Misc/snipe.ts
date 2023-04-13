@@ -77,6 +77,7 @@ export const snipe = {
         url: interaction.member?.guild.dynamicIconURL('png', 64) ?? '',
       },
     };
+    // console.log(JSON.stringify(lastMessage.embeds));
     return await interaction.createMessage({
       embeds: [embed, ...(lastMessage.embeds || [])],
     });
