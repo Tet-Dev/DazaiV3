@@ -2,6 +2,7 @@ import { Constants, InteractionDataOptionsUser } from 'eris';
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import TetLib from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
+import { kittenCacheMap } from '../../Events/HandleKittenTalk';
 
 // This object represents a command to make a user a Discord kitten.
 export const uwuSpeak = {
@@ -88,6 +89,7 @@ export const uwuSpeak = {
           kitten: 0,
         }
       );
+      kittenCacheMap.delete(user.id);
 
       // Send a success message to
 
@@ -117,7 +119,7 @@ export const uwuSpeak = {
             : 1,
       }
     );
-
+    kittenCacheMap.set(user.id, true);
     // Send a success message
     return interaction.createMessage({
       embeds: [
