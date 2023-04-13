@@ -124,14 +124,22 @@ bot.on('error', (err) => {
   console.error(err);
 });
 
-process.on('unhandledRejection', (err) => {
+process.on('unhandledRejection', async (err) => {
   console.error(err);
   bot.createMessage(
     '798446171294924831',
     `An error occured: \`\`\`${err}\`\`\``
   );
   // if logs folder doesn't exist, create it
-  fs.appendFile(`log.txt`, `${err}`, {
+  if (
+    !(await fs
+      .access('logs')
+      .then(() => true)
+      .catch(() => null))
+  ) {
+    await fs.mkdir('logs');
+  }
+  await fs.appendFile(`logs/log.txt`, `${err}`, {
     mode: 0o777,
   });
 });
