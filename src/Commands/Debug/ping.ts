@@ -7,9 +7,6 @@ import { Command } from '../../types/misc';
 // Importing the InteractionCollector class from the InteractionCollector file
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
 
-// Importing the InventoryManager class from the Crate folder
-import { InventoryManager } from '../../Handlers/Crates/InventoryManager';
-
 // Defining the 'ping' command as an object
 export const ping = {
   // Command name
