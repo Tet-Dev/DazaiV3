@@ -169,7 +169,7 @@ export class SniperManager {
       auditLogEmbed.fields = [
         {
           name: 'Author',
-          value: `<@!${message.author.id}>`,
+          value: message?.author?.id ? `<@!${message?.author?.id}>` : 'Unknown',
           inline: true,
         },
         {
@@ -223,7 +223,7 @@ export class SniperManager {
       auditLogEmbed.fields = [
         {
           name: 'Author',
-          value: `${message.author.username}#${message.author.discriminator}`,
+          value: message?.author?.id ? `<@!${message?.author?.id}>` : 'Unknown',
           inline: true,
         },
         {
