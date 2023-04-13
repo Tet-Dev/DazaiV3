@@ -169,7 +169,7 @@ export class SniperManager {
       auditLogEmbed.fields = [
         {
           name: 'Author',
-          value: `${message.author.username}#${message.author.discriminator}`,
+          value: `<@!${message.author.id}>`,
           inline: true,
         },
         {
@@ -233,7 +233,7 @@ export class SniperManager {
         },
         {
           name: 'Original Message',
-          value: `[[Jump to original message]](${message.jumpLink}) ${message.jumpLink}`,
+          value: `[[Jump to original message]](https://discord.com/channels/${message.guildID}/${message.channel.id}/${message.id})`,
           inline: true,
         },
       ];
