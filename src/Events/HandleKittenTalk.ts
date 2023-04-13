@@ -10,7 +10,7 @@ import {
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { EventHandler } from '../types/misc';
 import Uwuifier from 'uwuifier';
-import translate from 'google-translate-api-x';
+// import translate from 'google-translate-api-x';
 const uwuifier = new Uwuifier();
 // seeded random number generator
 const random = (seed: number) => {
@@ -86,18 +86,20 @@ export const KittenifyMessages = {
             webhooks.length
         )
       ];
-    const content = isASCII(msg.content, true)
-      ? uwuifier.uwuifySentence(msg.content).substring(0, 2000)
-      : uwuifier
-          .uwuifySentence(
-            (
-              await translate(msg.content, {
-                from: 'auto',
-                to: 'en',
-              })
-            ).text
-          )
-          .substring(0, 2000);
+    const content =
+      // isASCII(msg.content, true)
+      //   ?
+      uwuifier.uwuifySentence(msg.content).substring(0, 2000);
+    // : uwuifier
+    //     .uwuifySentence(
+    //       (
+    //         await translate(msg.content, {
+    //           from: 'auto',
+    //           to: 'en',
+    //         })
+    //       ).text
+    //     )
+    //     .substring(0, 2000);
     // uwuify every embed
     for (const embed of msg.embeds) {
       if (embed.title)
