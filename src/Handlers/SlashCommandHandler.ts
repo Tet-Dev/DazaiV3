@@ -87,6 +87,7 @@ export class SlashCommandHandler {
     if (commandInList.description !== command.description) return false;
     return true;
   }
+
   async onReady() {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
     const cmds = await (this.devMode
@@ -104,6 +105,7 @@ export class SlashCommandHandler {
     }
     console.log('registered all commands');
   }
+
   async registerCommand(command: Command) {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
     console.log('registering command', command);
