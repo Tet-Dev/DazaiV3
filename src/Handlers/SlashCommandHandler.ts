@@ -101,16 +101,16 @@ export class SlashCommandHandler {
 
     const cmdArr = Array.from(this.commands.values());
 
-    const cmds = cmdsList[0];
+    for (const cmds of cmdsList) {
+      const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));
 
-    const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));
-
-    console.log('registering commands, skipping over existing ones', cmds);
-    // for every command in this.commands, check if it's already registered
-    for (let i = 0; i < commands.length; i++) {
-      const command = commands[i];
-      await create(command);
-      console.log(`registered ${command.name}, ${i + 1}/${commands.length}`);
+      console.log('registering commands, skipping over existing ones', cmds);
+      // for every command in this.commands, check if it's already registered
+      for (let i = 0; i < commands.length; i++) {
+        const command = commands[i];
+        await create(command);
+        console.log(`registered ${command.name}, ${i + 1}/${commands.length}`);
+      }
     }
     console.log('registered all commands');
   }
