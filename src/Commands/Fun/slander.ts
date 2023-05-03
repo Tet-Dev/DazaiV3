@@ -13,7 +13,7 @@ const slanderCooldowns = new Map<string, number>();
 // Define a "slander" command object
 export const slander = {
   name: 'slander',
-  description: 'Slander someone/something',
+  description: 'Concatenates `text` and `slander_type`',
   args: [
     {
       name: 'slander_type',
