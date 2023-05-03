@@ -28,10 +28,15 @@ export const migrateXP: DiscordScript = async (bot, interaction) => {
   await interaction.acknowledge();
   const start = Date.now();
   const sqlConnection = await mysql2.createConnection({
+    //@ts-ignore
     host: env.sql.host,
+    //@ts-ignore
     user: env.sql.user,
+    //@ts-ignore
     password: env.sql.password,
+    //@ts-ignore
     database: env.sql.database,
+    //@ts-ignore
     charset: env.sql.charset,
   });
   console.log('connection', sqlConnection);
@@ -115,7 +120,7 @@ export const migrateXP: DiscordScript = async (bot, interaction) => {
         return;
       }
       await XPManager.getInstance().updateGuildMemberXP(guildID, r.userID, {
-        xp: r.exp,
+        xp: r.exp || 0,
         //@ts-ignore
         migrated: true,
       });
