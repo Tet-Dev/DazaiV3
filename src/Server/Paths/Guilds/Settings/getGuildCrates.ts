@@ -1,4 +1,3 @@
-
 import { getGuildCards } from '../../../../Handlers/Crates/CardManager';
 import { CrateManager } from '../../../../Handlers/Crates/CrateManager';
 import { RESTHandler, RESTMethods } from '../../../../types/misc';
@@ -9,8 +8,11 @@ export const getGuildCrates = {
   sendUser: false,
   run: async (req, res, next, user) => {
     const guildID = req.params.guildID;
-    const cardData = await CrateManager.getInstance().getGuildCrateTemplates(guildID);
-    return res.json(cardData); 
+    const cardData = await CrateManager.getInstance().getGuildCrateTemplates(
+      guildID
+    );
+    res.set('Cache-Control', 'public, max-age=5');
+    return res.json(cardData);
   },
 } as RESTHandler;
 export default getGuildCrates;

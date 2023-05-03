@@ -10,6 +10,7 @@ export const rank = {
   description: 'Get the top users in the server!',
   args: [],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+  aliases: ['leaderboard'],
   execute: async (bot, { interaction }) => {
     return interaction.createMessage({
       embeds: [

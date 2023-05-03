@@ -1,4 +1,11 @@
-import { CardRarity } from '../../../../constants/cardNames';
+import { ObjectId } from 'mongodb';
+import {
+  CardRarity,
+  rarityColorMap,
+  rarityEmojiMap,
+  rarityNameMap,
+} from '../../../../constants/cardNames';
+import { AuditLogManager } from '../../../../Handlers/Auditor/AuditLogManager';
 import {
   createCard,
   getGuildCards,
@@ -90,6 +97,7 @@ export const createRankCard = {
         message: `${e}`,
       };
     });
+
     if (result.error) {
       return res.status(500).json({
         error: (
@@ -98,6 +106,42 @@ export const createRankCard = {
           }
         ).message,
       });
+    }
+    if (
+      await AuditLogManager.getInstance().shouldLogAction(
+        guildID,
+        'logRankCardEdits'
+      )
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          guildID,
+          user.id
+        );
+      const cardData = result as {
+        cardID: ObjectId;
+        error: false;
+        url: string;
+      };
+      auditLogEmbed.title = 'Rank Card Created';
+      auditLogEmbed.description = `**Card ID:** ${cardData.cardID.toString()}`;
+
+      auditLogEmbed.fields = [
+        {
+          name: '__Card Details__',
+          value: `​\n**Name:** \`\`\`${name}\`\`\`\n**Description:** \`\`\`${description}\`\`\`\n**Rarity:**\n\`${
+            rarityEmojiMap[rarity as CardRarity]
+          } ${
+            rarityNameMap[rarity as CardRarity]
+          }\`\n\n**Sell Price:**\n\`${sellPrice}\`円​\n​\n`,
+          inline: false,
+        },
+      ];
+      auditLogEmbed.image = {
+        url: cardData.url,
+      };
+      auditLogEmbed.color = rarityColorMap[rarity as CardRarity];
+      AuditLogManager.getInstance().logAuditMessage(guildID, auditLogEmbed);
     }
     return res.json(result);
   },

@@ -1,4 +1,11 @@
-import { CardRarity } from '../../../../constants/cardNames';
+import {
+  CardRarity,
+  CardType,
+  rarityColorMap,
+  rarityEmojiMap,
+  rarityNameMap,
+} from '../../../../constants/cardNames';
+import { AuditLogManager } from '../../../../Handlers/Auditor/AuditLogManager';
 import {
   createCard,
   getCard,
@@ -67,12 +74,53 @@ export const createRankCard = {
           .json({ error: 'Missing permissions, need manage guild or admin' });
       }
     }
+    let oldCard = card;
     await updateCard(cardID, {
       name,
       description,
       rarity: rarity as CardRarity,
       sellPrice,
     });
+    let newCard = (await getCard(cardID)) as CardType;
+    if (
+      await AuditLogManager.getInstance().shouldLogAction(
+        guildID,
+        'logRankCardEdits'
+      )
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          guildID,
+          user.id
+        );
+      auditLogEmbed.title = 'Rank Card Edited';
+      auditLogEmbed.description = `**Card ID:** ${cardID}`;
+      auditLogEmbed.fields = [
+        {
+          name: '__Old Card__',
+          value: `​\n**Name:** \`\`\`${oldCard.name}\`\`\`\n**Description:** \`\`\`${
+            oldCard.description
+          }\`\`\`\n**Rarity:**\n\`${rarityEmojiMap[oldCard.rarity]} ${
+            rarityNameMap[oldCard.rarity]
+          }\`\n\n**Sell Price:**\n\`${oldCard.sellPrice}円\`​\n​\n`,
+          inline: false,
+        },
+        {
+          name: '__New Card__',
+          value: `​\n**Name:** \`\`\`${newCard.name}\`\`\`\n**Description:** \`\`\`${
+            newCard.description
+          }\`\`\`\n**Rarity:**\n\`${rarityEmojiMap[newCard.rarity]} ${
+            rarityNameMap[newCard.rarity]
+          }\`\n\n**Sell Price:**\n\`${newCard.sellPrice}\`円​\n​\n`,
+          inline: false,
+        },
+      ];
+      auditLogEmbed.image = {
+        url: newCard.url,
+      };
+      auditLogEmbed.color = rarityColorMap[newCard.rarity]
+      AuditLogManager.getInstance().logAuditMessage(guildID, auditLogEmbed);
+    }
     return res.json({ success: true });
   },
 } as RESTHandler;

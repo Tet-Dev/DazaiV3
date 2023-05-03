@@ -110,18 +110,27 @@ export class XPManager {
       userID,
       ...data,
     } as GuildMemeberXP;
-    return MongoDB.db('EXP').collection('userLevels').updateOne(
-      {
-        guildID,
-        userID,
-      },
-      {
-        $set: newData,
-      },
-      {
-        upsert: true,
-      }
-    );
+    return MongoDB.db('EXP')
+      .collection('userLevels')
+      .updateOne(
+        {
+          guildID,
+          userID,
+        },
+        {
+          $set: newData,
+          $setOnInsert: {
+            xp: 0,
+            level: 0,
+            dailyMessages: 0,
+            resetAt: 0,
+            
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
   }
   async messageXP(
     guildID: string,

@@ -93,6 +93,7 @@ export const createCard = async (
   return {
     cardID,
     error: false,
+    url: `https://assets.dazai.app/${fileLoc}`,
   };
 };
 export const updateCard = async (cardID: string, card: Partial<CardType>) => {

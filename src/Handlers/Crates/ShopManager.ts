@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Crate } from '../../constants/cardNames';
 import { CrateManager } from './CrateManager';
 import { InventoryManager } from './InventoryManager';
+import { AuditLogManager } from '../Auditor/AuditLogManager';
 
 const defaultShopData = (guildID: string) => ({
   guildID,
@@ -162,6 +163,44 @@ export class ShopManager {
         },
       },
     });
+    if (
+      await AuditLogManager.getInstance().shouldLogAction(
+        guildID,
+        'logShopPurchase'
+      )
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          guildID,
+          userID
+        );
+      auditLogEmbed.title = 'Shop Purchase';
+      auditLogEmbed.fields = []
+      auditLogEmbed.fields?.push({
+        name: 'Shop Offer',
+        value: item.name,
+        inline: true,
+      });
+      auditLogEmbed.fields?.push({
+        name: 'Offer Price',
+        value: `${item.price}$`,
+        inline: true,
+      });
+      auditLogEmbed.fields?.push({
+        name: 'Balance pre-transaction',
+        value: `${inventory.money}$`,
+        inline: true,
+      });
+      auditLogEmbed.fields?.push({
+        name: 'Balance post transaction',
+        value: `${inventory.money - item.price}$`,
+        inline: true,
+      });
+      await AuditLogManager.getInstance().logAuditMessage(
+        guildID,
+        auditLogEmbed
+      );
+    }
     let newMoney = await InventoryManager.getInstance().getUserInventory(
       userID,
       guildID

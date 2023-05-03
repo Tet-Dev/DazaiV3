@@ -1,8 +1,16 @@
 import Eris, { Constants, TextableChannel, VoiceChannel } from 'eris';
-import { InventoryManager } from '../../../../Handlers/Crates/InventoryManager';
+import {
+  DefaultInventoryType,
+  InventoryManager,
+} from '../../../../Handlers/Crates/InventoryManager';
 import { XPManager } from '../../../../Handlers/Levelling/XPManager';
 import { MusicManager } from '../../../../Handlers/Music/MusicPlayer';
 import { RESTHandler, RESTMethods } from '../../../../types/misc';
+import {
+  getGlobalCards,
+  getGuildCards,
+} from '../../../../Handlers/Crates/CardManager';
+import { CardType } from '../../../../constants/cardNames';
 
 export const getLeaderboard = {
   method: RESTMethods.GET,
@@ -51,6 +59,31 @@ export const getLeaderboard = {
     );
 
     let fallbacks = 0;
+    const [allGuildCards, allGlobalCards, getAllUsersWithSelectionPrefs] =
+      await Promise.all([
+        getGuildCards(guildID),
+        getGlobalCards(),
+        MongoDB.db('Guilds')
+          .collection('userData')
+          .find({
+            guildID: guildID,
+            selectedCard: { $exists: true },
+            userID: { $in: leaderboard.map((x) => x.userID) },
+          })
+          .toArray() as Promise<DefaultInventoryType[]>,
+      ]);
+    console.log('leaderboard timing fetch cards', Date.now() - fetchTime);
+    fetchTime = Date.now();
+    const cardMap = new Map<string, CardType>();
+    allGuildCards.forEach((x) => cardMap.set(x._id.toString(), x));
+    allGlobalCards.forEach((x) => cardMap.set(x._id.toString(), x));
+    // console.log('leaderboard timing fetch prefs', Date.now() - fetchTime);
+    // fetchTime = Date.now();
+    const selectionPrefs = new Map<string, string>();
+    getAllUsersWithSelectionPrefs.forEach(
+      (x) => x.selectedCard && selectionPrefs.set(x.userID, x.selectedCard)
+    );
+
     let resultMap = await Promise.all(
       leaderboard.map(async (xp) => {
         let start = Date.now();
@@ -68,10 +101,9 @@ export const getLeaderboard = {
         }
         getUserTime += Date.now() - start;
         start = Date.now();
-        let card = await InventoryManager.getInstance()
-          .getSelectedCard(xp.userID, guildID)
-          .then((x) => (x ? x.url : null))
-          .catch((e) => null);
+        let card = selectionPrefs.get(xp.userID)
+          ? cardMap.get(selectionPrefs.get(xp.userID)!)
+          : null;
         getCardTime += Date.now() - start;
         return {
           ...xp,

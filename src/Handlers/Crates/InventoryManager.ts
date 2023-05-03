@@ -1,7 +1,7 @@
 import { ObjectID } from 'bson';
 import { getCard } from './CardManager';
 
-type DefaultInventoryType = {
+export type DefaultInventoryType = {
   _id?: ObjectID;
   userID: string;
   guildID: string | '@global';

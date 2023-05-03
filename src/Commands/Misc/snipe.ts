@@ -21,8 +21,7 @@ export const snipe = {
   ],
   // Set the type of command as a chat input
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
-  aliases: ['snipe'],
-  // Define the function that will be executed when the command is called
+  // Define pthe function that will be executed when the command is called
   execute: async (bot, { interaction }) => {
     const edited = (
       TetLib.findCommandParam(

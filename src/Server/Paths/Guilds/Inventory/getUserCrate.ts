@@ -12,7 +12,7 @@ export const getUserCrates = {
     const { guildID, crateID } = req.params;
     const crate = await CrateManager.getInstance().getUserCrate(crateID);
     if (!crate) return res.status(404).json({ error: 'Crate not found' });
-
+    res.set('Cache-Control', 'public, max-age=15');
     return res.json(crate);
   },
 } as RESTHandler;

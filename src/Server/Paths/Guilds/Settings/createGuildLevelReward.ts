@@ -1,10 +1,23 @@
-import { getGuildCards } from '../../../../Handlers/Crates/CardManager';
+import { ObjectId } from 'mongodb';
+import { AuditLogManager } from '../../../../Handlers/Auditor/AuditLogManager';
+import {
+  getCard,
+  getGuildCards,
+} from '../../../../Handlers/Crates/CardManager';
 import { CrateManager } from '../../../../Handlers/Crates/CrateManager';
 import {
   LevellingRewards,
+  LevelUpAtLevelRewardType,
+  LevelUpEveryNLevelsRewardType,
   LevelUpRewardType,
 } from '../../../../Handlers/Levelling/LevelRewards';
 import { XPManager } from '../../../../Handlers/Levelling/XPManager';
+import {
+  rarityEmojiMap,
+  CardRarity,
+  rarityNameMap,
+  rarityColorMap,
+} from '../../../../constants/cardNames';
 import { RESTMethods, RESTHandler } from '../../../../types/misc';
 
 export const updateGuildReward = {
@@ -166,6 +179,69 @@ export const updateGuildReward = {
       guildID,
       rewardData as LevelUpRewardType
     );
+
+    if (
+      await AuditLogManager.getInstance().shouldLogAction(
+        guildID,
+        'logRankCardEdits'
+      )
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          guildID,
+          user.id
+        );
+      auditLogEmbed.title = 'Level Up Reward Added';
+      auditLogEmbed.description = `**Reward ID:** ${update._id}\n`;
+
+      auditLogEmbed.fields = [];
+      if (update.type === 'atLevel') {
+        auditLogEmbed.fields.push({
+          name: 'Reward Type',
+          value: `At Level ${(update as LevelUpAtLevelRewardType).level}`,
+          inline: true,
+        });
+      }
+      if (update.type === 'everyNLevels') {
+        auditLogEmbed.fields.push({
+          name: 'Reward Type',
+          value: `Every ${
+            (update as LevelUpEveryNLevelsRewardType).everyNLevel
+          } Levels starting at Level ${
+            (update as LevelUpEveryNLevelsRewardType).offset
+          }`,
+          inline: true,
+        });
+      }
+      let rewardStr = ``;
+      for (const reward of update.rewards) {
+        if (reward.type === 'role') {
+          rewardStr += `- ${reward.action === 'add' ? 'Give' : 'Remove'} <@&${
+            reward.roleID
+          }> Role\n`;
+        }
+        if (reward.type === 'crate') {
+          rewardStr += `- ${reward.action === 'add' ? 'Add' : 'Remove'} ${
+            reward.count
+          } ${
+            (await CrateManager.getInstance().getCrateTemplate(reward.crateID))
+              ?.name
+          } Crate(s)\n`;
+        }
+        if (reward.type === 'card') {
+          rewardStr += `- ${reward.action === 'add' ? 'Add' : 'Remove'} ${
+            reward.count
+          } ${(await getCard(reward.cardID))?.name} Card(s)\n`;
+        }
+      }
+      auditLogEmbed.fields.push({
+        name: 'Rewards',
+        value: rewardStr,
+        inline: false,
+      });
+      // auditLogEmbed.color = rarityColorMap[rarity as CardRarity];
+      AuditLogManager.getInstance().logAuditMessage(guildID, auditLogEmbed);
+    }
     return res.json(update);
   },
 } as RESTHandler;

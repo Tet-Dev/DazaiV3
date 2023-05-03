@@ -5,6 +5,7 @@ import {
 } from 'eris';
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import { Command } from '../../types/misc';
+import { PermissionManager } from '../../Handlers/PermissionHandler';
 export const rank = {
   name: 'rank',
   description: 'Get your rank card!',
@@ -17,12 +18,34 @@ export const rank = {
     },
   ],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
+  permissions: ['rank'],
   execute: async (bot, { interaction }) => {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
     const selectedUserID = (
       interaction.data?.options?.[0] as InteractionDataOptionsUser
     )?.value;
+    if (selectedUserID) {
+      if (interaction.member) {
+        const hasPermission =
+          await PermissionManager.getInstance().hasMultiplePermissions(
+            interaction.guildID!,
+            interaction.member.roles,
+            ['rankOther']
+          );
+        if (typeof hasPermission === 'object') {
+          interaction.createMessage({
+            embeds: [
+              await PermissionManager.getInstance().rejectInteraction(
+                hasPermission.missing,
+                interaction.member?.user || interaction.user
+              ),
+            ],
+          });
+          return;
+        }
+      }
+    }
     const user = selectedUserID
       ? bot.users.get(selectedUserID) || (await bot.getRESTUser(selectedUserID))
       : interaction.user || interaction.member?.user;

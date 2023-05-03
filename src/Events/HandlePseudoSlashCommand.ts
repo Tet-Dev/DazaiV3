@@ -20,6 +20,7 @@ import {
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { SlashCommandHandler } from '../Handlers/SlashCommandHandler';
 import { EventHandler } from '../types/misc';
+import { PermissionManager } from '../Handlers/PermissionHandler';
 const commandMapCooldowns = new Map<string, number>();
 
 export const HandlePseudoSlashCommands = {
@@ -149,6 +150,26 @@ export const HandlePseudoSlashCommands = {
       cmdArgs,
       user: msg.author.username + '#' + msg.author.discriminator,
     });
+    // calculate if user has permission to run command
+    if (command.permissions?.length && msg.member) {
+      const hasPermission =
+        await PermissionManager.getInstance().hasMultiplePermissions(
+          msg.guildID!,
+          msg.member.roles,
+          command.permissions
+        );
+      if (typeof hasPermission === 'object') {
+        channel.createMessage({
+          embeds: [
+            await PermissionManager.getInstance().rejectInteraction(
+              hasPermission.missing,
+              msg.author
+            ),
+          ],
+        });
+        return;
+      }
+    }
     command.execute(bot, {
       interaction: {
         type: 2,

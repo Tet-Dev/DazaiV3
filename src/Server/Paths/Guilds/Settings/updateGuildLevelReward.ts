@@ -1,7 +1,10 @@
-import { getGuildCards } from '../../../../Handlers/Crates/CardManager';
+import { AuditLogManager } from '../../../../Handlers/Auditor/AuditLogManager';
+import { getCard, getGuildCards } from '../../../../Handlers/Crates/CardManager';
 import { CrateManager } from '../../../../Handlers/Crates/CrateManager';
 import {
   LevellingRewards,
+  LevelUpAtLevelRewardType,
+  LevelUpEveryNLevelsRewardType,
   LevelUpRewardType,
 } from '../../../../Handlers/Levelling/LevelRewards';
 import { XPManager } from '../../../../Handlers/Levelling/XPManager';
@@ -163,6 +166,9 @@ export const updateGuildReward = {
           .json({ error: 'Missing permissions, need manage guild or admin' });
       }
     }
+    const oldReward = await LevellingRewards.getInstance().getGuildReward(
+      rewardID
+    );
     const update = await LevellingRewards.getInstance().updateGuildReward(
       rewardID,
       rewardData
@@ -170,6 +176,69 @@ export const updateGuildReward = {
     const newReward = await LevellingRewards.getInstance().getGuildReward(
       rewardID
     );
+    if (
+      await AuditLogManager.getInstance().shouldLogAction(
+        guildID,
+        'logRankCardEdits'
+      )
+    ) {
+      const auditLogEmbed =
+        await AuditLogManager.getInstance().generateAuditLogEmbed(
+          guildID,
+          user.id
+        );
+      auditLogEmbed.title = 'Level Up Reward Changed';
+      auditLogEmbed.description = `**Reward ID:** ${oldReward._id}\n`;
+
+      auditLogEmbed.fields = [];
+      if (newReward.type === 'atLevel') {
+        auditLogEmbed.fields.push({
+          name: 'Reward Type',
+          value: `At Level ${(newReward as LevelUpAtLevelRewardType).level}`,
+          inline: true,
+        });
+      }
+      if (newReward.type === 'everyNLevels') {
+        auditLogEmbed.fields.push({
+          name: 'Reward Type',
+          value: `Every ${
+            (newReward as LevelUpEveryNLevelsRewardType).everyNLevel
+          } Levels starting at Level ${
+            (newReward as LevelUpEveryNLevelsRewardType).offset
+          }`,
+          inline: true,
+        });
+      }
+      let rewardStr = ``;
+      for (const reward of newReward.rewards) {
+        if (reward.type === 'role') {
+          rewardStr += `- ${reward.action === 'add' ? 'Give' : 'Remove'} <@&${
+            reward.roleID
+          }> Role\n`;
+        }
+        if (reward.type === 'crate') {
+          rewardStr += `- ${reward.action === 'add' ? 'Add' : 'Remove'} ${
+            reward.count
+          } ${
+            (await CrateManager.getInstance().getCrateTemplate(reward.crateID))
+              ?.name
+          } Crate(s)\n`;
+        }
+        if (reward.type === 'card') {
+          rewardStr += `- ${reward.action === 'add' ? 'Add' : 'Remove'} ${
+            reward.count
+          } ${(await getCard(reward.cardID))?.name} Card(s)\n`;
+        }
+      }
+      auditLogEmbed.fields.push({
+        name: 'Rewards',
+        value: rewardStr,
+        inline: false,
+      });
+      // auditLogEmbed.color = rarityColorMap[rarity as CardRarity];
+      AuditLogManager.getInstance().logAuditMessage(guildID, auditLogEmbed);
+    }
+
     return res.json(newReward);
   },
 } as RESTHandler;

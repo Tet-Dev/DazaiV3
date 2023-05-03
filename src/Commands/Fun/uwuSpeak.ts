@@ -120,10 +120,10 @@ export const uwuSpeak = {
         embeds: [
           {
             title: `${
-              selectedUserID ? `${user.username} is ` : `You're`
+              selectedUserID ? `${user.username} is` : `You're`
             } no longer a discord kitten`,
             description: `${
-              selectedUserID ? `${user.username} is ` : `You're`
+              selectedUserID ? `${user.username} is` : `You're`
             } no longer a discord kitten and now can talk normally!`,
             color: 16728385,
           },
@@ -171,10 +171,10 @@ export const uwuSpeak = {
       embeds: [
         {
           title: `${
-            selectedUserID ? `${user.username} is ` : `You're`
+            selectedUserID ? `${user.username} is` : `You're`
           } now a discord kitten`,
           description: `${
-            selectedUserID ? `${user.username} is ` : `You're`
+            selectedUserID ? `${user.username} is` : `You're`
           } now a discord kitten and now can only talk in uwu!`,
           color: 16728385,
         },

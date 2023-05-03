@@ -9,6 +9,7 @@ export const getGuildCrate = {
   run: async (req, res, next, user) => {
     const { guildID, crateID } = req.params;
     const crateData = await CrateManager.getInstance().getCrateTemplate(crateID);
+    res.set('Cache-Control', 'public, max-age=15');
     return res.json(crateData);
   },
 } as RESTHandler;
