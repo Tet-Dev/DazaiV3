@@ -136,8 +136,8 @@ export const slander = {
 
     // If the slander GIF is successfully generated, send it as a response to the command input
     if (slanderData) {
-      // If the GIF is larger than 8MB, upload it to imgbb and send it as a URL-encoded response
-      if (slanderData.buffer.byteLength > 8 * 1024 * 1024) {
+      // If the GIF is larger than 24MB, upload it to imgbb and send it as a URL-encoded response
+      if (slanderData.buffer.byteLength > 24 * 1024 * 1024) {
         const data = await nfetch(
           `https://api.imgbb.com/1/upload?key=a30605f1da7b089b528b79988fdf09ba`,
           {
