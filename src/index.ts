@@ -127,7 +127,7 @@ bot.on('error', (err) => {
 process.on('unhandledRejection', async (err) => {
   console.error(err);
   bot.createMessage(
-    '798446171294924831',
+    env.errorLogChannel,
     `An error occured: \`\`\`${err}\`\`\``
   );
   // if logs folder doesn't exist, create it
@@ -139,7 +139,7 @@ process.on('unhandledRejection', async (err) => {
   ) {
     await fs.mkdir('logs');
   }
-  await fs.appendFile(`logs/log.txt`, `${err}`, {
+  await fs.appendFile(`logs/log.txt`, `---\n${err}\n---\n\n`, {
     mode: 0o777,
   });
 });

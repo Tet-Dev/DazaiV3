@@ -32,6 +32,7 @@ export const env = {
   sql: null,
   voteKey: '',
   adminID: ``,
+  errorLogChannel: '',
 };
 export const envDevOptions = {
   guildsWithSlashCommands: [],
