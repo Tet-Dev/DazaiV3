@@ -90,18 +90,27 @@ export class SlashCommandHandler {
 
   async onReady() {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
-    const cmds = await (this.devMode
-      ? bot.getGuildCommands('1089977920023449783')
-      : bot.getCommands());
-    const cmdArr = Array.from(this.commands.values());
-    const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));
 
-    console.log('registering commands, skipping over existing ones', cmds);
-    // for every command in this.commands, check if it's already registered
-    for (let i = 0; i < commands.length; i++) {
-      const command = commands[i];
-      await create(command);
-      console.log(`registered ${command.name}, ${i + 1}/${commands.length}`);
+    const cmdsList = this.devMode
+      ? await Promise.all(
+          envDevOptions.guildsWithSlashCommands.map(
+            async (guildID) => await bot.getGuildCommands(guildID)
+          )
+        )
+      : [await bot.getCommands()];
+
+    const cmdArr = Array.from(this.commands.values());
+
+    for (const cmds of cmdsList) {
+      const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));
+
+      console.log('registering commands, skipping over existing ones', cmds);
+      // for every command in this.commands, check if it's already registered
+      for (let i = 0; i < commands.length; i++) {
+        const command = commands[i];
+        await create(command);
+        console.log(`registered ${command.name}, ${i + 1}/${commands.length}`);
+      }
     }
     console.log('registered all commands');
   }
