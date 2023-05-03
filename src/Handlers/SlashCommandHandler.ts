@@ -90,10 +90,19 @@ export class SlashCommandHandler {
 
   async onReady() {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
-    const cmds = await (this.devMode
-      ? bot.getGuildCommands('1089977920023449783')
-      : bot.getCommands());
+
+    const cmdsList = this.devMode
+      ? await Promise.all(
+          envDevOptions.guildsWithSlashCommands.map(
+            async (guildID) => await bot.getGuildCommands(guildID)
+          )
+        )
+      : [await bot.getCommands()];
+
     const cmdArr = Array.from(this.commands.values());
+
+    const cmds = cmdsList[0];
+
     const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));
 
     console.log('registering commands, skipping over existing ones', cmds);
