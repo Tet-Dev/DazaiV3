@@ -117,11 +117,11 @@ export const scriptRun = {
     // sort user's roles by position
     const memberRoles = !roleID?.value && [
       ...((
-        (member as Member).roles
-          .map((roleID) => guildRoles?.get(roleID))
-          .filter((x) => x) as Role[]
+        [
+          ...(member as Member).roles.map((roleID) => guildRoles?.get(roleID)),
+          guildRoles.get(interaction.guildID),
+        ].filter((x) => x) as Role[]
       ).sort((a, b) => (b?.position || 0) - (a?.position || 0)) || []),
-      interaction.guildID,
     ];
     // get all permissions
     const allServerPermissions = await PermissionManager.getInstance().getPerms(
