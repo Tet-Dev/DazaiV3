@@ -33,5 +33,8 @@ export const env = {
   voteKey: '',
   adminID: ``,
 };
+export const envDevOptions = {
+  guildsWithSlashCommands: [],
+};
 export default env;
 export type EnvData = typeof env;

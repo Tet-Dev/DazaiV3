@@ -1,10 +1,8 @@
 import Eris, { CommandInteraction, Interaction } from 'eris';
 import { Command } from '../types/misc';
-const guildsWithSlashCommands = [
-  '1061108960268124210',
-  '739559911033405592',
-  '1089977920023449783',
-];
+import { PermissionManager } from './PermissionHandler';
+import { envDevOptions } from '../env';
+const guildsWithSlashCommands = envDevOptions.guildsWithSlashCommands;
 export class SlashCommandHandler {
   static instance: SlashCommandHandler;
   static getInstance(): SlashCommandHandler {
@@ -52,23 +50,17 @@ export class SlashCommandHandler {
   }
   async purgeDevCommands() {
     console.log('purging dev commands');
-    const gcmds1 = await bot.getGuildCommands('1061108960268124210');
-    const gcmds2 = await bot.getGuildCommands('739559911033405592');
-    console.log('purging dev commands', gcmds1, gcmds2);
-    await Promise.all(
-      gcmds1.map((cmd) =>
-        bot
-          .deleteGuildCommand('1061108960268124210', cmd.id)
-          .then((x) => console.log(`deleted gcmd ${cmd.name}`))
-      )
-    );
-    await Promise.all(
-      gcmds2.map((cmd) =>
-        bot
-          .deleteGuildCommand('739559911033405592', cmd.id)
-          .then((x) => console.log(`deleted gcmd ${cmd.name}`))
-      )
-    );
+    for (const guild of guildsWithSlashCommands) {
+      const cmds = await bot.getGuildCommands(guild);
+      console.log('purging dev commands', cmds);
+      await Promise.all(
+        cmds.map((cmd) =>
+          bot
+            .deleteGuildCommand(guild, cmd.id)
+            .then((x) => console.log(`deleted ${cmd.name}`))
+        )
+      );
+    }
   }
   commandExists(
     command: Command,
@@ -114,7 +106,17 @@ export class SlashCommandHandler {
   }
   async registerCommand(command: Command) {
     const create = this.devMode ? this.createDevCommand : this.createCommand;
+    console.log('registering command', command);
     await create(command);
+    if (command.aliases) {
+      console.log('registering aliases', command.aliases);
+      for (const alias of command.aliases) {
+        await create({
+          ...command,
+          name: alias,
+        });
+      }
+    }
   }
 
   loadCommand(command: Command) {
@@ -122,7 +124,7 @@ export class SlashCommandHandler {
     if (command.aliases) {
       command.aliases.forEach((alias) => {
         this.commands.set(alias, command);
-        if (bot.ready) this.registerCommand(command);
+        // if (bot.ready) this.registerCommand(command);
       });
     }
     if (bot.ready) {
@@ -132,7 +134,7 @@ export class SlashCommandHandler {
   getCommand(name: string): Command | undefined {
     return this.commands.get(name);
   }
-  handleInteraction(interaction: Interaction) {
+  async handleInteraction(interaction: Interaction) {
     if (interaction instanceof CommandInteraction) {
       const command = this.getCommand(interaction.data.name);
       if (!command) return;
@@ -144,6 +146,26 @@ export class SlashCommandHandler {
           '#' +
           interaction.member?.user.discriminator,
       });
+      // calculate if user has permission to run command
+      if (command.permissions?.length && interaction.member) {
+        const hasPermission =
+          await PermissionManager.getInstance().hasMultiplePermissions(
+            interaction.guildID!,
+            interaction.member.roles,
+            command.permissions
+          );
+        if (typeof hasPermission === 'object') {
+          interaction.createMessage({
+            embeds: [
+              await PermissionManager.getInstance().rejectInteraction(
+                hasPermission.missing,
+                interaction.member?.user || interaction.user
+              ),
+            ],
+          });
+          return;
+        }
+      }
       command.execute(bot, {
         interaction,
         // args: interaction.data.options.map(option => option.value),
