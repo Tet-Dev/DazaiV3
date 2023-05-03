@@ -49,6 +49,9 @@ export class RankCardManager {
         // console.log({ cb });
         if (cb) cb({ buffer, type: data.type });
       });
+      worker.send({
+        cacheFonts: true,
+      })
       this.workers.push(worker);
       worker.on('exit', (n, s) => {
         this.workers.splice(this.workers.indexOf(worker), 1);
@@ -64,7 +67,7 @@ export class RankCardManager {
     return new Promise((res) => {
       const nonce = (Math.random() * 1000000000).toString(36);
       this.jobMap.set(nonce, res);
-      console.log('Sending job to worker', nonce);
+      console.log('Sending job to worker', this.nextWorker, nonce);
       this.workers[this.nextWorker].send({
         nonce,
         data,

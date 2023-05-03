@@ -33,9 +33,11 @@ export const env = {
   voteKey: '',
   adminID: ``,
   errorLogChannel: '',
+  purchaseLogChannel: '',
 };
 export const envDevOptions = {
-  guildsWithSlashCommands: [],
+  guildsWithSlashCommands: [''],
+  eventRunnerServers: [''], // Servers where events will still run even if devmode is true
 };
 export default env;
 export type EnvData = typeof env;

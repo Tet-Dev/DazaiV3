@@ -61,7 +61,7 @@ const recursivelyAddCommands = async (dir: string) => {
     if (file.endsWith('.js') || file.endsWith('.ts')) {
       const command = (await import(join(dir, file))).default as Command;
       SlashCommandHandler.getInstance().loadCommand(command);
-      console.log(command);
+      console.log(command.name, `loaded`);
     }
   }
 };

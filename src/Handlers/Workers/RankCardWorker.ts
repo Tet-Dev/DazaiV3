@@ -81,6 +81,16 @@ function SecsToFormat(str: number) {
   );
 }
 
+async function cacheRenderFonts() {
+  console.log('Caching fonts');
+  await Promise.all([
+    Image.renderText(pop, 64, `Hi`, Jimp.rgbaToInt(255, 255, 255, 255)),
+    Image.renderText(pop, 32, `Hi`, Jimp.rgbaToInt(255, 255, 255, 255)),
+    Image.renderText(pop, 16, `Hi`, Jimp.rgbaToInt(255, 255, 255, 255)),
+  ]);
+  console.log('Cached fonts');
+}
+
 async function generateOverlay(data: RankCardGenerationDataBundle) {
   const { username, discriminator, avatar, level, xp, xpToNext, rank } = data;
   const canvas = new Image(1024, 340);
@@ -260,8 +270,13 @@ const queue = [] as {
   data: RankCardGenerationDataBundle;
 }[];
 process.on('message', async (msg: any) => {
+  if (msg.cacheFonts) {
+    // cacheRenderFonts();
+    return;
+  }
   queue.push(msg);
 });
+// cacheRenderFonts();
 let genSlots = 4;
 (async () => {
   // eslint-disable-next-line no-constant-condition
@@ -292,3 +307,4 @@ let genSlots = 4;
     //Parse args
   }
 })();
+// cacheRenderFonts()

@@ -6,6 +6,7 @@ import {
 import { XPManager } from '../../Handlers/Levelling/XPManager';
 import { Command } from '../../types/misc';
 import { PermissionManager } from '../../Handlers/PermissionHandler';
+import { performance } from 'perf_hooks';
 export const rank = {
   name: 'rank',
   description: 'Get your rank card!',
@@ -46,23 +47,36 @@ export const rank = {
         }
       }
     }
+    let perf = performance.now();
     const user = selectedUserID
       ? bot.users.get(selectedUserID) || (await bot.getRESTUser(selectedUserID))
       : interaction.user || interaction.member?.user;
     if (!user) return interaction.createMessage('User not found!');
     const ackPromise = interaction.acknowledge();
+    const findUser = performance.now() - perf;
+    perf = performance.now();
     const guildCard = await XPManager.getInstance().generateRankCard(
       interaction.guildID,
       user.id
     );
+
+    const generateCard = performance.now() - perf;
+    perf = performance.now();
     await ackPromise;
-    return interaction.createFollowup(
+    await interaction.createFollowup(
       {},
       {
         file: Buffer.from(guildCard.buffer),
         name: `Dazai_RankCard_${user.username}.${guildCard.type}`,
       }
     );
+    const sendCard = performance.now() - perf;
+    console.log('rank timing', {
+      findUser,
+      generateCard,
+      sendCard,
+    });
+    return;
   },
 } as Command;
 

@@ -10,6 +10,7 @@ import {
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { EventHandler } from '../types/misc';
 import Uwuifier from 'uwuifier';
+import { envDevOptions } from '../env';
 // import translate from 'google-translate-api-x';
 const uwuifier = new Uwuifier();
 // seeded random number generator
@@ -46,7 +47,8 @@ export const KittenifyMessages = {
   event: 'messageCreate',
   run: async (bot, msg) => {
     //@ts-ignore
-    if (env.devmode) return;
+    if (env.devmode && !envDevOptions?.eventRunnerServers?.includes(msg.guildID))
+      return;
     if (!msg.guildID) return;
 
     let perf = Date.now();

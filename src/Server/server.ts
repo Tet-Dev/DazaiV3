@@ -35,7 +35,7 @@ export default function initServer() {
             if (!handler) {
               return failedImports.push(`${file} is not a REST handler`);
             }
-            console.log(handler);
+            // console.log(handler);
             server[handler.method](handler.path, async (req, res, next) => {
               let userInfo = handler.sendUser
                 ? await getDiscordUser(req.headers.authorization!)

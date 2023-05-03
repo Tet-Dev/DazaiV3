@@ -7,6 +7,7 @@ import {
 import { XPManager } from '../Handlers/Levelling/XPManager';
 import { EventHandler } from '../types/misc';
 import levenshtein from 'fast-levenshtein';
+import { envDevOptions } from '../env';
 const lastEXP = new Map<string, number>();
 const lastUserMessages = new Map<string, Message[]>();
 const getLastMessagesInCollection = (
@@ -177,7 +178,9 @@ export const GrantEXPOnChat = {
     if (multiplier <= 0.9) {
       // bot.addMessageReaction(msg.channel.id, msg.id, '🤨');
     }
-    if (env.devmode) return;
+    //@ts-ignore
+    if (env.devmode && !envDevOptions?.eventRunnerServers?.includes(msg.guildID))
+      return;
     console.log(
       `Granting xp to ${msg.author.username}#${msg.author.discriminator}`
     );

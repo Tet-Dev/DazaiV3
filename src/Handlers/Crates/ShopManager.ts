@@ -143,7 +143,7 @@ export class ShopManager {
     await Promise.all(
       item.items.map((i) => this.processItemPurchase(userID, guildID, i))
     );
-    const txt = (await bot.getChannel(`1088348179667374080`)) as TextChannel;
+    const txt = (await bot.getChannel(env.purchaseLogChannel)) as TextChannel;
     await txt.createMessage({
       embed: {
         title: 'Shop Purchase',
@@ -175,7 +175,7 @@ export class ShopManager {
           userID
         );
       auditLogEmbed.title = 'Shop Purchase';
-      auditLogEmbed.fields = []
+      auditLogEmbed.fields = [];
       auditLogEmbed.fields?.push({
         name: 'Shop Offer',
         value: item.name,

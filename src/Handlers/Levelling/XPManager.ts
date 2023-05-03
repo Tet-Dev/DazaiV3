@@ -88,7 +88,11 @@ export class XPManager {
       guildID,
       userID,
     })) as GuildMemeberXP | null;
-
+    if (!defaultGuildMemberXP) {
+      await MongoDB.db('EXP')
+        .collection('userLevels')
+        .insertOne(defaultGuildMemberXP);
+    }
     return data || defaultGuildMemberXP;
   }
   async getAllGuildMemberXP(guildID: string) {
@@ -110,27 +114,19 @@ export class XPManager {
       userID,
       ...data,
     } as GuildMemeberXP;
-    return MongoDB.db('EXP')
-      .collection('userLevels')
-      .updateOne(
-        {
-          guildID,
-          userID,
-        },
-        {
-          $set: newData,
-          $setOnInsert: {
-            xp: 0,
-            level: 0,
-            dailyMessages: 0,
-            resetAt: 0,
-            
-          },
-        },
-        {
-          upsert: true,
-        }
-      );
+    const userData = this.getGuildMemberXP(guildID, userID);
+    return MongoDB.db('EXP').collection('userLevels').updateOne(
+      {
+        guildID,
+        userID,
+      },
+      {
+        $set: newData,
+      },
+      {
+        upsert: true,
+      }
+    );
   }
   async messageXP(
     guildID: string,

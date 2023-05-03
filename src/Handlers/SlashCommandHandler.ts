@@ -67,10 +67,10 @@ export class SlashCommandHandler {
     commandList: Eris.ApplicationCommand<Eris.ApplicationCommandTypes>[]
   ) {
     const commandInList = commandList.find((x) => x.name === command.name);
-    console.log({
-      commandInList,
-      command,
-    });
+    // console.log({
+    //   commandInList,
+    //   command,
+    // });
     if (!commandInList) return false;
     if (!commandInList.options?.length && !command.args.length) return true;
     if (commandInList.options?.length !== command.args.length) return false;
@@ -104,7 +104,7 @@ export class SlashCommandHandler {
     for (const cmds of cmdsList) {
       const commands = cmdArr.filter((x) => !this.commandExists(x, cmds));
 
-      console.log('registering commands, skipping over existing ones', cmds);
+      console.log('registering commands, skipping over existing ones');
       // for every command in this.commands, check if it's already registered
       for (let i = 0; i < commands.length; i++) {
         const command = commands[i];
