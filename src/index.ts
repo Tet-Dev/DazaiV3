@@ -126,10 +126,11 @@ bot.on('error', (err) => {
 
 process.on('unhandledRejection', async (err) => {
   console.error(err);
-  bot.createMessage(
-    env.errorLogChannel,
-    `An error occured: \`\`\`${err}\`\`\``
-  );
+  if (env.errorLogChannel)
+    bot.createMessage(
+      env.errorLogChannel,
+      `An error occured: \`\`\`${err}\`\`\``
+    );
   // if logs folder doesn't exist, create it
   if (
     !(await fs
