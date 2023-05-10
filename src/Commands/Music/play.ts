@@ -6,23 +6,23 @@ import {
 import { Command } from '../../types/misc';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
 import { MusicManager } from '../../Handlers/Music/MusicPlayer';
-import moment from 'moment';
+
 const msToReadable = (ms: number) => {
   const secLen = 1000,
     minLen = 60 * secLen,
     hourLen = 60 * minLen;
   const twoDigits = (n: number) => `${~~n}`.padStart(2, '0');
 
-  const d = ms;
-  const hours = twoDigits(d / hourLen) + ':';
+  const hours = twoDigits(ms / hourLen) + ':';
 
   return (
     (hours === '00:' ? '' : hours) +
-    twoDigits((d % hourLen) / minLen) +
+    twoDigits((ms % hourLen) / minLen) +
     ':' +
-    twoDigits((d % minLen) / secLen)
+    twoDigits((ms % minLen) / secLen)
   );
 };
+
 export const play = {
   name: 'play',
   description: 'Play a song from youtube!',
