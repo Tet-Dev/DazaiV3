@@ -6,6 +6,8 @@ import {
 import { Command } from '../../types/misc';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
 import { MusicManager } from '../../Handlers/Music/MusicPlayer';
+import moment from 'moment';
+
 export const play = {
   name: 'play',
   description: 'Play a song from youtube!',
@@ -154,7 +156,22 @@ export const play = {
           fields: results.map((track) => {
             return {
               name: track.title,
-              value: `🕓 ${track.duration}  [「 Video Link 」](${track.uri})\n👤 ${track.author}`,
+              value: `🕓 ${(() => {
+                const secLen = 1000,
+                  minLen = 60 * secLen,
+                  hourLen = 60 * minLen;
+                const twoDigits = (n: number) => `${~~n}`.padStart(2, '0');
+
+                const d = track.duration;
+                const hours = twoDigits(d / hourLen) + ':';
+
+                return (
+                  (hours === '00:' ? '' : hours) +
+                  twoDigits((d % hourLen) / minLen) +
+                  ':' +
+                  twoDigits((d % minLen) / secLen)
+                );
+              })()}  [「 Video Link 」](${track.uri})\n👤 ${track.author}`,
             };
           }),
           thumbnail: {
