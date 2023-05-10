@@ -14,7 +14,6 @@ const msToReadable = (ms: number) => {
   const twoDigits = (n: number) => `${~~n}`.padStart(2, '0');
 
   const hours = twoDigits(ms / hourLen) + ':';
-
   return (
     (hours === '00:' ? '' : hours) +
     twoDigits((ms % hourLen) / minLen) +
