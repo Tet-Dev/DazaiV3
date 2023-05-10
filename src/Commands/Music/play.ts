@@ -19,7 +19,7 @@ export const play = {
     },
   ],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
-  permissions: ["playSong"],
+  permissions: ['playSong'],
   execute: async (bot, { interaction }) => {
     if (!interaction.guildID || !interaction.member)
       return interaction.createMessage('This is a guild only command!');
