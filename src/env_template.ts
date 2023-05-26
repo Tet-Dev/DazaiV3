@@ -22,6 +22,7 @@ export const env = {
     client_x509_cert_url: '',
   },
   MongoURL: 'mongodb+srv://YOUR MONGO URL',
+  imgbbApiKey: '',
   MusicDrawers: 1, //How many threads should be used to generate music cards
   SlanderDrawers: 1, //How many threads should be used to generate slander cards
   RankCardDrawers: 2, //How many threads should be used to generate rank cards

@@ -1,3 +1,5 @@
+import env from '../../env';
+
 import { Constants, InteractionDataOptionsString } from 'eris';
 import nfetch from '../../Handlers/FixedNodeFetch';
 import {
@@ -139,7 +141,7 @@ export const slander = {
       // If the GIF is larger than 24MB, upload it to imgbb and send it as a URL-encoded response
       if (slanderData.buffer.byteLength > 24 * 1024 * 1024) {
         const data = await nfetch(
-          `https://api.imgbb.com/1/upload?key=a30605f1da7b089b528b79988fdf09ba`,
+          `https://api.imgbb.com/1/upload?key=${env.imgbbApiKey}`,
           {
             method: 'POST',
             body: `image=${encodeURIComponent(
