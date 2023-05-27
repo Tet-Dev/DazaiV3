@@ -2590,11 +2590,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/google-translate-api@^2.3.2":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@types/google-translate-api/-/google-translate-api-2.3.2.tgz#71392368bd08a308f08761c2d345ff1566a796be"
-  integrity sha512-axaGFgandRinp3BeH05URLorKU6wc55j5ZYxylnpmIgsOyXHpDMrM8rUrgCHv93EeLvxaDO1CL5w1kSWXOhJEg==
-
 "@types/graceful-fs@^4.1.2":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.5.tgz#21ffba0d98da4350db64891f92a9e5db3cdb4e15"
