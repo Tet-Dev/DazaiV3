@@ -8,6 +8,7 @@ import ffmpeg from 'ffmpeg-static';
 import { Readable } from 'stream';
 import { readFile, unlink, writeFile } from 'fs/promises';
 import { RankCardGenerationDataBundle } from '../Levelling/RankCardManager';
+import { performance } from 'perf_hooks';
 const genID = (length: number) => {
   var result = '';
   var characters =
@@ -95,9 +96,13 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
   const { username, discriminator, avatar, level, xp, xpToNext, rank } = data;
   const canvas = new Image(1024, 340);
   // canvas.fill(Jimp.rgbaToInt(0, 0, 0, 80));
-  let time = Date.now();
+  let time = performance.now();
   const imgBuffer = await nfetch(avatar).then((res) => res.buffer());
+  console.log('Avatar fetch', performance.now() - time);
+  time = performance.now();
   const pfp = (await imagescript.decode(imgBuffer, true)) as imagescript.Image;
+  console.log('Avatar decode', performance.now() - time);
+  time = performance.now();
   // console.log('PFP', Date.now() - time);
   pfp.resize(224, 224);
   pfp.cropCircle(true, 0);

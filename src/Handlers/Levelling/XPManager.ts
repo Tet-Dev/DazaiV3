@@ -332,7 +332,7 @@ ${
     );
     const rankCardBuffer = await RankCardManager.getInstance().getRankCardImage(
       {
-        avatar: user.dynamicAvatarURL('png', 256),
+        avatar: user.dynamicAvatarURL('jpeg', 256).replace('https', 'http'),
         username: user.username,
         discriminator: user.discriminator,
         level: memberXP.level,

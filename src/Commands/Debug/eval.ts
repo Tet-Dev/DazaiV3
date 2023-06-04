@@ -2,6 +2,7 @@
 import { Constants, InteractionDataOptionsString } from 'eris';
 import { Command } from '../../types/misc';
 import util from 'util';
+import nfetch from '../../Handlers/FixedNodeFetch';
 
 // Creating a command object for evaluating code
 export const evalCmd = {

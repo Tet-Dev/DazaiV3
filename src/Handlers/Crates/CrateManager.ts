@@ -96,6 +96,9 @@ export class CrateManager {
       description: crateTemplate.description,
       items: crateTemplate.items,
       dropRates: crateTemplate.dropRates,
+      showCrateDetails: crateTemplate.showCrateDetails,
+      showDrops: crateTemplate.showDrops,
+      showRates: crateTemplate.showRates,
     } as CrateTemplate;
     await MongoDB.db('Crates')
       .collection('crateTemplates')
@@ -175,6 +178,7 @@ export class CrateManager {
       userID,
       createdAt: Date.now(),
       itemID: item._id.toString() as string,
+      crateID: crateTemplate._id.toString() as string,
     } as Crate;
     if (!addLater)
       await MongoDB.db('Crates')
