@@ -39,7 +39,10 @@ export const pfp = {
     // Create an embed with a title, description, thumbnail, and color
     const embed: EmbedOptions = {
       title: `${user.username}'s Profile Picture`,
-      description: `Here is ${user.username}'s profile picture!`,
+      description: `Here is ${user.username}'s profile picture! Click [here](${user.dynamicAvatarURL(
+        'png',
+        1024
+      )}) if you can't see it!`,
       image: {
         url: user.dynamicAvatarURL('png', 1024),
       },
