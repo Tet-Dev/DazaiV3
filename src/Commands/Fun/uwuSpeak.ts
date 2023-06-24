@@ -83,6 +83,10 @@ export const uwuSpeak = {
       }
 
       // Update the user's XP data to remove their kitten status
+      await XPManager.getInstance().getGuildMemberXP(
+        interaction.guildID,
+        user.id
+      );
       await XPManager.getInstance().updateGuildMemberXP(
         interaction.guildID,
         user.id,

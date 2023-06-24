@@ -40,7 +40,7 @@ export const pfp = {
     const embed: EmbedOptions = {
       title: `${user.username}'s Profile Picture`,
       description: `Here is ${user.username}'s profile picture!`,
-      thumbnail: {
+      image: {
         url: user.dynamicAvatarURL('png', 1024),
       },
       color: 16728385,

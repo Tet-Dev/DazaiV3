@@ -18,13 +18,24 @@ export const editGuildCrate = {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const { name, description, items, dropRates } = req.body as {
+    const {
+      name,
+      description,
+      items,
+      dropRates,
+      showCrateDetails,
+      showRates,
+      showDrops,
+    } = req.body as {
       name: string;
       description: string;
       items: string[];
       dropRates: {
         [key in CardRarity]: number;
       };
+      showCrateDetails: boolean;
+      showRates: boolean;
+      showDrops: boolean;
     };
     if (!name || !description || !items || !dropRates) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -46,7 +57,8 @@ export const editGuildCrate = {
     ) {
       return res.status(400).json({
         error: `Invalid items: ${cards
-          .filter((card) => typeof card === 'string' || card.guild !== guildID).map(card=>card.name)
+          .filter((card) => typeof card === 'string' || card.guild !== guildID)
+          .map((card) => card.name)
           .join(', ')}`,
       });
     }
@@ -83,7 +95,7 @@ export const editGuildCrate = {
     if (Object.values(dropRates).reduce((a, b) => a + b, 0) !== 100) {
       return res.status(400).json({ error: 'Drop rates must add up to 100' });
     }
-    
+
     if (guildID === '@global') {
       if (user.id !== env.adminID) {
         return res.status(400).json({ error: 'Unauthorized' });
@@ -112,13 +124,19 @@ export const editGuildCrate = {
     if (crate.guild !== guildID) {
       return res.status(400).json({ error: 'Crate not in this guild' });
     }
-    await CrateManager.getInstance().updateCrateTemplate(crateID, {
-      name,
-      description,
-      items,
-      dropRates,
-    });
-    return res.json(crate);
+    const newCrate = await CrateManager.getInstance().updateCrateTemplate(
+      crateID,
+      {
+        name,
+        description,
+        items,
+        dropRates,
+        showCrateDetails,
+        showRates,
+        showDrops,
+      }
+    );
+    return res.json(newCrate);
   },
 } as RESTHandler;
 export default editGuildCrate;

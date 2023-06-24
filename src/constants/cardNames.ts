@@ -61,6 +61,7 @@ export interface Crate {
   openedAt?: number;
   name: string;
   description: string;
+  crateID?: string;
 }
 export interface UserCrate extends Crate {
   item: CardType;
@@ -75,6 +76,9 @@ export type CrateTemplate = {
     [key in CardRarity]: number;
   };
   guild?: string;
+  showDrops?: boolean;
+  showRates?: boolean;
+  showCrateDetails?: boolean;
 };
 
 // Default crate ['63e698050296c1c2c951ba49', '63e698050296c1c2c951ba4a', '63e698050296c1c2c951ba4b', '63e698050296c1c2c951ba4c', '63e698050296c1c2c951ba4d', '63e698050296c1c2c951ba4e', '63e698050296c1c2c951ba4f', '63e698050296c1c2c951ba50', '63e698050296c1c2c951ba51', '63e698050296c1c2c951ba52', '63e698050296c1c2c951ba53', '63e698050296c1c2c951ba54']
