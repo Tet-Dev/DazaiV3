@@ -17,7 +17,7 @@ export const disconnect = {
   args: [],
   // Type of the command.
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
-
+  aliases: ['dc'],
   // Executes the command when called by a user.
   execute: async (bot, { interaction }) => {
     // Check if the command is being executed in a guild.
