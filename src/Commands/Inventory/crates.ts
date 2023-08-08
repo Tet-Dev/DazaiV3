@@ -158,7 +158,7 @@ export const crateInv = {
                 name: '🌐',
               },
               style: 5,
-              url: `${env.website}/app/guild/${interaction.guildID}/inventory?`,
+              url: `${env.website}/app/guild/${interaction.guildID}/inventory/${user.id}`,
             },
           ],
         },
