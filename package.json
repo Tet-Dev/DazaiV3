@@ -42,7 +42,7 @@
     "@google-cloud/storage": "^6.10.1",
     "bson": "4.7.0",
     "cors": "^2.8.5",
-    "erela.js": "^2.3.3",
+    "erela.js": "Tomato6966/erela.js",
     "eris": "0.17.2",
     "express": "^4.18.2",
     "fast-levenshtein": "^3.0.0",
