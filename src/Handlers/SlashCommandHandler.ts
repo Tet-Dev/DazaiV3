@@ -93,8 +93,8 @@ export class SlashCommandHandler {
 
     const cmdsList = this.devMode
       ? await Promise.all(
-          envDevOptions.guildsWithSlashCommands.map(
-            async (guildID) => await bot.getGuildCommands(guildID)
+          (envDevOptions as any).guildsWithSlashCommands.map(
+            async (guildID:string) => await bot.getGuildCommands(guildID)
           )
         )
       : [await bot.getCommands()];

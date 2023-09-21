@@ -137,10 +137,11 @@ export const slander = {
     console.log(`Slander took ${Date.now() - timeStart}ms`);
 
     // If the slander GIF is successfully generated, send it as a response to the command input
-    if (slanderData) {
+    if (slanderData && (env as any).imgbbApiKey) {
       // If the GIF is larger than 24MB, upload it to imgbb and send it as a URL-encoded response
       if (slanderData.buffer.byteLength > 24 * 1024 * 1024) {
         const data = await nfetch(
+          //@ts-ignore
           `https://api.imgbb.com/1/upload?key=${env.imgbbApiKey}`,
           {
             method: 'POST',
