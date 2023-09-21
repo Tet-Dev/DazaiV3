@@ -91,6 +91,7 @@ export class MusicManager extends EventEmitter {
       voiceChannel: channelID,
       textChannel: textChannelID,
       selfDeafen: true,
+      instaUpdateFiltersFix: true,
     });
     player.connect();
     this.guildMap.set(guildID, player);
@@ -170,7 +171,7 @@ export class MusicManager extends EventEmitter {
       title: track.title,
       url: track.uri,
       duration: track.duration,
-      thumbnail: track.displayThumbnail?.('maxresdefault') || track.thumbnail,
+      thumbnail: track.thumbnail,
       author: track.author,
       requestedBy: {
         id: user.id,

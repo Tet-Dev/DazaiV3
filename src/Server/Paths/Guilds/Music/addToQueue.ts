@@ -17,6 +17,10 @@ export const getQueue = {
     }
     const member = await bot.getRESTGuildMember(guildID, user.id);
     const track = await MusicManager.getInstance().search(url, member);
+    if (!track) {
+      return res.status(400).json({ error: 'No track found' });
+    }
+    
     if (track.error) {
       return res.status(400).json({ error: track.message });
     }

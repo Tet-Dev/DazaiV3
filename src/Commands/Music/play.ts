@@ -96,6 +96,23 @@ export const play = {
       interaction.member
     );
     await initAck;
+    if (!songs) {
+      return interaction.createFollowup({
+        embeds: [
+          {
+            title: `No songs found for \`${
+              (interaction.data.options[0] as InteractionDataOptionsString)
+                .value
+            }\``,
+            description: `Try using a different search term!`,
+            color: 16728385,
+            thumbnail: {
+              url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+            },
+          },
+        ],
+      });
+    }
     if (songs.error) {
       return interaction.createFollowup({
         embeds: [
@@ -156,6 +173,20 @@ export const play = {
                 url: `${env.website}/app/guild/${interaction.guildID}/music?`,
               },
             ],
+          },
+        ],
+      });
+    }
+    if (!songs|| !songs?.tracks?.length) {
+      return interaction.createFollowup({
+        embeds: [
+          {
+            title: `No songs found for \`${(interaction.data.options[0] as InteractionDataOptionsString).value}\``,
+            description: `Try using a different search term!`,
+            color: 16728385,
+            thumbnail: {
+              url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+            },
           },
         ],
       });
