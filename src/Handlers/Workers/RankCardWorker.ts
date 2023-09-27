@@ -9,6 +9,7 @@ import { Readable } from 'stream';
 import { readFile, unlink, writeFile } from 'fs/promises';
 import { RankCardGenerationDataBundle } from '../Levelling/RankCardManager';
 import { performance } from 'perf_hooks';
+import sharp from 'sharp';
 const genID = (length: number) => {
   var result = '';
   var characters =
@@ -55,18 +56,28 @@ const pop = readFileSync('assets/pop.ttf');
 const backgroundCacher = new Map<string, Buffer>();
 
 const getBackgroundBuffer = async (url: string) => {
-  if (backgroundCacher.has(url)) {
-    return backgroundCacher.get(url)!;
-  }
-  const imgBuffer = await nfetch(url).then((res) => res.buffer());
+  // if (backgroundCacher.has(url)) {
+  //   return backgroundCacher.get(url)!;
+  // }
+  const timer = performance.now();
+  const rawBuffer = await nfetch(url).then((res) => res.buffer());
+  console.log('Downloaded background', performance.now() - timer);
+  const sharpedBuffer = await sharp(rawBuffer, { animated: true });
+  const meta= (await sharpedBuffer.metadata())
+  const formattedBuffer = meta.pages
+    ? await sharpedBuffer.gif().toBuffer()
+    : await sharpedBuffer.jpeg().toBuffer();
+  console.log('Formatted background', performance.now() - timer);
+
   // clone imgBuffer so it can be cached
-  backgroundCacher.set(url, imgBuffer);
-  // delete cached image after 1 day or if map has more than 1000 entries
-  setTimeout(() => {
-    backgroundCacher.delete(url);
-  }, 1000 * 60 * 60 * 24);
-  return imgBuffer;
+  // backgroundCacher.set(url, formattedBuffer);
+  // // delete cached image after 1 day or if map has more than 1000 entries
+  // setTimeout(() => {
+  //   backgroundCacher.delete(url);
+  // }, 1000 * 60 * 60 * 24);
+  return {formattedBuffer,meta};
 };
+
 
 function SecsToFormat(str: number) {
   let sec_num = str;
@@ -189,16 +200,16 @@ async function generateOverlay(data: RankCardGenerationDataBundle) {
 }
 async function generateRankCard(data: RankCardGenerationDataBundle) {
   // console.log('Generating rank card');
-  const [overlay, canvas] = await Promise.all([
-    await generateOverlay(data),
+  const [overlay, bgData] = await Promise.all([
+    generateOverlay(data),
     data.background
-      ? data.background.endsWith('.gif')
-        ? await imagescript.decode(await getBackgroundBuffer(data.background))
-        : await imagescript.decode(await getBackgroundBuffer(data.background))
-      : new Image(1024, 340).fill(Jimp.rgbaToInt(40, 40, 40, 100)),
+      ? getBackgroundBuffer(data.background)
+      :
+      new Image(1024, 340).fill(Jimp.rgbaToInt(40, 40, 40, 100)),
   ]);
+  const [canvas,mdata] = bgData instanceof Image ? [bgData,null] : [await imagescript.decode(bgData.formattedBuffer, false),bgData.meta];
   // console.log('Donwloaded background', data.background);
-  if (data.background?.match(/\.gif$/)) {
+  if (mdata && mdata.pages) {
     const gif = canvas as imagescript.GIF;
     for (let frame of gif) {
       frame.composite(overlay, 0, 0);
