@@ -32,7 +32,7 @@ export const queue = {
     const res = await MusicManager.getInstance().getGuildData(
       interaction.guildID
     );
-    if (!res || !res.queue.length) {
+    if (!res || !res.queue.tracks.length) {
       return interaction.createMessage({
         embeds: [
           {
@@ -63,7 +63,7 @@ export const queue = {
       });
     }
     if (res) {
-      const pages = Math.ceil(res.queue.length / 10);
+      const pages = Math.ceil(res.queue.tracks.length / 10);
       let page =
         (interaction.data.options?.[0] as InteractionDataOptionsNumber)
           ?.value ?? 1;
@@ -84,7 +84,7 @@ export const queue = {
       //   slice queue into array of arrays of 10
       const embeds = [] as EmbedOptions[];
       for (let i = 0; i < pages; i++) {
-        const queue = res.queue.slice(i * 10, i * 10 + 10);
+        const queue = res.queue.tracks.slice(i * 10, i * 10 + 10);
         const embed: EmbedOptions = {
           title: `Song Queue`,
           description: `Page ${i + 1} of ${pages}`,
@@ -93,7 +93,7 @@ export const queue = {
             url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
           },
           fields: queue.map((song, index) => ({
-            name: `${i * 10 + index + 1}. ${song.title}`,
+            name: `${i * 10 + index + 1}. ${song.info.title}`,
             value: `Requested by <@${(song.requester as Member).id}> (${
               (song.requester as Member).nick ||
               (song.requester as Member).username

@@ -31,11 +31,11 @@ export const PersonLeftVCEvent = {
           if (channel.voiceMembers.size === 1 && channel.voiceMembers.get(bot.user.id)) {
             if (
               MusicManager.getInstance().getGuildData(channel.guild.id)
-                ?.textChannel
+                ?.textChannelId
             )
               bot.createMessage(
                 MusicManager.getInstance().getGuildData(channel.guild.id)
-                  ?.textChannel!,
+                  ?.textChannelId!,
                 {
                   embeds: [
                     {

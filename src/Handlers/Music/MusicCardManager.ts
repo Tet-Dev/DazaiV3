@@ -1,5 +1,5 @@
 import { ChildProcess, fork } from 'child_process';
-import { Player, Track } from 'erela.js';
+import { Player, Track } from 'lavalink-client';
 import { Member } from 'eris';
 import path, { join } from 'path';
 
@@ -22,7 +22,7 @@ export class MusicCardManager {
         '-r',
         'ts-node/register',
       ]);
-      worker.on('message', d => {
+      worker.on('message', (d) => {
         const data = d as {
           type: 'nowplaying';
           nonce: string;
@@ -45,13 +45,13 @@ export class MusicCardManager {
         this.init(1);
         console.log('Worker died, restarting', n, s);
       });
-      worker.on('error', e => {
+      worker.on('error', (e) => {
         console.log('Worker error', e);
       });
     }
   }
   getNowPlayingImage(player: Player) {
-    return new Promise(res => {
+    return new Promise((res) => {
       const nonce = (Math.random() * 1000000000).toString(36);
       this.jobMap.set(nonce, res);
       const track = player.queue.current;
@@ -60,10 +60,10 @@ export class MusicCardManager {
         type: 'nowplaying',
         nonce,
         data: {
-          title: track.title,
-          author: track.author,
-          duration: track.duration,
-          thumbnail: track.thumbnail,
+          title: track.info.title,
+          author: track.info.author,
+          duration: track.info.duration,
+          thumbnail: track.info.artworkUrl,
           played: player.position,
           requester: track.requester,
         },
@@ -71,18 +71,18 @@ export class MusicCardManager {
     }) as Promise<Buffer | null>;
   }
   getUpNextImage(track: Track) {
-    return new Promise(res => {
+    return new Promise((res) => {
       const nonce = (Math.random() * 1000000000).toString(36);
       this.jobMap.set(nonce, res);
       if (!track) return res(null);
       this.workers[~~(this.workers.length * Math.random())].send({
         type: 'nextsong',
         data: {
-          title: track.title,
-          author: track.author,
-          duration: track.duration,
+          title: track.info.title,
+          author: track.info.author,
+          duration: track.info.duration,
           nonce,
-          thumbnail: track.thumbnail,
+          thumbnail: track.info.artworkUrl,
           requester: `${(track.requester as Member).user.username}#${
             (track.requester as Member).user.discriminator
           }`,

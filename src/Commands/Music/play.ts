@@ -6,6 +6,7 @@ import {
 import { Command } from '../../types/misc';
 import { InteractionCollector } from '../../Handlers/InteractionCollector';
 import { MusicManager } from '../../Handlers/Music/MusicPlayer';
+import { Track } from 'lavalink-client/dist/types';
 
 const msToReadable = (ms: number) => {
   const secLen = 1000,
@@ -145,7 +146,7 @@ export const play = {
       tracks?.map((track) => {
         MusicManager.getInstance().queueSong(
           interaction.member!.guild.id,
-          track
+          track as Track
         );
       });
       return interaction.createFollowup({
@@ -200,10 +201,10 @@ export const play = {
           color: 11629370,
           fields: results.map((track) => {
             return {
-              name: track.title,
-              value: `🕓 ${msToReadable(track.duration)}  [「 Video Link 」](${
-                track.uri
-              })\n👤 ${track.author}`,
+              name: track.info.title,
+              value: `🕓 ${msToReadable(track.info.duration || 0)}  [「 Video Link 」](${
+                track.info.uri
+              })\n👤 ${track.info.author}`,
             };
           }),
           thumbnail: {
@@ -221,7 +222,7 @@ export const play = {
               placeholder: 'Select a song',
               options: results.map((track, i) => {
                 return {
-                  label: `${track.title} | ${track.author}`.substring(0, 100),
+                  label: `${track.info.title} | ${track.info.author}`.substring(0, 100),
                   value: i.toString(),
                 };
               }),
@@ -240,17 +241,17 @@ export const play = {
               if (
                 !MusicManager.getInstance().queueSong(
                   interaction.member!.guild.id,
-                  track
+                  track as Track
                 )
               )
                 await interaction.createMessage({
                   embeds: [
                     {
                       title: 'Added to queue!',
-                      description: `\`\`\`${track.title} has been added to the queue!\`\`\``,
+                      description: `\`\`\`${track.info.title} has been added to the queue!\`\`\``,
                       color: 11629370,
                       thumbnail: {
-                        url: `${track.thumbnail}`,
+                        url: `${track.info.artworkUrl}`,
                       },
                     },
                   ],

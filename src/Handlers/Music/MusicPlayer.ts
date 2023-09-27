@@ -1,4 +1,5 @@
-import { Manager, Player, Track, UnresolvedTrack } from 'erela.js';
+// import { Manager, Player, Track, UnresolvedTrack } from 'erela.js';
+import { LavalinkManager, Player, Track, UnresolvedTrack } from "lavalink-client";
 import { Constants, Member, TextChannel, User } from 'eris';
 import EventEmitter from 'events';
 import { MusicCardManager } from './MusicCardManager';
@@ -10,48 +11,54 @@ export class MusicManager extends EventEmitter {
     return MusicManager.instance;
   }
   guildMap: Map<string, Player> = new Map();
-  musicManager: Manager;
+  musicManager: LavalinkManager;
   private constructor() {
     super();
     MusicCardManager.getInstance();
-    this.musicManager = new Manager({
+    this.musicManager = new LavalinkManager({
       // The nodes to connect to, optional if using default lavalink options
       nodes: env.LavalinkNodes,
       // Method to send voice data to Discord
-      send: (id, payload) => {
+      sendToShard: (id, payload) => {
         const guild = bot.guilds.get(id);
         // NOTE: FOR ERIS YOU NEED JSON.stringify() THE PAYLOAD
         if (guild) guild.shard.sendWS(payload.op, payload.d);
         console.trace({ payload });
       },
-      autoPlay: true,
+      autoSkip: true,
+      client: {
+        id: bot.user.id,
+        username: bot.user.username,
+      },
+      queueOptions: {
+        
+      }
     });
-    this.musicManager.createNode(env.LavalinkNodes[0]);
+    // this.musicManager.createNode(env.LavalinkNodes[0]);
     bot.on('rawWS', (d) => {
-      if (!['VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE'].includes(d.t!)) return;
-      //@ts-ignore
-      this.musicManager.updateVoiceState(d);
+      // if (!['VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE'].includes(d.t!)) return;
+      this.musicManager.sendRawData(d);
       // console.log({ voiceState: d });
     });
     // this.musicManager.on('nodeRaw', d => console.log(d));
-    this.musicManager.on('nodeConnect', (node) => {
-      console.log(`Node ${node.options.identifier} connected`);
+    this.musicManager.nodeManager.on("connect", (node) => {
+      console.log(`Node ${node.options.host} connected`);
     });
-    this.musicManager.on('nodeError', (node, error) => {
+    this.musicManager.nodeManager.on("error", (node, error) => {
       console.log(
-        `Node ${node.options.identifier} had an error: ${error.message}`
+        `Node ${node.options.host} had an error: ${error.message}`
       );
     });
     this.musicManager.on('playerDisconnect', (player) => {
-      this.guildMap.delete(player.guild);
-      player.destroy(true);
+      this.guildMap.delete(player.guildId);
+      player.destroy();
     });
     this.musicManager.on('trackStart', async (player, track) => {
       console.log('Track started', { track });
-      if (player.textChannel) {
+      if (player.textChannelId) {
         const card = await MusicCardManager.getInstance().getUpNextImage(track);
         if (!card) return;
-        const text = bot.getChannel(player.textChannel) as TextChannel;
+        const text = bot.getChannel(player.textChannelId) as TextChannel;
         text.createMessage(
           {
             components: [
@@ -65,7 +72,7 @@ export class MusicManager extends EventEmitter {
                       name: '🌐',
                     },
                     style: 5,
-                    url: `${env.website}/app/guild/${player.guild}/music?`,
+                    url: `${env.website}/app/guild/${player.guildId}/music?`,
                   },
                 ],
               },
@@ -86,13 +93,15 @@ export class MusicManager extends EventEmitter {
   }
   connect(guildID: string, channelID: string, textChannelID: string) {
     if (this.guildMap.has(guildID)) return this.guildMap.get(guildID);
-    const player = this.musicManager.create({
-      guild: guildID,
-      voiceChannel: channelID,
-      textChannel: textChannelID,
-      selfDeafen: true,
-      instaUpdateFiltersFix: true,
-    });
+    const player = this.musicManager.createPlayer({
+        guildId: guildID,
+        voiceChannelId: channelID,
+        textChannelId: textChannelID,
+        // optional configurations:
+        selfDeaf: true, 
+        selfMute: false, 
+        volume: 100
+    })
     player.connect();
     this.guildMap.set(guildID, player);
     return player;
@@ -100,7 +109,7 @@ export class MusicManager extends EventEmitter {
   disconnect(guildID: string) {
     const player = this.guildMap.get(guildID);
     if (!player) return;
-    player.destroy(true);
+    player.destroy();
     this.guildMap.delete(guildID);
   }
   queueSong(guildID: string, song: Track) {
@@ -108,7 +117,9 @@ export class MusicManager extends EventEmitter {
     if (!player) return undefined;
     //@ts-ignore
     player.queue.add(song);
-    if (!player.playing && !player.paused && !player.queue.size) {
+    console.log('Added song to queue', { song });
+    console.log(player.playing, player.paused, player.queue)
+    if (!player.playing && !player.paused && player.queue.tracks.length <= 1) {
       player.play();
       console.log('Requesting play');
       return true;
@@ -119,24 +130,27 @@ export class MusicManager extends EventEmitter {
   async removeQueuedSong(guildID: string, index: number) {
     const player = this.getGuildData(guildID);
     if (!player) return;
-    const song = player.queue[index];
+    const song = player.queue.splice(index, 1)[0] as Track;
     if (!song) return;
-    player.queue.remove(index);
     return song;
   }
 
   async search(query: string, requester: Member) {
-    const results = await this.musicManager.search(query, requester);
+    // get guild data
+    const guildPlayer = this.getGuildData(requester.guild.id);
+    if (!guildPlayer) return { error: true, message: 'Not connected to voice.' };
+    // search for song'
+    const results = await guildPlayer.search(query, requester);
     switch (results.loadType) {
-      case 'LOAD_FAILED':
+      case 'error':
         return { error: true, message: results.exception?.message };
-      case 'NO_MATCHES':
+      case 'empty':
         return { error: true, message: 'No results found.' };
-      case 'PLAYLIST_LOADED':
+      case 'playlist':
         return { error: false, tracks: results.tracks, type: 'playlist' };
-      case 'TRACK_LOADED':
+      case 'track':
         return { error: false, tracks: results.tracks, type: 'track' };
-      case 'SEARCH_RESULT':
+      case 'search':
         return { error: false, tracks: results.tracks, type: 'search' };
     }
   }
@@ -148,31 +162,31 @@ export class MusicManager extends EventEmitter {
       this.resume(guildID);
       return false;
     }
-    player.pause(true);
+    player.pause();
     return true;
   }
   async resume(guildID: string) {
     const player = this.getGuildData(guildID);
     if (!player) return null;
     if (!player.paused) return false;
-    player.pause(false);
+    player.resume();
     return true;
   }
   async skip(guildID: string) {
     const player = this.getGuildData(guildID);
     if (!player) return null;
     let track = player.queue.current;
-    player.stop();
+    player.skip();
     return track;
   }
   static getJSONOfTrack(track: UnresolvedTrack | Track) {
     const user = track.requester as User;
     return {
-      title: track.title,
-      url: track.uri,
-      duration: track.duration,
-      thumbnail: track.thumbnail,
-      author: track.author,
+      title: track.info.title,
+      url: track.info.uri,
+      duration: track.info.duration,
+      thumbnail: track.info.artworkUrl,
+      author: track.info.author,
       requestedBy: {
         id: user.id,
         username: user.username,

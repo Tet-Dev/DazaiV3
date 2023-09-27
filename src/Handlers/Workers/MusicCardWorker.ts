@@ -4,6 +4,7 @@ import * as imagescript from 'imagescript';
 //  '../../types/external/ImageScript';
 import nfetch from '../FixedNodeFetch';
 import Jimp from 'jimp';
+import sharp from 'sharp';
 import { readFileSync } from 'fs';
 const { Image } = imagescript;
 const inter400 = readFileSync('assets/fonts/inter/Inter-Regular.ttf');
@@ -51,12 +52,20 @@ async function generateBaseCard(data: {
   const { title, author, thumbnail, durationtxt } = data;
   const canvas = new Image(1024, 420);
   const imgBuffer = await nfetch(
-    `https://i.ytimg.com/vi/${thumbnail.match(/vi\/(.+?)\//)[1]}/hqdefault.jpg`
-  ).then(res => res.buffer());
+    thumbnail
+  ).then(res => res.buffer()).catch(er=>{console.log("Error fetching",er);null});
+  const processedBuffer = thumbnail.match(/\.webp/) ? await sharp(imgBuffer).jpeg().toBuffer() : imgBuffer;
   // console.log('Got thumbnail', data);
-  const img = (await imagescript.decode(imgBuffer)) as imagescript.Image;
+  const img = (await imagescript.decode(processedBuffer)) as imagescript.Image;
   // console.log('Decoded thumbnail', data);
-  img.crop(105, 45, 270, 270);
+  // img.resize(480, Image.RESIZE_AUTO);
+  // crop a square form the center
+  img.crop(
+    Math.floor((img.width - img.height) / 2),
+    0,
+    Math.min(img.width, img.height),
+    Math.min(img.width, img.height)
+  );
   const bgImg = img.clone();
   // console.log('Cloned thumbnail', data);
   bgImg.resize(1024, Image.RESIZE_AUTO);

@@ -110,7 +110,10 @@ console.log('Connecting...');
 bot.once('ready', () => {
   console.log('Ready!');
   server();
-  MusicManager.getInstance().musicManager.init(bot.user.id);
+  MusicManager.getInstance().musicManager.init({
+    username: bot.user.username,
+    id: bot.user.id,
+  });
   import(`./Handlers/Globals/VoteManager`).then((vm) => {
     vm.VoteManager.getInstance();
   });

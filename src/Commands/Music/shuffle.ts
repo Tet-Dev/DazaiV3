@@ -24,7 +24,7 @@ export const queue = {
     const res = await MusicManager.getInstance().getGuildData(
       interaction.guildID
     );
-    if (!res || !res.queue.length) {
+    if (!res || !res.queue.tracks.length) {
       return interaction.createMessage({
         embeds: [
           {

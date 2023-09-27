@@ -1,3 +1,4 @@
+import { Track } from 'lavalink-client/dist/types';
 import { MusicManager } from '../../../../Handlers/Music/MusicPlayer';
 import { RESTHandler, RESTMethods } from '../../../../types/misc';
 
@@ -32,14 +33,14 @@ export const getQueue = {
       return res.status(404).json({ error: 'No player found' });
     }
     if (track.type === 'playlist') {
-      track.tracks.map((t) => MusicManager.getInstance().queueSong(guildID, t));
+      track.tracks.map((t) => MusicManager.getInstance().queueSong(guildID, t as Track));
       return res.json({
         tracks: track.tracks.map(MusicManager.getJSONOfTrack),
       });
     }
     const playRes = MusicManager.getInstance().queueSong(
       guildID,
-      track.tracks[0]
+      track.tracks[0] as Track
     );
     if (playRes === undefined) {
       return res.status(400).json({ error: 'Bot is not connected to VC!' });

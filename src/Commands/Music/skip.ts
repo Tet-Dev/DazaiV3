@@ -25,7 +25,7 @@ export const skip = {
         embeds: [
           {
             title: 'Music Skipped',
-            description: `Skipped the current song, \`\`\`${res.title}\`\`\``,
+            description: `Skipped the current song, \`\`\`${res.info.title}\`\`\``,
             color: 16728385,
             thumbnail: {
               url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',

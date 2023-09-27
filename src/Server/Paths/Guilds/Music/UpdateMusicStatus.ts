@@ -26,7 +26,7 @@ export const getMusicStatus = {
     }
     if (paused) {
       MusicManager.getInstance().pause(guildID);
-      bot.createMessage(player.textChannel!, {
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Music Paused',
@@ -42,7 +42,7 @@ export const getMusicStatus = {
         ],
       });
     } else if (paused === false) {
-      bot.createMessage(player.textChannel!, {
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Music Resumed',
@@ -61,11 +61,11 @@ export const getMusicStatus = {
     }
     if (skip) {
       const skipSong = await MusicManager.getInstance().skip(guildID);
-      bot.createMessage(player.textChannel!, {
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Music Skipped',
-            description: `Skipped the current song, \`\`\`${skipSong?.title}\`\`\``,
+            description: `Skipped the current song, \`\`\`${skipSong?.info.title}\`\`\``,
             color: 16728385,
             thumbnail: {
               url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
@@ -78,7 +78,7 @@ export const getMusicStatus = {
       });
     }
     if (seekTo) {
-      bot.createMessage(player.textChannel!, {
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Music Seeked',
@@ -102,22 +102,22 @@ export const getMusicStatus = {
           error: 'Both removeSong (url) and removeSongIndex are required',
         });
       }
-      const song = player.queue[removeSongIndex];
+      const song = player.queue.tracks[removeSongIndex];
       if (!song) {
         return res.status(400).json({ error: 'Song not found' });
       }
-      if (song.uri !== removeSong) {
+      if (song.info.uri !== removeSong) {
         return res.status(400).json({ error: 'Song url mismatch' });
       }
       const removedSong = await MusicManager.getInstance().removeQueuedSong(
         guildID,
         removeSongIndex
       );
-      bot.createMessage(player.textChannel!, {
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Song Removed',
-            description: `Removed \`\`\`${removedSong?.title}\`\`\` from the queue.`,
+            description: `Removed \`\`\`${removedSong?.info.title}\`\`\` from the queue.`,
             color: 16728385,
             thumbnail: {
               url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
@@ -134,8 +134,8 @@ export const getMusicStatus = {
       if (!guilddata) {
         return res.status(404).json({ error: 'No player found' });
       }
-      guilddata.queue.clear();
-      bot.createMessage(player.textChannel!, {
+      guilddata.queue.splice(0, guilddata.queue.tracks.length);
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Queue Purged',
@@ -157,7 +157,7 @@ export const getMusicStatus = {
         return res.status(404).json({ error: 'No player found' });
       }
       MusicManager.getInstance().disconnect(guildID);
-      bot.createMessage(player.textChannel!, {
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Disconnected',
@@ -179,7 +179,7 @@ export const getMusicStatus = {
         return res.status(404).json({ error: 'No player found' });
       }
       MusicManager.getInstance().getGuildData(guildID)?.queue.shuffle();
-      bot.createMessage(player.textChannel!, {
+      bot.createMessage(player.textChannelId!, {
         embeds: [
           {
             title: 'Queue Shuffled',
