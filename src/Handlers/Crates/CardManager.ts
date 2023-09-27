@@ -6,6 +6,7 @@ const fileTypeFromBuffer = (
 
 import { decode, GIF } from 'imagescript';
 import { CardType } from '../../constants/cardNames';
+import sharp from 'sharp';
 function toBuffer(arrayBuffer: ArrayBuffer) {
   const buffer = Buffer.alloc(arrayBuffer.byteLength);
   const view = new Uint8Array(arrayBuffer);
@@ -66,14 +67,16 @@ export const createCard = async (
     img.resize(1024, 340);
     cardImageBuffer = toBuffer(await img.encode(type.ext === 'gif' ? 90 : 1));
   }
-
-  const fileLoc = `cards/${guildID}/${new ObjectID().toString()}.${type?.ext}`;
+  const webpBuffer = await sharp(cardImageBuffer,{
+    animated:true
+  }).webp().toBuffer()
+  const fileLoc = `cards/${guildID}/${new ObjectID().toString()}.webp`;
   const ibFile = imageBucket.file(fileLoc);
-  await ibFile.save(cardImageBuffer, {
+  await ibFile.save(webpBuffer, {
     gzip: true,
     resumable: false,
     metadata: {
-      contentType: type?.mime,
+      contentType: 'image/webp',
       cacheControl: 'public, max-age=31536000',
     },
   });
