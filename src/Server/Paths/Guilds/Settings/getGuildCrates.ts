@@ -8,7 +8,7 @@ export const getGuildCrates = {
   sendUser: true,
   run: async (req, res, next, user) => {
     const guildID = req.params.guildID;
-    const reveal = !!req.query.reveal;
+    let reveal = !!req.query.reveal;
     const crateArrData =
       await CrateManager.getInstance().getGuildCrateTemplates(guildID);
     let hasAdmin = true;
@@ -36,11 +36,11 @@ export const getGuildCrates = {
         if (!crate?.showDrops) {
           crate.items = [];
         }
-        if (!crate.showCrateDetails && !reveal) {
+        if (!crate.showCrateDetails) {
           crate.name = '???';
           crate.description = '???';
         }
-        if (!crate.showRates && !reveal) {
+        if (!crate.showRates) {
           crate.dropRates = {
             common: -1,
             rare: -1,
