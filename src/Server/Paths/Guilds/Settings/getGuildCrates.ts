@@ -36,11 +36,11 @@ export const getGuildCrates = {
         if (!crate?.showDrops) {
           crate.items = [];
         }
-        if (!crate.showCrateDetails) {
+        if (!crate.showCrateDetails && !reveal) {
           crate.name = '???';
           crate.description = '???';
         }
-        if (!crate.showRates) {
+        if (!crate.showRates && !reveal) {
           crate.dropRates = {
             common: -1,
             rare: -1,
