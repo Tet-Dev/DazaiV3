@@ -47,6 +47,42 @@ export const addReactionRole = async (
       (await bot.getRESTGuildMember(guild.id, bot.user.id)),
     roles
   );
+  if (!roles
+    .filter(
+      (role) =>
+        !role.managed &&
+        role.id !== interaction.guildID &&
+        role.position < botHighestRole.position
+    ).length ) {
+    await interaction.createMessage({
+      embeds: [
+        {
+          title: `# Error`,
+          description: `My highest role is below all possible roles. If you would like me to give/remove these roles, please either give me a higher role or move my highest role above these roles.\n
+                ${
+                  roles
+                    .filter(
+                      (role) =>
+                        role.position >= botHighestRole.position &&
+                        !role.managed
+                    )
+                    .map((role) => `<@&${role.id}>`)
+                    .join('\n') || 'None'
+                }
+                If you are unsure how to do this, please view the attached gif below.
+              `,
+          color: 16774289,
+          thumbnail: {
+            url: 'https://i.pinimg.com/736x/f8/37/17/f837175981662cb08c92bfee0be2a6be.jpg',
+          },
+          image: {
+            url: `https://cdn.discordapp.com/attachments/757863990129852509/1158186066625445958/output2.gif?ex=651b5454&is=651a02d4&hm=8efd86abb503267f19458a52775a9f0628754656ba61b2987dd7d0439a1f3153&`,
+          },
+        } as any,
+      ],
+    });
+    return;
+  }
   const cancelMsg = await interaction.createFollowup({
     embeds: [
       {
