@@ -40,6 +40,26 @@ export class MusicManager extends EventEmitter {
       this.musicManager.sendRawData(d);
       // console.log({ voiceState: d });
     });
+    bot.on('voiceChannelLeave', (member, channel) => {
+      if (member.id !== bot.user.id) return;
+      const player = this.guildMap.get(member.guild.id);
+      if (!player) return;
+      if (player.voiceChannelId === channel.id) {
+        this.disconnect(member.guild.id);
+        player.textChannelId && bot.createMessage(player.textChannelId,{
+          embeds: [
+            {
+              title: 'Disconnected',
+              description: `Bye! I have been removed from the voice channel! If you want me to join again, use the \`/connect\` command!`,
+              color: 4456364,
+              thumbnail: {
+                url: 'https://cdn.discordapp.com/attachments/757863990129852509/1044221426418331648/tumblr_o7fk7quWVh1shr9wko3_400.jpg',
+              },
+            },
+          ],
+        });
+      }
+    });
     // this.musicManager.on('nodeRaw', d => console.log(d));
     this.musicManager.nodeManager.on("connect", (node) => {
       console.log(`Node ${node.options.host} connected`);
