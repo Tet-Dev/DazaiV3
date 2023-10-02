@@ -11,6 +11,7 @@ import { MongoClient } from 'mongodb';
 import server from './Server/server';
 import { writeFileSync } from 'fs';
 import process from 'node:process';
+import { ReactionRoleManager } from './Handlers/Utilities/ReactionRoleManager';
 // import { VoteManager } from './Handlers/Globals/VoteManager';
 // import MusicHandler from './Handlers/Music/MusicMain';
 // import RankCardDrawer from './Handlers/Levelling/RankCardDrawer';
@@ -59,7 +60,8 @@ const recursivelyAddCommands = async (dir: string) => {
     }
     // add commands
     if (file.endsWith('.js') || file.endsWith('.ts')) {
-      const command = (await import(join(dir, file))).default as Command;
+      const command = (await import(join(dir, file)))?.default as Command;
+      if (!command) continue;
       SlashCommandHandler.getInstance().loadCommand(command);
       console.log(command.name, `loaded`);
     }
@@ -114,6 +116,7 @@ bot.once('ready', () => {
     username: bot.user.username,
     id: bot.user.id,
   });
+  ReactionRoleManager.getInstance().init(bot);
   import(`./Handlers/Globals/VoteManager`).then((vm) => {
     vm.VoteManager.getInstance();
   });

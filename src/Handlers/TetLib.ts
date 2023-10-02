@@ -1,4 +1,4 @@
-import Eris, { Member, Message, User } from 'eris';
+import Eris, { Member, Message, Role, User } from 'eris';
 import { ReducedMessage } from './Fun/MessageReader/SniperManager';
 export const TetLib = {
   sleep: (delay: number) =>
@@ -131,6 +131,19 @@ export const TetLib = {
       } as ReducedMessage;
     }
     return memObj as ReducedMessage;
+  },
+  getHighestRole: (member: Member, guildRoles: Map<string | number, Role>) => {
+    const roles = member.roles
+      .map((roleID) => guildRoles.get(roleID) || null)
+      .filter((x) => x) as Role[];
+
+    const highestRole = roles.reduce((prev, role) => {
+      if (role.position > prev.position) {
+        return role;
+      }
+      return prev;
+    });
+    return highestRole;
   },
 };
 export default TetLib;

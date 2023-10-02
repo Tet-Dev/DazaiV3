@@ -16,6 +16,7 @@ export enum AuditLogPreferenceKey {
   logShopEdits = 'logShopEdits',
   logShopPurchase = 'logShopPurchase',
   logImpactfulCommands = 'logImpactfulCommands',
+  logReactionRoleEdits = 'logReactionRoleEdits',
   logMemberJoins = 'logMemberJoins',
   logMemberLeaves = 'logMemberLeaves',
 }

@@ -89,6 +89,7 @@ export class SlashCommandHandler {
   }
 
   async onReady() {
+    this.devMode = env.devmode
     const create = this.devMode ? this.createDevCommand : this.createCommand;
 
     const cmdsList = this.devMode
