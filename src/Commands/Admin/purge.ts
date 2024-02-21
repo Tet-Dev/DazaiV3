@@ -1,4 +1,9 @@
-import Eris, { Constants, Embed, InteractionDataOptionsNumber } from 'eris';
+import Eris, {
+  Constants,
+  Embed,
+  InteractionDataOptionsNumber,
+  InteractionDataOptionsUser,
+} from 'eris';
 import { Command } from '../../types/misc';
 import TetLib from '../../Handlers/TetLib';
 import { AuditLogManager } from '../../Handlers/Auditor/AuditLogManager';
@@ -15,6 +20,12 @@ export const purge = {
       description: 'The number of messages to delete.',
       type: Constants.ApplicationCommandOptionTypes.NUMBER,
       required: true,
+    },
+    {
+      name: 'user',
+      description: 'The user to delete messages from.',
+      type: Constants.ApplicationCommandOptionTypes.USER,
+      required: false,
     },
   ],
   type: Constants.ApplicationCommandTypes.CHAT_INPUT,
@@ -37,6 +48,12 @@ export const purge = {
         'message_count'
       ) as InteractionDataOptionsNumber
     ).value;
+    const user = (
+      TetLib.findCommandParam(
+        interaction.data.options,
+        'user'
+      ) as InteractionDataOptionsUser
+    )?.value;
     // Check if user has permissions to manage messages in the channel
     const channel = interaction.channel as Eris.TextChannel;
     if (
@@ -63,6 +80,7 @@ export const purge = {
       limit: amount,
       reason: `Purged by ${interaction.member?.user.username}#${interaction.member?.user.discriminator}`,
       filter: (msg) => {
+        if (user && msg.author.id !== user) return false;
         // only delete messages if they are less than 14 days old
         if (Date.now() - msg.timestamp < 1209600000) {
           return true;
