@@ -77,12 +77,20 @@ export const getLeaderboard = {
     const cardMap = new Map<string, CardType>();
     allGuildCards.forEach((x) => cardMap.set(x._id.toString(), x));
     allGlobalCards.forEach((x) => cardMap.set(x._id.toString(), x));
+    console.log(
+      'leaderboard timing fetch cardMap',
+      Date.now() - fetchTime,
+      allGuildCards
+    );
     // console.log('leaderboard timing fetch prefs', Date.now() - fetchTime);
     // fetchTime = Date.now();
     const selectionPrefs = new Map<string, string>();
-    getAllUsersWithSelectionPrefs.forEach(
-      (x) => x.selectedCard && selectionPrefs.set(x.userID, x.selectedCard)
-    );
+    getAllUsersWithSelectionPrefs.forEach((x) => {
+      if (x.selectedCard) {
+        let card = x.cards.find((y) => y.id === x.selectedCard);
+        selectionPrefs.set(x.userID, card?.cardID ?? '');
+      }
+    });
 
     let resultMap = await Promise.all(
       leaderboard.map(async (xp) => {
@@ -115,7 +123,8 @@ export const getLeaderboard = {
             banner: user?.banner,
             color: user?.accentColor,
           },
-          card: card,
+          sel: selectionPrefs.get(xp.userID)!,
+          card: card?.url,
         };
       })
     );
