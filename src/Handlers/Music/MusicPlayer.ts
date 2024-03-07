@@ -37,7 +37,7 @@ export class MusicManager extends EventEmitter {
     // this.musicManager.createNode(env.LavalinkNodes[0]);
     bot.on('rawWS', (d) => {
       // if (!['VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE'].includes(d.t!)) return;
-      this.musicManager.sendRawData(d);
+      this.musicManager.sendRawData(d as any);
       // console.log({ voiceState: d });
     });
     bot.on('voiceChannelLeave', (member, channel) => {
