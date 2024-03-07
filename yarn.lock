@@ -7463,10 +7463,10 @@ last-call-webpack-plugin@^3.0.0:
     lodash "^4.17.5"
     webpack-sources "^1.1.0"
 
-lavalink-client@^1.1.20:
-  version "1.1.20"
-  resolved "https://registry.yarnpkg.com/lavalink-client/-/lavalink-client-1.1.20.tgz#f3d35fe241783e743ccd3b1d1f17dd0acb056f43"
-  integrity sha512-WCfDjVNzVUwIlTbQ9wLFowgsoCptnQUmWNczqnmCnZgopQKwp1mDVeYHbAtkXBxLyqdVyM7IiY0hWNI2u2n1yg==
+lavalink-client@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/lavalink-client/-/lavalink-client-2.1.4.tgz#aaa08465083b25ed03967ce6ead580e40877eb73"
+  integrity sha512-z0NGMidYRVjFBEZ9GANnNRfHXPHYtiMFr2EF2bseDtwQzu+XosaFDiTaKfQq/YjN1asElo3RoR6WmcQlG5lLnA==
   dependencies:
     undici "^5.23.0"
     ws "^8.13.0"

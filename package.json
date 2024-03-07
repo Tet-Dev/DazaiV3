@@ -52,7 +52,7 @@
     "imagescript": "Tet-Dev/Imagescript",
     "into-stream": "6.0.0",
     "jimp": "^0.16.1",
-    "lavalink-client": "^1.1.20",
+    "lavalink-client": "^2.1.4",
     "mongodb": "^4.13.0",
     "mysql2": "^3.3.2",
     "node-fetch": "2.6.7",

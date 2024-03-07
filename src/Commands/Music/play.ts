@@ -42,6 +42,7 @@ export const play = {
       return interaction.createMessage('This is a guild only command!');
     const start = Date.now();
     const player = MusicManager.getInstance().getGuildData(interaction.guildID);
+    
     if (!player) {
       // get interaction member voice channel
       // if not in voice channel, return
@@ -178,11 +179,14 @@ export const play = {
         ],
       });
     }
-    if (!songs|| !songs?.tracks?.length) {
+    if (!songs || !songs?.tracks?.length) {
       return interaction.createFollowup({
         embeds: [
           {
-            title: `No songs found for \`${(interaction.data.options[0] as InteractionDataOptionsString).value}\``,
+            title: `No songs found for \`${
+              (interaction.data.options[0] as InteractionDataOptionsString)
+                .value
+            }\``,
             description: `Try using a different search term!`,
             color: 16728385,
             thumbnail: {
@@ -202,9 +206,11 @@ export const play = {
           fields: results.map((track) => {
             return {
               name: track.info.title,
-              value: `🕓 ${msToReadable(track.info.duration || 0)}  [「 Video Link 」](${
-                track.info.uri
-              })\n👤 ${track.info.author}`,
+              value: `🕓 ${msToReadable(
+                track.info.duration || 0
+              )}  [「 Video Link 」](${track.info.uri})\n👤 ${
+                track.info.author
+              }`,
             };
           }),
           thumbnail: {
@@ -222,7 +228,10 @@ export const play = {
               placeholder: 'Select a song',
               options: results.map((track, i) => {
                 return {
-                  label: `${track.info.title} | ${track.info.author}`.substring(0, 100),
+                  label: `${track.info.title} | ${track.info.author}`.substring(
+                    0,
+                    100
+                  ),
                   value: i.toString(),
                 };
               }),
