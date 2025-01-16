@@ -75,7 +75,20 @@ export class MusicManager extends EventEmitter {
     });
     this.musicManager.on('trackStart', async (player, track) => {
       console.log('Track started', { track });
+
       if (player.textChannelId) {
+        if (!track) {
+          bot.createMessage(player.textChannelId, {
+            embeds: [
+              {
+                title: 'No track found',
+                description: 'The track was not found. Please try again.',
+                color: 16711680,
+              },
+            ],
+          });
+          return;
+        }
         const card = await MusicCardManager.getInstance().getUpNextImage(track);
         if (!card) return;
         const text = bot.getChannel(player.textChannelId) as TextChannel;
