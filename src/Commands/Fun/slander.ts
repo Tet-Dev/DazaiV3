@@ -141,17 +141,33 @@ export const slander = {
     if (slanderData && (env as any).imgbbApiKey) {
       // If the GIF is larger than 24MB, upload it to imgbb and send it as a URL-encoded response
       if (slanderData.buffer.byteLength > 24 * 1024 * 1024) {
-        const path = `slanders/${Date.now()}-${interaction.id}.gif`
+        const path = `slanders/${Date.now()}-${interaction.id}.gif`;
         const upfile = await storagePromise
           .bucket('assets.dazai.app')
-          .file(path);
-        await upfile.save(Buffer.from(slanderData.buffer), {
-          contentType: 'image/gif',
-          metadata: {
-            cacheControl: 'public, max-age=31536000',
-          },
-        });
-        
+          .file(path)
+        console.log(`Uploading slander to ${path}`);
+        // Upload the GIF to the storage bucket
+        await upfile
+          .save(Buffer.from(slanderData.buffer), {
+            contentType: 'image/gif',
+            metadata: {
+              cacheControl: 'public, max-age=31536000',
+            },
+          })
+          .catch((err) => {
+            console.error('Error uploading slander:', err);
+            return interaction.createFollowup({
+              embeds: [
+                {
+                  title: `Error uploading slander`,
+                  description: `There was an error uploading the slander GIF. Please try again later.`,
+                  color: 16728385,
+                },
+              ],
+            });
+          });
+        console.log(`Uploaded slander to ${path}`);
+
         // const data = await nfetch(
         //   //@ts-ignore
         //   `https://api.imgbb.com/1/upload?key=${env.imgbbApiKey}`,
