@@ -30,7 +30,7 @@ import * as intoStream from 'into-stream';
 
 const dazaiPFPPromise = new Promise(async (res) => {
   const dazaiPFP = await nfetch(
-    `https://cdn.discordapp.com/attachments/757863990129852509/1086049836794662972/dazai-1.png`
+    `https://cdn.discordapp.com/avatars/755260934699745441/9cf4c572e99f9e5af6da1e3ee4a436dc.png?size=1024`
   );
   const dazaiPFPBuffer = await dazaiPFP.buffer();
   const dazaiPFPImage = (await imagescript.decode(
