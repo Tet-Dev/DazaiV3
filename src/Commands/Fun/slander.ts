@@ -8,6 +8,7 @@ import {
 } from '../../Handlers/Fun/Slander/SlanderManager';
 import TetLib from '../../Handlers/TetLib';
 import { Command } from '../../types/misc';
+import storagePromise from '../../Server/Utils/storagePromise';
 
 // Map to keep track of the cooldown of the "slander" command for each user
 const slanderCooldowns = new Map<string, number>();
@@ -140,29 +141,40 @@ export const slander = {
     if (slanderData && (env as any).imgbbApiKey) {
       // If the GIF is larger than 24MB, upload it to imgbb and send it as a URL-encoded response
       if (slanderData.buffer.byteLength > 24 * 1024 * 1024) {
-        const data = await nfetch(
-          //@ts-ignore
-          `https://api.imgbb.com/1/upload?key=${env.imgbbApiKey}`,
-          {
-            method: 'POST',
-            body: `image=${encodeURIComponent(
-              Buffer.from(slanderData.buffer).toString('base64')
-            )}`,
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          }
-        ).then((x) => {
-          console.log(x.status);
-          return x.json();
+        const path = `slanders/${Date.now()}-${interaction.id}.gif`
+        const upfile = await storagePromise
+          .bucket('assets.dazai.app')
+          .file(path);
+        await upfile.save(Buffer.from(slanderData.buffer), {
+          contentType: 'image/gif',
+          metadata: {
+            cacheControl: 'public, max-age=31536000',
+          },
         });
-        console.log(data);
+        
+        // const data = await nfetch(
+        //   //@ts-ignore
+        //   `https://api.imgbb.com/1/upload?key=${env.imgbbApiKey}`,
+        //   {
+        //     method: 'POST',
+        //     body: `image=${encodeURIComponent(
+        //       Buffer.from(slanderData.buffer).toString('base64')
+        //     )}`,
+        //     headers: {
+        //       'Content-Type': 'application/x-www-form-urlencoded',
+        //     },
+        //   }
+        // ).then((x) => {
+        //   console.log(x.status);
+        //   return x.json();
+        // });
+        // console.log(data);
         return interaction.createFollowup({
           embeds: [
             {
               color: 16728385,
               image: {
-                url: data.data.url,
+                url: `https://assets.dazai.app/${path}`,
               },
             },
           ],
