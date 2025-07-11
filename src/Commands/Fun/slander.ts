@@ -139,8 +139,8 @@ export const slander = {
 
     // If the slander GIF is successfully generated, send it as a response to the command input
     if (slanderData && (env as any).google) {
-      // If the GIF is larger than 24MB, upload it to imgbb and send it as a URL-encoded response
-      if (slanderData.buffer.byteLength > 24 * 1024 * 1024) {
+      // If the GIF is larger than 10MB, upload it to imgbb and send it as a URL-encoded response
+      if (slanderData.buffer.byteLength > 10 * 1024 * 1024) {
         const path = `slanders/${Date.now()}-${interaction.id}.gif`;
         const upfile = await storagePromise
           .bucket('assets.dazai.app')
